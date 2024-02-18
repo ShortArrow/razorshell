@@ -6,18 +6,17 @@ This is browser extension add keyboard shortcut link bash shell.
 
 |Implemented|Shortcut|Description|
 | --- | --- | --- |
-|x| `Ctrl`+`a` | Move to the start of the line |
-|-| `Ctrl`+`b` ||
-|-| `Ctrl`+`c` ||
-|-| `Ctrl`+`d` ||
-|-| `Ctrl`+`d` ||
-|x| `Ctrl`+`e` | Move to the end of the line |
-|-| `Ctrl`+`f` ||
+|✅| `Ctrl`+`a` | Move to the start of the line |
+|-| `Ctrl`+`b` | Move back one character |
+|-| `Ctrl`+`c` | Exit from the text box |
+|-| `Ctrl`+`d` | Delete character under the cursor |
+|✅| `Ctrl`+`e` | Move to the end of the line |
+|-| `Ctrl`+`f` | Move forward one character |
 |-| `Ctrl`+`g` ||
-|-| `Ctrl`+`h` ||
+|-| `Ctrl`+`h` | Delete character before the cursor |
 |-| `Ctrl`+`i` ||
 |-| `Ctrl`+`j` ||
-|-| `Ctrl`+`k` ||
+|-| `Ctrl`+`k` | Delete from the cursor to the end of the line |
 |-| `Ctrl`+`l` ||
 |-| `Ctrl`+`m` ||
 |-| `Ctrl`+`n` ||
@@ -27,12 +26,11 @@ This is browser extension add keyboard shortcut link bash shell.
 |-| `Ctrl`+`r` ||
 |-| `Ctrl`+`s` ||
 |-| `Ctrl`+`t` ||
-|-| `Ctrl`+`u` ||
-|-| `Ctrl`+`u` ||
+|-| `Ctrl`+`u` | Delete from the cursor to the start of the line |
 |-| `Ctrl`+`v` ||
-|-| `Ctrl`+`w` ||
+|-| `Ctrl`+`w` | Delete from the cursor to the start of the line |
 |-| `Ctrl`+`x` ||
-|-| `Ctrl`+`y` ||
+|-| `Ctrl`+`y` | Paste the yanked text at the cursor |
 |-| `Ctrl`+`z` ||
 |-| `Ctrl`+`\` ||
 |-| `Ctrl`+`[` ||
@@ -41,3 +39,7 @@ This is browser extension add keyboard shortcut link bash shell.
 |-| `Ctrl`+`?` ||
 |-| `Ctrl`+`@` ||
 |-| `Ctrl`+`Space` ||
+
+- configurable url allow list
+- configurable url deny list
+- changeable allow list mode or deny list mode
