@@ -35,3 +35,7 @@ export function showUrls(): Promise<string[]> {
     });
   });
 }
+
+// todo: swap allowlist/denylist
+// todo: zod for validation
+// todo: use dictionary for allowlist/denylist
