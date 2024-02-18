@@ -5,11 +5,9 @@
     "description": "Enhances text boxes with custom keyboard shortcuts.",
     "permissions": [
       "activeTab",
-      "scripting"
+      "scripting",
+      "storage"
     ],
-    "background": {
-      "service_worker": "background.js"
-    },
     "content_scripts": [
       {
         "matches": ["<all_urls>"],
