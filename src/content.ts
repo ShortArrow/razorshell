@@ -18,14 +18,21 @@ if (textInputs.length === 0) {
       if (event.ctrlKey && event.key === 'a') {
         event.preventDefault(); // cancel default action
         console.log('ctrl+a');
-        textinput.setSelectionRange(0, 0); // テキストボックスの先頭にカーソルを移動
+        textinput.setSelectionRange(0, 0); // set the cursor to the beginning of the text
       }
-      // Ctrl + Eが押された場合
       else if (event.ctrlKey && event.key === 'e') {
-        event.preventDefault(); // デフォルトのイベントをキャンセル
+        event.preventDefault(); // cancel default action
         console.log('ctrl+e');
-        const end = textinput.value.length; // テキストボックスの文字数を取得
-        textinput.setSelectionRange(end, end); // テキストボックスの末尾にカーソルを移動
+        const end = textinput.value.length; // get the end position of the text
+        textinput.setSelectionRange(end, end); // set the cursor to the end of the text
+      }
+      else if (event.ctrlKey && event.key === 'k') {
+        event.preventDefault(); // cancel default action
+        console.log('ctrl+w');
+        const cursor = textinput.selectionEnd; // get the end position of the selected text
+        if (cursor == null || cursor === 0) return; // do nothing if the cursor is at the beginning
+        const text = textinput.value.slice(0, cursor); // get the text before the cursor
+        textinput.value = text; // set the text before the cursor
       }
     });
   });
