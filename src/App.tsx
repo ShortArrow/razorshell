@@ -1,35 +1,38 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react';
+import { saveUrl, showUrls } from './urllist';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [urls, setUrls] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchUrls = async () => {
+      setUrls(await showUrls());
+    };
+    fetchUrls();
+  }, []);
 
   return (
     <>
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <div>
+          {
+            urls.map((url, index) => {
+              return <div key={index}>{url}</div>;
+            })
+          }
+        </div>
+        <div>
+          <input type="text" id="url" />
+          <button onClick={() => {
+            const url = (document.getElementById('url') as HTMLInputElement).value;
+            saveUrl([url]);
+            setUrls([...urls, url]);
+          }}>add url</button>
+        </div>
+
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
