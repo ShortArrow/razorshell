@@ -2,9 +2,14 @@ import { expect, test } from "vitest";
 import { cursor } from "../src/cursor";
 
 test("moveCursorToBeginning", () => {
-  const target = "hello world new order";
+  const target = "hello world new order top of the world";
   const actual = cursor.getTopOfWord(target, 9);
-  // todo update input arg current index
+  expect(actual).toBe(7);
+  const actual = cursor.getTopOfWord(target, 2);
+  expect(actual).toBe(1);
+  const actual = cursor.getTopOfWord(target, 11);
+  expect(actual).toBe(7);
+  const actual = cursor.getTopOfWord(target, 12);
   expect(actual).toBe(7);
 });
 test("split", () => {
