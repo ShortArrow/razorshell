@@ -6,20 +6,45 @@ test("moveCursorToBeginning of world", () => {
   const actual = cursor.getTopOfWord(target, 9);
   expect(actual).toBe(7);
 });
-test("moveCursorToBeginning of new", () => {
+test("hello world ne", () => {
   const target = "hello world new order";
   const actual = cursor.getTopOfWord(target, 14);
   expect(actual).toBe(13);
 });
-test("moveCursorToBeginning of new", () => {
+test("hello world n", () => {
   const target = "hello world new order";
   const actual = cursor.getTopOfWord(target, 13);
   expect(actual).toBe(13);
 });
-test("moveCursorToBeginning of new", () => {
+test("hello world new", () => {
   const target = "hello world new order";
   const actual = cursor.getTopOfWord(target, 15);
   expect(actual).toBe(13);
+});
+test("h", () => {
+  const target = "hello world new order";
+  const actual = cursor.getTopOfWord(target, 1);
+  expect(actual).toBe(1);
+});
+test("_", () => {
+  const target = "hello world new order";
+  const actual = cursor.getTopOfWord(target, 0);
+  expect(actual).toBe(1);
+});
+test("hello", () => {
+  const target = "hello world new order";
+  const actual = cursor.getTopOfWord(target, 5);
+  expect(actual).toBe(1);
+});
+test("hello_", () => {
+  const target = "hello world new order";
+  const actual = cursor.getTopOfWord(target, 6);
+  expect(actual).toBe(1);
+});
+test("hello w", () => {
+  const target = "hello world new order";
+  const actual = cursor.getTopOfWord(target, 7);
+  expect(actual).toBe(7);
 });
 test("split", () => {
   const target = "hello world new order";
