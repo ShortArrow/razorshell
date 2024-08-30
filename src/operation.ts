@@ -4,6 +4,7 @@ export interface Keymap {
   key: string;
   alt?: boolean;
   ctrl?: boolean;
+  shift?: boolean;
 }
 
 export const operation = {
