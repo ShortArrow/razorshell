@@ -2,45 +2,47 @@
 
 This is browser extension add keyboard shortcut link bash shell.
 
->> This is a work in progress. It is not ready for use. 🚧
+> This is a work in progress. It is not ready for use. 🚧
 
 ## Features
 
-|Implemented|Shortcut|Description|
-| --- | --- | --- |
-|✅| `Ctrl`+`a` | Move to the start of the line |
-|🚧| `Ctrl`+`b` | Move back one character |
-|🚧| `Ctrl`+`c` | Exit from the text box |
-|🚧| `Ctrl`+`d` | Delete character under the cursor |
-|✅| `Ctrl`+`e` | Move to the end of the line |
-|🚧| `Ctrl`+`f` | Move forward one character |
-|-| `Ctrl`+`g` ||
-|🚧| `Ctrl`+`h` | Delete character before the cursor |
-|-| `Ctrl`+`i` ||
-|-| `Ctrl`+`j` ||
-|🚧| `Ctrl`+`k` | Delete from the cursor to the end of the line |
-|-| `Ctrl`+`l` ||
-|-| `Ctrl`+`m` ||
-|-| `Ctrl`+`n` ||
-|-| `Ctrl`+`o` ||
-|-| `Ctrl`+`p` ||
-|-| `Ctrl`+`q` ||
-|-| `Ctrl`+`r` ||
-|-| `Ctrl`+`s` ||
-|-| `Ctrl`+`t` ||
-|🚧| `Ctrl`+`u` | Delete from the cursor to the start of the line |
-|-| `Ctrl`+`v` ||
-|🚧| `Ctrl`+`w` | Delete from the cursor to the start of the line |
-|-| `Ctrl`+`x` ||
-|🚧| `Ctrl`+`y` | Paste the yanked text at the cursor |
-|-| `Ctrl`+`z` ||
-|-| `Ctrl`+`\` ||
-|-| `Ctrl`+`[` ||
-|-| `Ctrl`+`]` ||
-|-| `Ctrl`+`_` ||
-|-| `Ctrl`+`?` ||
-|-| `Ctrl`+`@` ||
-|-| `Ctrl`+`Space` ||
+<!-- markdownlint-disable md013 -->
 
+| Shortcut                | Description                                     |
+| ----------------------- | ----------------------------------------------- |
+| `Ctrl` + `a`            | Go to start of line                             |
+| `Ctrl` + `b`            | Go backward character                           |
+| `Ctrl` + `c`            | Exit text box                                   |
+| ~~`Ctrl` + `d`~~        | Delete character                                |
+| `Ctrl` + `e`            | Go to end of line                               |
+| `Ctrl` + `f`            | Go forward character                            |
+| ~~`Ctrl` + `h`~~        | backspace                                       |
+| `Ctrl` + `k`            | kill line                                       |
+| `Ctrl` + `l`            | clear screen                                    |
+| `Ctrl` + `p`            | previous history                                |
+| `Ctrl` + `r`            | reverse search history                          |
+| ~~`Ctrl` + `t`~~        | transpose characters                            |
+| `Ctrl` + `u`            | Delete from the cursor to the start of the line |
+| ~~`Ctrl` + `w`~~        | Delete character before                         |
+| `Ctrl` + `y`            | Paste the yanked                                |
+| `Ctrl` + `\`            |                                                 |
+| `Ctrl` + `[`            |                                                 |
+| `Ctrl` + `]`            | character search                                |
+| `Ctrl` + `_`            | Redo                                            |
+| `Ctrl` + `?`            |                                                 |
+| `Ctrl` + `@`            |                                                 |
+| `Ctrl` + `Space`        |                                                 |
+| `Alt` + `f` (`Esc`,`f`) | Go forward word                                 |
+| `Alt` + `b` (`Esc`,`b`) | Go backward word                                |
+| `Alt` + `p`             | non incremental reverse serch history           |
+| `Alt` + `u`             | up case word                                    |
+| `Alt` + `l`             | down case word                                  |
+| `Alt` + `d`             | kill word                                       |
+| `Alt` + `c`             | change to capital                               |
+| `Alt` + `.`             | yank last arg                                   |
+
+<!-- markdownlint-enable md013 -->
+
+- [⛔] Browser tab-related shortcuts are reserved and cannot be overwritten
 - [🚧] URL allow/deny list
   - changeable allow list mode or deny list mode
