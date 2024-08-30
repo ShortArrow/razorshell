@@ -1,9 +1,10 @@
 import { Keymap, operation } from "./operation";
 
 export function keymaching(event: KeyboardEvent, key: Keymap): boolean {
-  key.ctrl = key.ctrl ?? false;
-  event.ctrlKey = event.ctrlKey ?? false;
-  return true;
+  if (key.ctrl == true && event.ctrlKey) return true;
+  if (key.alt == true && event.altKey) return true;
+  if (key.shift == true && event.shiftKey) return true;
+  return false;
 }
 
 export const defaultKeymap: Keymap[] = [

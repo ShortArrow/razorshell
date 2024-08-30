@@ -8,7 +8,13 @@ const vitestConfig = defineConfig({
     coverage: {
       include: ["src/**/*.{ts,tsx}", "tests/vitest/**/*.{ts,tsx}"],
     },
-    exclude: ["**/node_modules/**", "**/dist/**", "**/cypress/**", "tests/playwright/**"],
+    exclude: [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/cypress/**",
+      "tests/playwright/**",
+    ],
+    environment: "jsdom",
   },
 });
 
