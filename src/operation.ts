@@ -50,8 +50,8 @@ export const operation = {
   moveCursorToTopOfWord(textinput: HTMLInputElement) {
     const position = textinput.selectionEnd; // get the cursor position
     if (position == null || position == 0) return;
-    const text = textinput.value.slice(0, position ?? 0); // get the text before the cursor
-    const previous = cursor.getTopOfWord(text, position); // get word top
+    const text = textinput.value.slice(0, position); // get the text before the cursor
+    const previous = cursor.getTopOfWord(text, position) - 1; // get word top
     textinput.setSelectionRange(previous, previous); // move cursor word top
   },
 };
