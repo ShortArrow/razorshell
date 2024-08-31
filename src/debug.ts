@@ -4,7 +4,7 @@ function logKey(event: KeyboardEvent) {
   ss += event.altKey ? "alt+" : "";
   ss += event.shiftKey ? "shift+" : "";
   ss += event.key;
-  console.log(`key: ${ss}`);
+  console.debug(`key: ${ss}`);
 }
 
 export const debug = {

@@ -1,10 +1,27 @@
 import { Keymap, operation } from "./operation";
 
 export function keymaching(event: KeyboardEvent, key: Keymap): boolean {
-  if (key.ctrl == true && event.ctrlKey) return true;
-  if (key.alt == true && event.altKey) return true;
-  if (key.shift == true && event.shiftKey) return true;
-  return false;
+  let result = true;
+  if (key.ctrl === true) {
+    result &&= event.ctrlKey == true;
+  }
+  else {
+    result &&= event.ctrlKey == false;
+  }
+  if (key.alt === true) {
+    result &&= event.altKey == true
+  }
+  else {
+    result &&= event.altKey == false;
+  }
+  if (key.shift === true) {
+    result &&= event.shiftKey == true;
+  }
+  else {
+    result &&= event.shiftKey == false;
+  }
+  result &&= key.key == event.key;
+  return result;
 }
 
 export const defaultKeymap: Keymap[] = [

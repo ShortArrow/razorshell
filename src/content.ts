@@ -18,6 +18,7 @@ function keyEventHandling(event: KeyboardEvent, textinput: HTMLInputElement) {
     if (!keymaching(event, keymap)) {
       return;
     }
+    console.debug("key matched");
     event.preventDefault(); // cancel default action
     keymap.operation(textinput);
   });
