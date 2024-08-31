@@ -1,11 +1,9 @@
-import { Keymap } from "./operation";
-
-function logKey(keymap: Keymap) {
+function logKey(event: KeyboardEvent) {
   let ss = "";
-  ss += keymap.ctrl ? "ctrl+" : "";
-  ss += keymap.alt ? "alt+" : "";
-  ss += keymap.shift ? "shift+" : "";
-  ss += keymap.key;
+  ss += event.ctrlKey ? "ctrl+" : "";
+  ss += event.altKey ? "alt+" : "";
+  ss += event.shiftKey ? "shift+" : "";
+  ss += event.key;
   console.log(`key: ${ss}`);
 }
 

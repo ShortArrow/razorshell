@@ -13,8 +13,8 @@ const query = [
 const textInputs = document.querySelectorAll<HTMLInputElement>(query);
 
 function keyEventHandling(event: KeyboardEvent, textinput: HTMLInputElement) {
+  debug.logKey(event);
   defaultKeymap.forEach((keymap) => {
-    debug.logKey(keymap);
     if (!keymaching(event, keymap)) {
       return;
     }
