@@ -67,4 +67,10 @@ export const defaultKeymap: Keymap[] = [
     alt: true,
     key: "b",
   },
+  {
+    label: "delete to the beginning of the line",
+    operation: operation.deleteToTOL,
+    ctrl: true,
+    key: "u",
+  },
 ];

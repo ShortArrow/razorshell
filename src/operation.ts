@@ -19,6 +19,7 @@ export const operation = {
     textinput.setSelectionRange(end, end);
   },
   deleteToEOL(textinput: HTMLInputElement) {
+    console.debug("deleteToEOL");
     // get the end position of the selected text
     const cursor = textinput.selectionEnd;
     // do nothing if the cursor is at the beginning
@@ -27,6 +28,13 @@ export const operation = {
     const text = textinput.value.slice(0, cursor);
     // set the text before the cursor
     textinput.value = text;
+  },
+  deleteToTOL(textinput: HTMLInputElement) {
+    const cursor = textinput.selectionStart;// get the cursor position
+    if (cursor == null) return; // do nothing if the cursor is at the end
+    const text = textinput.value.slice(cursor); // get the text after the cursor
+    textinput.value = text; // set the text
+    textinput.setSelectionRange(0, 0); // set the cursor to the beginning
   },
   moveCursorToNextChar(textinput: HTMLInputElement) {
     // get the cursor position
