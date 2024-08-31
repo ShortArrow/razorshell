@@ -9,68 +9,47 @@ export interface Keymap {
 
 export const operation = {
   moveCursorToBeginning(textinput: HTMLInputElement) {
-    // set the cursor to the beginning of the text
-    textinput.setSelectionRange(0, 0);
+    textinput.setSelectionRange(0, 0); // set cursor to beginning
   },
   moveCursorToEnd(textinput: HTMLInputElement) {
-    // get the end position of the text
-    const end = textinput.value.length;
-    // set the cursor to the end of the text
-    textinput.setSelectionRange(end, end);
+    const end = textinput.value.length; // get text length
+    textinput.setSelectionRange(end, end); // set cursor to end
   },
   deleteToEOL(textinput: HTMLInputElement) {
     console.debug("deleteToEOL");
-    // get the end position of the selected text
-    const cursor = textinput.selectionEnd;
-    // do nothing if the cursor is at the beginning
-    if (cursor == null || cursor === 0) return;
-    // get the text before the cursor
-    const text = textinput.value.slice(0, cursor);
-    // set the text before the cursor
-    textinput.value = text;
+    const cursor = textinput.selectionEnd; // get position
+    if (cursor == null) return; // do nothing if cursor is null
+    const text = textinput.value.slice(0, cursor); // get text before cursor
+    textinput.value = text; // set the text
   },
   deleteToTOL(textinput: HTMLInputElement) {
-    const cursor = textinput.selectionStart;// get the cursor position
-    if (cursor == null) return; // do nothing if the cursor is at the end
-    const text = textinput.value.slice(cursor); // get the text after the cursor
+    const cursor = textinput.selectionStart; // get position
+    if (cursor == null) return; // do nothing if cursor is null
+    const text = textinput.value.slice(cursor); // get text after the cursor
     textinput.value = text; // set the text
-    textinput.setSelectionRange(0, 0); // set the cursor to the beginning
+    textinput.setSelectionRange(0, 0); // set cursor to beginning
   },
   moveCursorToNextChar(textinput: HTMLInputElement) {
-    // get the cursor position
-    const cursor = textinput.selectionEnd;
-    // do nothing if the cursor is at the end
-    if (cursor == null || cursor === textinput.value.length) return;
-    // set the cursor to the next character
-    textinput.setSelectionRange(cursor + 1, cursor + 1);
+    const cursor = textinput.selectionEnd; // get position
+    if (cursor == null || cursor === textinput.value.length) return; // do nothing if cursor is end
+    textinput.setSelectionRange(cursor + 1, cursor + 1); // move cursor forward
   },
   moveCursorToPreviousChar(textinput: HTMLInputElement) {
-    // get the cursor position
-    const cursor = textinput.selectionEnd;
-    // do nothing if the cursor is at the beginning
-    if (cursor == null || cursor === 0) return;
-    // set the cursor to the previous character
-    textinput.setSelectionRange(cursor - 1, cursor - 1);
+    const cursor = textinput.selectionEnd; // get position
+    if (cursor == null || cursor === 0) return; // do nothing if the cursor is beginning
+    textinput.setSelectionRange(cursor - 1, cursor - 1); // move cursor backward
   },
-  moveCursorToNextWord(textinput: HTMLInputElement) {
-    // get the cursor position
-    const cursor = textinput.selectionEnd;
-    // get the text after the cursor
-    const text = textinput.value.slice(cursor ?? 0);
-    // get the next word position
-    const next = text.search(/\w\s/);
-    // set the cursor to the next word
-    textinput.setSelectionRange(cursor ?? 0 + next + 1, cursor ?? 0 + next + 1);
+  moveCursorToEndOfWord(textinput: HTMLInputElement) {
+    const cursor = textinput.selectionEnd; // get position
+    const text = textinput.value.slice(cursor ?? 0); // get the text after the cursor
+    const next = text.search(/\w\s/); // get word end
+    textinput.setSelectionRange(cursor ?? 0 + next + 1, cursor ?? 0 + next + 1); // move cursor word end
   },
   moveCursorToTopOfWord(textinput: HTMLInputElement) {
-    // get the cursor position
-    const cursor = textinput.selectionEnd;
+    const cursor = textinput.selectionEnd; // get the cursor position
     if (cursor == null || cursor == 0) return;
-    // get the text before the cursor
-    const text = textinput.value.slice(0, cursor ?? 0);
-    // get the previous word position
-    const previous = text.search(/\s\w/);
-    // set the cursor to the previous word
-    textinput.setSelectionRange(cursor ?? 0 - previous, cursor ?? 0 - previous);
+    const text = textinput.value.slice(0, cursor ?? 0); // get the text before the cursor
+    const previous = text.search(/\s\w/); // get word top
+    textinput.setSelectionRange(cursor ?? 0 - previous, cursor ?? 0 - previous); // move cursor word top
   },
 };
