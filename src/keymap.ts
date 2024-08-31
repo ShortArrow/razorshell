@@ -57,7 +57,7 @@ export const defaultKeymap: Keymap[] = [
   },
   {
     label: "move cursor to the next word",
-    operation: operation.moveCursorToNextWord,
+    operation: operation.moveCursorToEndOfWord,
     alt: true,
     key: "f",
   },
