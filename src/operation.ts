@@ -1,3 +1,5 @@
+import { cursor } from "./cursor";
+
 export interface Keymap {
   label: string;
   operation: (textinput: HTMLInputElement) => void;
@@ -46,10 +48,10 @@ export const operation = {
     textinput.setSelectionRange(cursor ?? 0 + next + 1, cursor ?? 0 + next + 1); // move cursor word end
   },
   moveCursorToTopOfWord(textinput: HTMLInputElement) {
-    const cursor = textinput.selectionEnd; // get the cursor position
-    if (cursor == null || cursor == 0) return;
-    const text = textinput.value.slice(0, cursor ?? 0); // get the text before the cursor
-    const previous = text.search(/\s\w/); // get word top
-    textinput.setSelectionRange(cursor ?? 0 - previous, cursor ?? 0 - previous); // move cursor word top
+    const position = textinput.selectionEnd; // get the cursor position
+    if (position == null || position == 0) return;
+    const text = textinput.value.slice(0, position ?? 0); // get the text before the cursor
+    const previous = cursor.getTopOfWord(text, position); // get word top
+    textinput.setSelectionRange(previous, previous); // move cursor word top
   },
 };
