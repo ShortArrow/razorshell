@@ -18,7 +18,6 @@ export const operation = {
     textinput.setSelectionRange(end, end); // set cursor to end
   },
   deleteToEOL(textinput: HTMLInputElement) {
-    console.debug("deleteToEOL");
     const cursor = textinput.selectionEnd; // get position
     if (cursor == null) return; // do nothing if cursor is null
     const text = textinput.value.slice(0, cursor); // get text before cursor
@@ -44,15 +43,13 @@ export const operation = {
   moveCursorToEndOfWord(textinput: HTMLInputElement) {
     const position = textinput.selectionEnd; // get position
     if (position == null) return;
-    const text = textinput.value.slice(position); // get the text after the cursor
-    const next = cursor.getEndOfWord(text, position); // get word end
+    const next = cursor.getEndOfWord(textinput.value, position); // get word end
     textinput.setSelectionRange(next, next); // move cursor word end
   },
   moveCursorToTopOfWord(textinput: HTMLInputElement) {
     const position = textinput.selectionEnd; // get the cursor position
     if (position == null || position == 0) return;
-    const text = textinput.value.slice(0, position); // get the text before the cursor
-    const previous = cursor.getTopOfWord(text, position); // get word top
+    const previous = cursor.getTopOfWord(textinput.value, position); // get word top
     textinput.setSelectionRange(previous, previous); // move cursor word top
   },
 };
