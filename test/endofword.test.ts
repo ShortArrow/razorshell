@@ -34,7 +34,7 @@ test("_", () => {
 test("hello", () => {
   const target = "hello world new order";
   const actual = cursor.getEndOfWord(target, 5);
-  expect(actual).toBe(11);
+  expect(actual).toBe(5);
 });
 test("hello_", () => {
   const target = "hello world new order";

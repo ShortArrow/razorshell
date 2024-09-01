@@ -16,16 +16,8 @@ export const cursor = {
     return charcount;
   },
   getEndOfWord(text: string, cursor: number): number {
-    const splited = text.slice(cursor).split(" ");
-    let wordcount = 0;
-    let charcount = cursor;
-    while (splited[wordcount]) {
-      charcount += splited[wordcount].length + 1;
-      if (charcount + splited[wordcount].length >= cursor) {
-        break;
-      }
-      wordcount++;
-    }
-    return charcount + splited[wordcount].length;
+    const sliced = text.slice(cursor);
+    const splited = sliced.split(" ");
+    return cursor + splited[0].length;
   },
 };
