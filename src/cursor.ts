@@ -13,6 +13,6 @@ export const cursor = {
       }
       wordcount++;
     }
-    return charcount + 1;
+    return charcount;
   },
 };

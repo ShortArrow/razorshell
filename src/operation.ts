@@ -42,16 +42,17 @@ export const operation = {
     textinput.setSelectionRange(cursor - 1, cursor - 1); // move cursor backward
   },
   moveCursorToEndOfWord(textinput: HTMLInputElement) {
-    const cursor = textinput.selectionEnd; // get position
-    const text = textinput.value.slice(cursor ?? 0); // get the text after the cursor
-    const next = text.search(/\w\s/); // get word end
-    textinput.setSelectionRange(cursor ?? 0 + next + 1, cursor ?? 0 + next + 1); // move cursor word end
+    const position = textinput.selectionEnd; // get position
+    if (position == null) return;
+    const text = textinput.value.slice(position); // get the text after the cursor
+    const next = cursor.getEndOfWord(text, position); // get word end
+    textinput.setSelectionRange(next, next); // move cursor word end
   },
   moveCursorToTopOfWord(textinput: HTMLInputElement) {
     const position = textinput.selectionEnd; // get the cursor position
     if (position == null || position == 0) return;
     const text = textinput.value.slice(0, position); // get the text before the cursor
-    const previous = cursor.getTopOfWord(text, position) - 1; // get word top
+    const previous = cursor.getTopOfWord(text, position); // get word top
     textinput.setSelectionRange(previous, previous); // move cursor word top
   },
 };
