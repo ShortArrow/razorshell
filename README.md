@@ -41,6 +41,8 @@ This is browser extension add keyboard shortcut link bash shell.
 | `Alt` + `c`             | change to capital                               |
 | `Alt` + `.`             | yank last arg                                   |
 
+reference `bind -p | grep -E '^"\\(e|C)'`
+
 <!-- markdownlint-enable md013 -->
 
 - [⛔] Browser tab-related shortcuts are reserved and cannot be overwritten
