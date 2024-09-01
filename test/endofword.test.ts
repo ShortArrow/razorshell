@@ -19,7 +19,7 @@ test("hello world n", () => {
 test("hello world new", () => {
   const target = "hello world new order";
   const actual = cursor.getEndOfWord(target, 15);
-  expect(actual).toBe(15);
+  expect(actual).toBe(21);
 });
 test("h", () => {
   const target = "hello world new order";
@@ -34,7 +34,7 @@ test("_", () => {
 test("hello", () => {
   const target = "hello world new order";
   const actual = cursor.getEndOfWord(target, 5);
-  expect(actual).toBe(5);
+  expect(actual).toBe(11);
 });
 test("hello_", () => {
   const target = "hello world new order";

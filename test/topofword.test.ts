@@ -6,6 +6,16 @@ test("moveCursorToBeginning of world", () => {
   const actual = cursor.getTopOfWord(target, 9);
   expect(actual).toBe(6);
 });
+test("hello world new order_", () => {
+  const target = "hello world new order";
+  const actual = cursor.getTopOfWord(target, 22);
+  expect(actual).toBe(21);
+});
+test("hello world new order", () => {
+  const target = "hello world new order";
+  const actual = cursor.getTopOfWord(target, 21);
+  expect(actual).toBe(16);
+});
 test("hello world ne", () => {
   const target = "hello world new order";
   const actual = cursor.getTopOfWord(target, 14);
@@ -39,7 +49,7 @@ test("hello", () => {
 test("hello_", () => {
   const target = "hello world new order";
   const actual = cursor.getTopOfWord(target, 6);
-  expect(actual).toBe(6);
+  expect(actual).toBe(5);
 });
 test("hello w", () => {
   const target = "hello world new order";
