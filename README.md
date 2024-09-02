@@ -1,6 +1,6 @@
 # Razorshell
 
-This is browser extension add keyboard shortcut link bash shell.
+This is browser extension add keyboard shortcut like bash shell.
 
 > This is a work in progress. It is not ready for use. 🚧
 
