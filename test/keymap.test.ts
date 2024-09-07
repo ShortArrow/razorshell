@@ -1,7 +1,6 @@
 import { expect, test } from "vitest";
 import { keymaching } from "../src/keymap";
 import { Keymap } from "../src/operation";
-import { Key } from "react";
 
 test("key and event match", () => {
   const target: Keymap = { label: "", operation: () => { }, key: "a" };
