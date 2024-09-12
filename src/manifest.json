@@ -1,43 +1,46 @@
 {
-    "manifest_version": 3,
-    "name": "Text Box Shortcuts",
-    "version": "1.0",
-    "description": "Enhances text boxes with custom keyboard shortcuts.",
-    "permissions": [
-      "activeTab",
-      "scripting",
-      "storage"
-    ],
-    "content_scripts": [
-      {
-        "matches": ["<all_urls>"],
-        "js": ["content.js"]
-      }
-    ],
-    "options_ui": {
-      "page": "options.html",
-      "open_in_tab": true
+  "manifest_version": 3,
+  "name": "Razorshell",
+  "version": "0.0.1",
+  "description": "This is browser extension add keyboard shortcut like bash shell. Enhances text boxes with custom keyboard shortcuts.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ]
+    }
+  ],
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "action": {
+    "default_icon": {
+      "16": "/assets/16.png",
+      "32": "/assets/32.png",
+      "48": "/assets/48.png",
+      "128": "/assets/128.png"
     },
-    "action": {
-      "default_icon": {
-        "16": "/assets/16.png",
-        "32": "/assets/32.png",
-        "48": "/assets/48.png",
-        "128": "/assets/128.png"
+    "default_title": "Razorshell"
+  },
+  "commands": {
+    "delete-word": {
+      "suggested_key": {
+        "default": "Ctrl+W",
+        "mac": "Command+W"
       },
-      "default_title": "Text Box Enhancer"
-    },
-    "commands": {
-      "delete-word": {
-        "suggested_key": {
-          "default": "Ctrl+W",
-          "mac": "Command+W"
-        },
-        "description": "Delete word left of the cursor in a text box"
-      }
-    },
-    "host_permissions": [
-      "*://*/*"
-    ]
-  }
-  
+      "description": "Delete word left of the cursor in a text box"
+    }
+  },
+  "host_permissions": [
+    "*://*/*"
+  ]
+}
