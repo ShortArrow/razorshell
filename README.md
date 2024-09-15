@@ -2,7 +2,7 @@
 
 This is browser extension add keyboard shortcut like bash shell.
 
-> This is a work in progress. It is not ready for use. 🚧
+![main image](./images/razorshell.svg)
 
 ## Features
 
