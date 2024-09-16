@@ -1,6 +1,6 @@
 # Razorshell
 
-This is browser extension add keyboard shortcut like bash shell.
+This is a browser extension that adds bash shell-like keyboard shortcuts to textboxes.
 
 ![main image](./image/razorshell.svg)
 
@@ -46,5 +46,8 @@ reference `bind -p | grep -E '^"\\(e|C)'`
 <!-- markdownlint-enable md013 -->
 
 - [⛔] Browser tab-related shortcuts are reserved and cannot be overwritten
+  - [Certain Chrome shortcuts cannot be overridden](https://developer.chrome.com/docs/extensions/reference/api/commands#key-combinations)
 - [🚧] URL allow/deny list
   - changeable allow list mode or deny list mode
+- [🚧] Verify shortcut registered and make alart
+  - [verify commands registered](https://developer.chrome.com/docs/extensions/reference/api/commands?hl=en#verify_commands_registered)
