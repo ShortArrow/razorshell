@@ -6,6 +6,7 @@
   "permissions": [
     "activeTab",
     "scripting",
+    "commands",
     "storage"
   ],
   "content_scripts": [
@@ -31,8 +32,11 @@
     },
     "default_title": "Razorshell"
   },
+  "background": {
+    "service_worker": "service.js"
+  },
   "commands": {
-    "delete-word": {
+    "_execute_action": {
       "suggested_key": {
         "default": "Ctrl+W",
         "mac": "Command+W"

@@ -18,6 +18,7 @@ export default defineConfig({
       input: {
         content: "./src/content.ts",
         options: "./src/options.tsx",
+        service: "./src/service.ts",
       },
       output: {
         entryFileNames: "[name].js",
