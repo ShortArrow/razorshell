@@ -6,5 +6,37 @@
   "description": {
     "message": "このブラウザ拡張機能は、テキストボックスにbashシェルのようなキーボードショートカットを追加します。 ",
     "description": "Extension description"
+  },
+  "move_cursor_to_the_beginning": {
+    "message": "行の先頭までカーソルを移動",
+    "description": "Move cursor to the beginning"
+  },
+  "move_cursor_to_the_end": {
+    "message": "行の末尾までカーソルを移動",
+    "description": "Move cursor to the end"
+  },
+  "delete_to_the_end_of_the_line": {
+    "message": "行末まで削除",
+    "description": "Delete to the end of the line"
+  },
+  "move_cursor_to_the_next_character": {
+    "message": "次の文字までカーソルを移動",
+    "description": "Move cursor to the next character"
+  },
+  "move_cursor_to_the_previous_character": {
+    "message": "前の文字までカーソルを移動",
+    "description": "Move cursor to the previous character"
+  },
+  "move_cursor_to_the_next_word": {
+    "message": "次の単語までカーソルを移動",
+    "description": "Move cursor to the next word"
+  },
+  "move_cursor_to_the_previous_word": {
+    "message": "前の単語までカーソルを移動",
+    "description": "Move cursor to the previous word"
+  },
+  "delete_to_the_beginning_of_the_line": {
+    "message": "行の先頭まで削除",
+    "description": "Delete to the beginning of the line"
   }
 }

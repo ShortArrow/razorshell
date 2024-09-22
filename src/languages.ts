@@ -14,3 +14,9 @@ export async function getAcceptLanguage(): Promise<string[]> {
 export function getUILanguage(): string {
   return chrome.i18n.getUILanguage();
 }
+
+export function getMessage(messageName: string): () => string {
+  return () => {
+    return chrome.i18n.getMessage(messageName);
+  };
+}

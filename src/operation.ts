@@ -3,6 +3,7 @@ import { cursor } from "./cursor";
 export interface Keymap {
   label: string;
   operation: (textinput: HTMLInputElement) => void;
+  description?: () => string;
   key: string;
   alt?: boolean;
   ctrl?: boolean;
