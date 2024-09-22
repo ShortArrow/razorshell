@@ -4,6 +4,8 @@ import { TitleApp } from './ui/title';
 import { TestApp } from './ui/testui';
 import { ThemeApp } from './ui/theme';
 import { FooterApp } from './ui/footer';
+import { LuaApp } from './ui/lua';
+import { KeymapApp } from './ui/keymap';
 
 function OptionsUI() {
 
@@ -15,6 +17,8 @@ function OptionsUI() {
           <TitleApp />
           <TestApp />
           <UrlApp />
+          <KeymapApp />
+          <LuaApp />
           <LangApp />
         </div>
         <div className='grow'></div>
