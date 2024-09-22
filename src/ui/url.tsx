@@ -1,22 +1,6 @@
 import { useEffect, useState } from 'react';
 import { saveUrl, showUrls, removeUrl } from '../urllist';
-
-function DeleteIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="h-4 w-4"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M6 18L18 6M6 6l12 12" />
-    </svg>
-  )
-}
+import { XMarkIcon } from '@heroicons/react/24/outline';
 
 export function UrlApp() {
   const [urls, setUrls] = useState<string[]>([]);
@@ -55,12 +39,12 @@ export function UrlApp() {
               return <li key={index} className='flex items-center gap-2'>
                 <a href={url}>{url}</a>
                 <button
-                  className='btn btn-square btn-outline btn-xs btn-error'
+                  className='btn btn-outline btn-xs btn-error'
                   onClick={async () => {
                     const urls = await removeUrl(url);
                     setUrls(urls);
                   }}>
-                  <DeleteIcon />
+                  <XMarkIcon className='w-4 h-4' />
                 </button>
               </li>;
             })
