@@ -27,13 +27,13 @@ export function keymaching(event: KeyboardEvent, key: Keymap): boolean {
 export const defaultKeymap: Keymap[] = [
   {
     label: "move cursor to the beginning",
-    operation: operation.moveCursorToBeginning,
+    operation: operation.moveToTOL,
     ctrl: true,
     key: "a",
   },
   {
     label: "move cursor to the end",
-    operation: operation.moveCursorToEnd,
+    operation: operation.moveToEOL,
     ctrl: true,
     key: "e",
   },
@@ -45,25 +45,25 @@ export const defaultKeymap: Keymap[] = [
   },
   {
     label: "move cursor to the next character",
-    operation: operation.moveCursorToNextChar,
+    operation: operation.moveToNextChar,
     ctrl: true,
     key: "f",
   },
   {
     label: "move cursor to the previous character",
-    operation: operation.moveCursorToPreviousChar,
+    operation: operation.moveToPreviousChar,
     ctrl: true,
     key: "b",
   },
   {
     label: "move cursor to the next word",
-    operation: operation.moveCursorToEndOfWord,
+    operation: operation.moveToEndOfWord,
     alt: true,
     key: "f",
   },
   {
     label: "move cursor to the previous word",
-    operation: operation.moveCursorToTopOfWord,
+    operation: operation.moveToTopOfWord,
     alt: true,
     key: "b",
   },
