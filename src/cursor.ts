@@ -1,15 +1,27 @@
+const separators = [" ", "\n", "\t", "\r"];
+
+function isStartOfWord(text: string, pos: number): boolean {
+  if (pos === 0) return true;
+  return separators.includes(text[pos - 1])
+}
+
 export const cursor = {
   getTopOfWord(text: string, cursor: number): number {
-    if (cursor === text.length + 1) return cursor - 1;
-    if (cursor === 0) return 0;
-    const sliced = text.slice(0, cursor);
-    const words = sliced.split(" ");
-    const lastWordLength = words[words.length - 1].length;
-    const newCursor = cursor - lastWordLength;
-    if (newCursor === cursor) {
-      return cursor - words[words.length - 1].length - 1;
+    if (cursor === 0) return cursor;
+    // check already at the beginning
+    if (!isStartOfWord(text, cursor)) {
+      while (cursor > 0 && !isStartOfWord(text, cursor)) {
+        cursor--; // to the beginning of the word
+      }
+      return cursor;
     }
-    return newCursor;
+    while (isStartOfWord(text, cursor)) {
+      cursor--;  // ignore separators
+    }
+    while (!isStartOfWord(text, cursor)) {
+      cursor--;  // to the previous word
+    }
+    return cursor;
   },
   getEndOfWord(text: string, cursor: number): number {
     const sliced = text.slice(cursor);
