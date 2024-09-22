@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { saveUrl, showUrls } from './urllist';
 import { LangApp } from './ui/language';
 
-function App() {
+function OptionsUI() {
   const [urls, setUrls] = useState<string[]>([]);
 
   useEffect(() => {
@@ -36,4 +36,4 @@ function App() {
   );
 }
 
-export default App;
+export default OptionsUI;
