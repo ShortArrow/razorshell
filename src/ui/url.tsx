@@ -12,20 +12,23 @@ export function UrlApp() {
   }, []);
 
   return <>
-    <div>
-      {
-        urls.map((url, index) => {
-          return <div key={index}>{url}</div>;
-        })
-      }
+    <div className='flex flex-col'>
+      <h2 className='h2'>URL list</h2>
+      <div>
+        {
+          urls.map((url, index) => {
+            return <div key={index}>{url}</div>;
+          })
+        }
+      </div>
+      <label className='input input-bordered flex p-0'>
+        <input type="url" id="url" className='grow' />
+        <button className='btn btn-neutral' onClick={() => {
+          const url = (document.getElementById('url') as HTMLInputElement).value;
+          saveUrl([url]);
+          setUrls([...urls, url]);
+        }}>add url</button>
+      </label>
     </div>
-    <label className='input input-bordered flex'>
-      <input type="url" id="url"/>
-      <button className='btn btn-neutral' onClick={() => {
-        const url = (document.getElementById('url') as HTMLInputElement).value;
-        saveUrl([url]);
-        setUrls([...urls, url]);
-      }}>add url</button>
-    </label>
   </>;
 }
