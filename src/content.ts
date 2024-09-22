@@ -12,7 +12,7 @@ const query = [
 // select all elements that can input single line text
 const textInputs = document.querySelectorAll<HTMLInputElement>(query);
 
-function keyEventHandling(event: KeyboardEvent, textinput: HTMLInputElement) {
+export function keyEventHandling(event: KeyboardEvent, textinput: HTMLInputElement) {
   debug.logKey(event);
   defaultKeymap.forEach((keymap) => {
     if (!keymaching(event, keymap)) {
