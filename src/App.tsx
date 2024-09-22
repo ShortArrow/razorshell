@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { saveUrl, showUrls } from './urllist';
+import { LangApp } from './ui/language';
 
 function App() {
   const [urls, setUrls] = useState<string[]>([]);
@@ -29,7 +30,7 @@ function App() {
             setUrls([...urls, url]);
           }}>add url</button>
         </div>
-
+        <LangApp />
       </div>
     </>
   );
