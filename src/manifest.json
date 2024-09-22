@@ -3,6 +3,7 @@
   "name": "Razorshell",
   "version": "0.0.1",
   "description": "This is a browser extension that adds bash shell-like keyboard shortcuts to textboxes. Enhances text boxes with custom keyboard shortcuts.",
+  "default_locale": "en",
   "permissions": [
     "activeTab",
     "scripting",
