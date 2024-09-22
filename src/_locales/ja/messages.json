@@ -2,5 +2,9 @@
   "name": {
     "message": "Razorshell",
     "description": "Extension name"
+  },
+  "description": {
+    "message": "このブラウザ拡張機能は、テキストボックスにbashシェルのようなキーボードショートカットを追加します。 ",
+    "description": "Extension description"
   }
 }

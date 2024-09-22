@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Razorshell",
+  "name": "__MSG_name__",
   "version": "0.0.1",
-  "description": "This is a browser extension that adds bash shell-like keyboard shortcuts to textboxes. Enhances text boxes with custom keyboard shortcuts.",
+  "description": "__MSG_description__",
   "default_locale": "en",
   "permissions": [
     "activeTab",
@@ -24,12 +24,18 @@
     "page": "options.html",
     "open_in_tab": true
   },
+  "icons": {
+    "16": "/images/16.png",
+    "32": "/images/32.png",
+    "48": "/images/48.png",
+    "128": "/images/128.png"
+  },
   "action": {
     "default_icon": {
-      "16": "/assets/16.png",
-      "32": "/assets/32.png",
-      "48": "/assets/48.png",
-      "128": "/assets/128.png"
+      "16": "/images/16.png",
+      "32": "/images/32.png",
+      "48": "/images/48.png",
+      "128": "/images/128.png"
     },
     "default_title": "Razorshell"
   },

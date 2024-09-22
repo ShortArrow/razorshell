@@ -8,9 +8,9 @@ export default defineConfig({
     react(),
     viteStaticCopy({
       targets: [
-        { src: 'src/manifest.json', dest: '.' },
-        { src: 'src/assets', dest: '.' },
         { src: 'src/options.html', dest: '.' },
+        { src: 'src/manifest.json', dest: '.' },
+        { src: 'src/images', dest: '.' },
         { src: 'src/_locales', dest: '.' },
       ],
     })
