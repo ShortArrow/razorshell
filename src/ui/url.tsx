@@ -42,7 +42,7 @@ export function UrlApp() {
             onChange={(e) => setUrl(e.target.value)}
           />
         </label>
-        <button className='btn btn-neutral join-item' onClick={() => {
+        <button className='btn btn-primary join-item' onClick={() => {
           saveUrl(url);
           setUrls([...urls, url]);
         }}>add url</button>

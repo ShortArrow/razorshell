@@ -14,7 +14,7 @@ export function LangApp() {
     };
   }, []);
   return (
-    <div className="collapse collapse-arrow bg-neutral">
+    <div className="collapse collapse-arrow">
       <input type="checkbox" id="collapse-2" />
       <div className="collapse-title">
         <h2 className="not-prose text-xl">Language</h2>
