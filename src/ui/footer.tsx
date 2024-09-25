@@ -4,8 +4,8 @@ import { ChatBubbleOvalLeftEllipsisIcon } from '@heroicons/react/20/solid'
 import { BuildingStorefrontIcon } from '@heroicons/react/20/solid'
 
 const codeUrl = "https://github.com/ShortArrow/razorshell"
-const chatUrl = "https://discord.gg/razorshell/issues"
-const storeUrl = "https://chromewebstore.google.com/detail/ahokbhndbjckeejighhkldiohmokpclb"
+const chatUrl = "https://github.com/ShortArrow/razorshell/issues"
+const storeUrl = "https://chromewebstore.google.com/detail/razorshell/ahokbhndbjckeejighhkldiohmokpclb"
 
 export function FooterApp() {
   return <>
