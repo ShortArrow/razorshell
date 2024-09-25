@@ -1,0 +1,42 @@
+{
+  "name": {
+    "message": "Razorshell",
+    "description": "Extension name"
+  },
+  "description": {
+    "message": "This is a browser extension that adds bash shell-like keyboard shortcuts to textboxes. ",
+    "description": "Extension description"
+  },
+  "move_cursor_to_the_beginning": {
+    "message": "Move cursor to the beginning",
+    "description": "Move cursor to the beginning"
+  },
+  "move_cursor_to_the_end": {
+    "message": "Move cursor to the end",
+    "description": "Move cursor to the end"
+  },
+  "delete_to_the_end_of_the_line": {
+    "message": "Delete to the end of the line",
+    "description": "Delete to the end of the line"
+  },
+  "move_cursor_to_the_next_character": {
+    "message": "Move cursor to the next character",
+    "description": "Move cursor to the next character"
+  },
+  "move_cursor_to_the_previous_character": {
+    "message": "Move cursor to the previous character",
+    "description": "Move cursor to the previous character"
+  },
+  "move_cursor_to_the_next_word": {
+    "message": "Move cursor to the next word",
+    "description": "Move cursor to the next word"
+  },
+  "move_cursor_to_the_previous_word": {
+    "message": "Move cursor to the previous word",
+    "description": "Move cursor to the previous word"
+  },
+  "delete_to_the_beginning_of_the_line": {
+    "message": "Delete to the beginning of the line",
+    "description": "Delete to the beginning of the line"
+  }
+}

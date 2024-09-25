@@ -8,8 +8,10 @@ export default defineConfig({
     react(),
     viteStaticCopy({
       targets: [
+        { src: 'src/options.html', dest: '.' },
         { src: 'src/manifest.json', dest: '.' },
-        { src: 'src/assets', dest: '.' }
+        { src: 'src/images', dest: '.' },
+        { src: 'src/_locales', dest: '.' },
       ],
     })
   ],
@@ -18,6 +20,7 @@ export default defineConfig({
       input: {
         content: "./src/content.ts",
         options: "./src/options.tsx",
+        service: "./src/service.ts",
       },
       output: {
         entryFileNames: "[name].js",

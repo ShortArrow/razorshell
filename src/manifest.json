@@ -1,43 +1,57 @@
 {
-    "manifest_version": 3,
-    "name": "Text Box Shortcuts",
-    "version": "1.0",
-    "description": "Enhances text boxes with custom keyboard shortcuts.",
-    "permissions": [
-      "activeTab",
-      "scripting",
-      "storage"
-    ],
-    "content_scripts": [
-      {
-        "matches": ["<all_urls>"],
-        "js": ["content.js"]
-      }
-    ],
-    "options_ui": {
-      "page": "options.html",
-      "open_in_tab": true
+  "manifest_version": 3,
+  "name": "__MSG_name__",
+  "version": "0.0.1",
+  "description": "__MSG_description__",
+  "default_locale": "en",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "commands",
+    "storage"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ]
+    }
+  ],
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "icons": {
+    "16": "/images/16.png",
+    "32": "/images/32.png",
+    "48": "/images/48.png",
+    "128": "/images/128.png"
+  },
+  "action": {
+    "default_icon": {
+      "16": "/images/16.png",
+      "32": "/images/32.png",
+      "48": "/images/48.png",
+      "128": "/images/128.png"
     },
-    "action": {
-      "default_icon": {
-        "16": "/assets/16.png",
-        "32": "/assets/32.png",
-        "48": "/assets/48.png",
-        "128": "/assets/128.png"
+    "default_title": "Razorshell"
+  },
+  "background": {
+    "service_worker": "service.js"
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+W",
+        "mac": "Command+W"
       },
-      "default_title": "Text Box Enhancer"
-    },
-    "commands": {
-      "delete-word": {
-        "suggested_key": {
-          "default": "Ctrl+W",
-          "mac": "Command+W"
-        },
-        "description": "Delete word left of the cursor in a text box"
-      }
-    },
-    "host_permissions": [
-      "*://*/*"
-    ]
-  }
-  
+      "description": "Delete word left of the cursor in a text box"
+    }
+  },
+  "host_permissions": [
+    "*://*/*"
+  ]
+}
