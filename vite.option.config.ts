@@ -8,17 +8,16 @@ export default defineConfig({
     react(),
     viteStaticCopy({
       targets: [
-        { src: 'src/manifest.json', dest: '.' },
+        { src: 'src/options.html', dest: '.' },
         { src: 'src/images', dest: '.' },
-        { src: 'src/_locales', dest: '.' },
       ],
     })
   ],
   build: {
+    emptyOutDir: false,
     rollupOptions: {
       input: {
-        content: "./src/content.ts",
-        service: "./src/service.ts",
+        options: "./src/options.tsx",
       },
       output: {
         entryFileNames: "[name].js",
