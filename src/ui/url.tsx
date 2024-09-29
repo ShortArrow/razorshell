@@ -3,6 +3,7 @@ import { saveUrl, showUrls, removeUrl } from '../urllist';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { urlSchema } from '../validation/url';
 import { ZodError } from 'zod';
+import toast, { Toaster } from 'react-hot-toast';
 
 export function UrlApp() {
   const [urls, setUrls] = useState<string[]>([]);
@@ -18,6 +19,7 @@ export function UrlApp() {
   return <>
     <div className='flex flex-col w-full'>
       <h2 className='h2'>URL list</h2>
+      <Toaster />
       <div className='join w-full'>
         <label className='input input-bordered join-item flex justify-center items-center grow'>
           <input
@@ -34,7 +36,7 @@ export function UrlApp() {
           }
           catch (e: unknown) {
             if (e instanceof ZodError) {
-              alert("Invalid URL");
+              toast.error("Invalid URL");
             }
             else {
               console.error(e);
