@@ -1,5 +1,15 @@
 import { getMessage } from "./languages";
-import { Keymap, operation } from "./operation";
+import { operation } from "./operation";
+
+export interface Keymap {
+  label: string;
+  operation: (textinput: HTMLInputElement) => void;
+  description?: () => string;
+  key: string;
+  alt?: boolean;
+  ctrl?: boolean;
+  shift?: boolean;
+}
 
 export function keymaching(event: KeyboardEvent, key: Keymap): boolean {
   let result = true;

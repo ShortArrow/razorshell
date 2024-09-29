@@ -1,15 +1,5 @@
 import { cursor } from "./cursor";
 
-export interface Keymap {
-  label: string;
-  operation: (textinput: HTMLInputElement) => void;
-  description?: () => string;
-  key: string;
-  alt?: boolean;
-  ctrl?: boolean;
-  shift?: boolean;
-}
-
 export const operation = {
   moveToTOL(textinput: HTMLInputElement) {
     textinput.setSelectionRange(0, 0); // set cursor to beginning
