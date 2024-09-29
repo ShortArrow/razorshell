@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { saveUrl, showUrls, removeUrl } from '../urllist';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { urlSchema } from '../validation/url';
+import { ZodError } from 'zod';
 
 export function UrlApp() {
   const [urls, setUrls] = useState<string[]>([]);
@@ -27,6 +29,18 @@ export function UrlApp() {
           />
         </label>
         <button className='btn btn-primary join-item' onClick={() => {
+          try {
+            urlSchema.parse(url);
+          }
+          catch (e: unknown) {
+            if (e instanceof ZodError) {
+              alert("Invalid URL");
+            }
+            else {
+              console.error(e);
+            }
+            return;
+          }
           saveUrl(url);
           setUrls([...urls, url]);
         }}>add url</button>
