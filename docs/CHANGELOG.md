@@ -58,6 +58,12 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ### Fixed
 
+- `email` inputs were dead keys since 0.0.1: the selection API does
+  not apply to that type, so every operation threw after
+  preventDefault had already suppressed the native action. `email`
+  leaves the target list, restoring native behavior; `password`,
+  where the selection API works, joins it. `number` stays out for
+  the same platform reason.
 - The theme toggle now persists: the choice is stored and reapplied
   when the options page opens, instead of resetting on every reload.
 - The handled badge follows the selected theme's accent color;

@@ -3,7 +3,7 @@ import { getActiveKeymap } from "./keymapstore";
 import { debug } from "./debug";
 import { Keymap, TextField } from "./operation";
 
-const targetInputTypes = ["text", "search", "url", "tel", "email"];
+const targetInputTypes = ["text", "search", "url", "tel", "password"];
 
 /**
  * Narrows an event target to a text field the keymap can operate on.
