@@ -17,6 +17,11 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 - The options test area shows the last keydown — the chord, whether
   the extension handled it, the event code — and the selection range
   of each test field.
+- The options page language can be overridden from a select listing
+  the eleven packaged locales, with "auto" following the browser as
+  before. The current effective language is shown next to it. The
+  extension name and description stay in the browser language; Chrome
+  resolves those itself.
 
 ### Fixed
 
