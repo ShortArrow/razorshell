@@ -7,6 +7,11 @@ Notable changes to Razorshell. The format is based on
 
 ### Fixed
 
+- The options test area processed each key twice (importing the
+  content script pulled its document-level listener into the options
+  bundle alongside the React handler), so Ctrl+f advanced two
+  characters there. Key handling now lives in a side-effect-free
+  module shared by both entry points.
 - The options page title image, broken since a 2024 path refactor left
   `src/images/razorshell.svg` as a 26-byte stub containing only the
   string `../../image/razorshell.svg`. The artwork now lives at
@@ -16,6 +21,10 @@ Notable changes to Razorshell. The format is based on
 
 ### Added
 
+- Options test area shows a live "last status" panel: the pressed
+  chord as kbd badges, whether the extension handled it, the event
+  code, and per-field selection readouts for both a single-line input
+  and a textarea.
 - URL allow/deny policy: ordered rules evaluated first-match-wins
   (iptables style) with a configurable default action. Each rule has a
   pattern, a match type (exact / glob / regex) and an action, all
