@@ -107,13 +107,21 @@
     "message": "検査するテキストボックスをクリック(Escで解除)",
     "description": "Click a text field to inspect (Esc to cancel)"
   },
-  "inspect_conflicts_title": {
-    "message": "このページが既に処理しているショートカット",
-    "description": "Shortcuts this page already handles"
+  "inspect_observed_title": {
+    "message": "確定した競合(実際の入力で観測)",
+    "description": "Confirmed conflicts (observed from real input)"
+  },
+  "inspect_static_title": {
+    "message": "競合の可能性(ハンドラのコードから検出)",
+    "description": "Possible conflicts (found in handler code)"
   },
   "inspect_no_conflicts": {
     "message": "このテキストボックスに競合するショートカットはありません",
     "description": "No conflicting shortcuts in this field"
+  },
+  "inspect_unknown_listeners": {
+    "message": "解析できないkeydownリスナー: ",
+    "description": "keydown listeners that could not be analyzed: "
   },
   "richtext_label": {
     "message": "リッチテキストエディタで有効化",

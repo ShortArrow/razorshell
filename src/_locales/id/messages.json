@@ -107,13 +107,21 @@
     "message": "Klik kolom teks untuk memeriksanya (Esc untuk membatalkan)",
     "description": "Click a text field to inspect (Esc to cancel)"
   },
-  "inspect_conflicts_title": {
-    "message": "Pintasan yang sudah ditangani halaman ini",
-    "description": "Shortcuts this page already handles"
+  "inspect_observed_title": {
+    "message": "Konflik terkonfirmasi (teramati dari input sebenarnya)",
+    "description": "Confirmed conflicts (observed from real input)"
+  },
+  "inspect_static_title": {
+    "message": "Kemungkinan konflik (ditemukan dalam kode handler)",
+    "description": "Possible conflicts (found in handler code)"
   },
   "inspect_no_conflicts": {
     "message": "Tidak ada pintasan yang berbenturan di kolom ini",
     "description": "No conflicting shortcuts in this field"
+  },
+  "inspect_unknown_listeners": {
+    "message": "Listener keydown yang tidak dapat dianalisis: ",
+    "description": "keydown listeners that could not be analyzed: "
   },
   "richtext_label": {
     "message": "Aktifkan di editor teks kaya",

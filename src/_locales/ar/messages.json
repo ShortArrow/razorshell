@@ -107,13 +107,21 @@
     "message": "انقر على حقل نص لفحصه (اضغط Esc للإلغاء)",
     "description": "Click a text field to inspect (Esc to cancel)"
   },
-  "inspect_conflicts_title": {
-    "message": "الاختصارات التي تعالجها هذه الصفحة بالفعل",
-    "description": "Shortcuts this page already handles"
+  "inspect_observed_title": {
+    "message": "تعارضات مؤكدة (مرصودة من إدخال فعلي)",
+    "description": "Confirmed conflicts (observed from real input)"
+  },
+  "inspect_static_title": {
+    "message": "تعارضات محتملة (وُجدت في شيفرة المعالج)",
+    "description": "Possible conflicts (found in handler code)"
   },
   "inspect_no_conflicts": {
     "message": "لا توجد اختصارات متعارضة في هذا الحقل",
     "description": "No conflicting shortcuts in this field"
+  },
+  "inspect_unknown_listeners": {
+    "message": "مستمعو keydown الذين تعذر تحليلهم: ",
+    "description": "keydown listeners that could not be analyzed: "
   },
   "richtext_label": {
     "message": "التفعيل في محرّرات النص المنسّق",

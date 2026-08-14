@@ -107,13 +107,21 @@
     "message": "点击要检查的文本框（按 Esc 取消）",
     "description": "Click a text field to inspect (Esc to cancel)"
   },
-  "inspect_conflicts_title": {
-    "message": "此页面已处理的快捷键",
-    "description": "Shortcuts this page already handles"
+  "inspect_observed_title": {
+    "message": "已确认的冲突(通过实际输入观测)",
+    "description": "Confirmed conflicts (observed from real input)"
+  },
+  "inspect_static_title": {
+    "message": "可能的冲突(在处理程序代码中发现)",
+    "description": "Possible conflicts (found in handler code)"
   },
   "inspect_no_conflicts": {
     "message": "此文本框中没有冲突的快捷键",
     "description": "No conflicting shortcuts in this field"
+  },
+  "inspect_unknown_listeners": {
+    "message": "无法解析的 keydown 监听器: ",
+    "description": "keydown listeners that could not be analyzed: "
   },
   "richtext_label": {
     "message": "在富文本编辑器中启用",

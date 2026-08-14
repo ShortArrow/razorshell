@@ -107,13 +107,21 @@
     "message": "Haz clic en un campo de texto para inspeccionarlo (Esc para cancelar)",
     "description": "Click a text field to inspect (Esc to cancel)"
   },
-  "inspect_conflicts_title": {
-    "message": "Atajos que esta página ya gestiona",
-    "description": "Shortcuts this page already handles"
+  "inspect_observed_title": {
+    "message": "Conflictos confirmados (observados con entrada real)",
+    "description": "Confirmed conflicts (observed from real input)"
+  },
+  "inspect_static_title": {
+    "message": "Posibles conflictos (encontrados en el código del manejador)",
+    "description": "Possible conflicts (found in handler code)"
   },
   "inspect_no_conflicts": {
     "message": "No hay atajos en conflicto en este campo",
     "description": "No conflicting shortcuts in this field"
+  },
+  "inspect_unknown_listeners": {
+    "message": "Detectores de keydown que no se pudieron analizar: ",
+    "description": "keydown listeners that could not be analyzed: "
   },
   "richtext_label": {
     "message": "Activar en editores de texto enriquecido",

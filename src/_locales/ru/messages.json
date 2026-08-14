@@ -107,13 +107,21 @@
     "message": "Щёлкните текстовое поле для проверки (Esc — отмена)",
     "description": "Click a text field to inspect (Esc to cancel)"
   },
-  "inspect_conflicts_title": {
-    "message": "Сочетания клавиш, которые эта страница уже обрабатывает",
-    "description": "Shortcuts this page already handles"
+  "inspect_observed_title": {
+    "message": "Подтверждённые конфликты (замечены при реальном вводе)",
+    "description": "Confirmed conflicts (observed from real input)"
+  },
+  "inspect_static_title": {
+    "message": "Возможные конфликты (найдены в коде обработчика)",
+    "description": "Possible conflicts (found in handler code)"
   },
   "inspect_no_conflicts": {
     "message": "В этом поле нет конфликтующих сочетаний клавиш",
     "description": "No conflicting shortcuts in this field"
+  },
+  "inspect_unknown_listeners": {
+    "message": "Не поддающиеся анализу обработчики keydown: ",
+    "description": "keydown listeners that could not be analyzed: "
   },
   "richtext_label": {
     "message": "Включить в редакторах форматированного текста",

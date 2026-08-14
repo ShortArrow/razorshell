@@ -107,13 +107,21 @@
     "message": "검사할 텍스트 상자를 클릭하세요 (Esc로 취소)",
     "description": "Click a text field to inspect (Esc to cancel)"
   },
-  "inspect_conflicts_title": {
-    "message": "이 페이지가 이미 처리하는 단축키",
-    "description": "Shortcuts this page already handles"
+  "inspect_observed_title": {
+    "message": "확정된 충돌(실제 입력에서 관측)",
+    "description": "Confirmed conflicts (observed from real input)"
+  },
+  "inspect_static_title": {
+    "message": "충돌 가능성(핸들러 코드에서 발견)",
+    "description": "Possible conflicts (found in handler code)"
   },
   "inspect_no_conflicts": {
     "message": "이 텍스트 상자에 충돌하는 단축키가 없습니다",
     "description": "No conflicting shortcuts in this field"
+  },
+  "inspect_unknown_listeners": {
+    "message": "분석할 수 없는 keydown 리스너: ",
+    "description": "keydown listeners that could not be analyzed: "
   },
   "richtext_label": {
     "message": "리치 텍스트 편집기에서 사용",

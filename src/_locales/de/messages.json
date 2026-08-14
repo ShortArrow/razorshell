@@ -107,13 +107,21 @@
     "message": "Textfeld anklicken, um es zu prüfen (Esc zum Abbrechen)",
     "description": "Click a text field to inspect (Esc to cancel)"
   },
-  "inspect_conflicts_title": {
-    "message": "Tastenkürzel, die diese Seite bereits verarbeitet",
-    "description": "Shortcuts this page already handles"
+  "inspect_observed_title": {
+    "message": "Bestätigte Konflikte (bei echter Eingabe beobachtet)",
+    "description": "Confirmed conflicts (observed from real input)"
+  },
+  "inspect_static_title": {
+    "message": "Mögliche Konflikte (im Handler-Code gefunden)",
+    "description": "Possible conflicts (found in handler code)"
   },
   "inspect_no_conflicts": {
     "message": "Keine kollidierenden Tastenkürzel in diesem Feld",
     "description": "No conflicting shortcuts in this field"
+  },
+  "inspect_unknown_listeners": {
+    "message": "Nicht analysierbare keydown-Listener: ",
+    "description": "keydown listeners that could not be analyzed: "
   },
   "richtext_label": {
     "message": "In Rich-Text-Editoren aktivieren",

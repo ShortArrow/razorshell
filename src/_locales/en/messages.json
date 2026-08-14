@@ -107,13 +107,21 @@
     "message": "Click a text field to inspect (Esc to cancel)",
     "description": "Click a text field to inspect (Esc to cancel)"
   },
-  "inspect_conflicts_title": {
-    "message": "Shortcuts this page already handles",
-    "description": "Shortcuts this page already handles"
+  "inspect_observed_title": {
+    "message": "Confirmed conflicts (observed from real input)",
+    "description": "Confirmed conflicts (observed from real input)"
+  },
+  "inspect_static_title": {
+    "message": "Possible conflicts (found in handler code)",
+    "description": "Possible conflicts (found in handler code)"
   },
   "inspect_no_conflicts": {
     "message": "No conflicting shortcuts in this field",
     "description": "No conflicting shortcuts in this field"
+  },
+  "inspect_unknown_listeners": {
+    "message": "keydown listeners that could not be analyzed: ",
+    "description": "keydown listeners that could not be analyzed: "
   },
   "richtext_label": {
     "message": "Enable in rich text editors",

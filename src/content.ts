@@ -1,11 +1,12 @@
 import { loadContentEditableSetting, subscribeContentEditableSetting } from "./contenteditablesetting";
-import { probeConflicts } from "./inspect";
+import { analyzeHandlerSource } from "./handleranalysis";
 import { showToast } from "./inspecttoast";
 import { dispatchEditableKey, isEditableTarget, isTextField, keyEventHandling, resolveEventTarget } from "./keyhandling";
 import { keyChord } from "./keychord";
+import { Chord } from "./keymapmerge";
 import { getActiveKeymap, initKeymap } from "./keymapstore";
 import { getMessage } from "./languages";
-import { Keymap, TextField } from "./operation";
+import { Keymap } from "./operation";
 import { loadUrlPolicy, subscribeUrlPolicy } from "./urlpolicy";
 import { UrlPolicy, resolveAction } from "./urlrules";
 
@@ -65,47 +66,124 @@ function chordLabel(entry: Keymap): string {
   }).join("+");
 }
 
-function conflictLines(conflicts: Keymap[]): string[] {
-  return conflicts.map((entry) => `${chordLabel(entry)} — ${entry.label}`);
+const queryEvent = "razorshell-inspect-query";
+const resultEvent = "razorshell-inspect-result";
+const queryTimeout = 300;
+
+interface InspectReport {
+  sources: string[];
+  observed: Chord[];
 }
 
-function reportConflicts(conflicts: Keymap[]): void {
-  const lines = conflictLines(conflicts);
-  if (conflicts.length === 0) {
+const emptyReport: InspectReport = { sources: [], observed: [] };
+
+function parseReport(detail: unknown): InspectReport {
+  if (typeof detail !== "string") return emptyReport;
+  try {
+    const parsed = JSON.parse(detail) as Partial<InspectReport>;
+    return {
+      sources: Array.isArray(parsed.sources) ? parsed.sources : [],
+      observed: Array.isArray(parsed.observed) ? parsed.observed : [],
+    };
+  } catch {
+    return emptyReport;
+  }
+}
+
+/**
+ * Asks the page world what it has registered and observed for this element,
+ * treating silence as a page carrying no hook, never as a failure to report.
+ */
+function queryPageWorld(target: EventTarget): Promise<InspectReport> {
+  return new Promise((resolve) => {
+    let settled = false;
+    const finish = (report: InspectReport) => {
+      if (settled) return;
+      settled = true;
+      document.removeEventListener(resultEvent, onResult);
+      resolve(report);
+    };
+    const onResult = (event: Event) => finish(parseReport((event as CustomEvent).detail));
+    document.addEventListener(resultEvent, onResult);
+    setTimeout(() => finish(emptyReport), queryTimeout);
+    target.dispatchEvent(new CustomEvent(queryEvent, { bubbles: true, composed: true }));
+  });
+}
+
+function sameChord(left: Chord, right: Chord): boolean {
+  return (
+    left.key === right.key &&
+    (left.ctrl === true) === (right.ctrl === true) &&
+    (left.alt === true) === (right.alt === true) &&
+    (left.shift === true) === (right.shift === true)
+  );
+}
+
+function entryChord(entry: Keymap): Chord {
+  return { key: entry.key, ctrl: entry.ctrl === true, alt: entry.alt === true, shift: entry.shift === true };
+}
+
+function entryLine(entry: Keymap): string {
+  return `${chordLabel(entry)} — ${entry.label}`;
+}
+
+function observedConflicts(observed: Chord[], keymap: Keymap[]): Keymap[] {
+  return keymap.filter((entry) => observed.some((chord) => sameChord(chord, entryChord(entry))));
+}
+
+interface StaticAnalysis {
+  conflicts: Keymap[];
+  unknown: number;
+}
+
+function chordKey(chord: Chord): string {
+  return `${chord.key} ${chord.ctrl === true} ${chord.alt === true} ${chord.shift === true}`;
+}
+
+function analyzeSources(sources: string[], keymap: Keymap[]): StaticAnalysis {
+  const chords = keymap.map(entryChord);
+  const hits = new Set<string>();
+  let unknown = 0;
+  for (const source of sources) {
+    const found = analyzeHandlerSource(source, chords);
+    if (found.length === 0) {
+      unknown += 1;
+      continue;
+    }
+    for (const chord of found) hits.add(chordKey(chord));
+  }
+  return {
+    conflicts: keymap.filter((entry) => hits.has(chordKey(entryChord(entry)))),
+    unknown,
+  };
+}
+
+function buildLines(report: InspectReport, keymap: Keymap[]): string[] {
+  const confirmed = observedConflicts(report.observed, keymap);
+  const { conflicts, unknown } = analyzeSources(report.sources, keymap);
+  const lines: string[] = [];
+  if (confirmed.length > 0) {
+    lines.push(getMessage("inspect_observed_title")());
+    for (const entry of confirmed) lines.push(entryLine(entry));
+  }
+  if (conflicts.length > 0) {
+    lines.push(getMessage("inspect_static_title")());
+    for (const entry of conflicts) lines.push(entryLine(entry));
+  }
+  if (unknown > 0) lines.push(`${getMessage("inspect_unknown_listeners")()}${unknown}`);
+  return lines;
+}
+
+async function inspectTarget(target: EventTarget): Promise<void> {
+  const report = await queryPageWorld(target);
+  const lines = buildLines(report, getActiveKeymap());
+  if (lines.length === 0) {
     console.log("razorshell inspect: no conflicts", []);
     showToast(getMessage("inspect_no_conflicts")(), []);
     return;
   }
-  console.log("razorshell inspect: conflicts", lines);
-  showToast(getMessage("inspect_conflicts_title")(), lines);
-}
-
-function inspectField(field: TextField): void {
-  reportConflicts(probeConflicts(field, getActiveKeymap()));
-}
-
-function chordEvent(entry: Keymap): KeyboardEvent {
-  return new KeyboardEvent("keydown", {
-    key: entry.key,
-    ctrlKey: entry.ctrl === true,
-    altKey: entry.alt === true,
-    shiftKey: entry.shift === true,
-    bubbles: true,
-    cancelable: true,
-  });
-}
-
-/**
- * Probes an editable root without the value save and restore probeConflicts
- * performs, there being no value to hold: an editor cancelling the chord is
- * assumed not to have written to itself first.
- */
-function inspectEditable(root: HTMLElement): void {
-  reportConflicts(getActiveKeymap().filter((entry) => {
-    const event = chordEvent(entry);
-    root.dispatchEvent(event);
-    return event.defaultPrevented;
-  }));
+  console.log("razorshell inspect", lines);
+  showToast(lines[0], lines.slice(1));
 }
 
 function stopInspecting(): void {
@@ -118,18 +196,12 @@ function stopInspecting(): void {
 
 function onInspectClick(event: MouseEvent): void {
   const target = resolveEventTarget(event);
-  if (isTextField(target)) {
-    event.preventDefault();
-    event.stopPropagation();
-    stopInspecting();
-    inspectField(target);
-    return;
-  }
-  if (!editableEnabled || !isEditableTarget(target)) return;
+  const inspectable = isTextField(target) || (editableEnabled && isEditableTarget(target));
+  if (!inspectable || target === null) return;
   event.preventDefault();
   event.stopPropagation();
   stopInspecting();
-  inspectEditable(target);
+  inspectTarget(target);
 }
 
 function onInspectKeydown(event: KeyboardEvent): void {

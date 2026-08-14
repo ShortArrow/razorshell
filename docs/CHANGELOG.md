@@ -34,11 +34,14 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   fields inside open shadow roots are reached as well. The inspector
   can probe editable targets when the toggle is on.
 - Conflict inspector: clicking the extension icon puts the page in
-  inspect mode; clicking a text field probes every current binding
-  and lists the ones the page already consumes, as an in-page toast
-  and in the console. The content script now ignores untrusted
-  synthetic key events, so the probe cannot trip the extension's own
-  handler.
+  inspect mode; clicking a text field reports, as an in-page toast
+  and in the console, which of the current bindings the page already
+  handles. Nothing is dispatched (ADR-0006): handler code recorded
+  by a first-party page hook is analyzed statically, listeners that
+  resist analysis are counted openly, and a binding becomes a
+  confirmed conflict once the page is seen cancelling it during real
+  typing. The content script also ignores untrusted synthetic key
+  events.
 - A URL tester above the rule list: type a URL and the first rule it
   hits is highlighted, with the resulting action shown as a badge —
   including when only the default action applies.

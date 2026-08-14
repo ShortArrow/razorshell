@@ -13,3 +13,6 @@ record names the files it concerns and is frozen when written.
   layer as default < lua < gui; only the GUI rejects conflicts
 - [ADR-0005](0005-contenteditable-support.md) — contenteditable
   support is opt-in and Selection-based
+- [ADR-0006](0006-inspector-never-dispatches.md) — the inspector
+  never dispatches key events; it reads handler code, admits what it
+  cannot analyze, and confirms from real input
