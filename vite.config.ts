@@ -18,7 +18,6 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        content: "./src/content.ts",
         options: "./src/options.tsx",
         service: "./src/service.ts",
       },
