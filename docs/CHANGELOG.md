@@ -41,9 +41,9 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 - The theme toggle now persists: the choice is stored and reapplied
   when the options page opens, instead of resetting on every reload.
-- The handled and allow/deny badges follow the selected theme's
-  accent colors like the rest of the page, instead of keeping fixed
-  status colors across themes.
+- The handled badge follows the selected theme's accent color;
+  allow/deny badges keep the theme's semantic success/error colors,
+  which carry the permit/block polarity.
 - Nine of the eleven locales carried only the extension name; the
   description and the keymap descriptions are now translated in all
   of them, and a test keeps the locale files key-identical.
