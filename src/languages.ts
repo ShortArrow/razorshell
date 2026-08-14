@@ -3,7 +3,7 @@
  * @returns {Promise<string[]>} - Returns a promise that resolves to an array of strings representing the accept-languages of the browser.
  */
 export async function getAcceptLanguage(): Promise<string[]> {
-  let languages = await chrome.i18n.getAcceptLanguages();
+  const languages = await chrome.i18n.getAcceptLanguages();
   return languages;
 }
 
