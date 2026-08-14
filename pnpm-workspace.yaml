@@ -1,3 +1,5 @@
 allowBuilds:
   '@swc/core': true
   esbuild: true
+overrides:
+  yaml: '>=2.8.3'
