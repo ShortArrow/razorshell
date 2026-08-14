@@ -25,7 +25,7 @@ export function RichTextApp() {
           <input
             type='checkbox'
             data-testid='richtext-toggle'
-            className='toggle toggle-primary checked:[--tglbg:color-mix(in_oklch,oklch(var(--p)/1)_25%,oklch(var(--b1)/1))]'
+            className='toggle toggle-primary checked:[--tglbg:color-mix(in_oklab,oklch(var(--p)/1)_25%,oklch(var(--b1)/1))]'
             checked={enabled}
             onChange={(e) => apply(e.target.checked)}
           />
