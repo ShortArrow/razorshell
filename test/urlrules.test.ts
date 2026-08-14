@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import {
   matchesRule,
   resolveAction,
+  findMatchingRuleIndex,
   migrateLegacyUrls,
   defaultUrlPolicy,
   UrlPolicy,
@@ -84,6 +85,26 @@ describe("resolveAction: first match wins, then default policy", () => {
   test("defaultAction deny turns unmatched pages off", () => {
     const denyByDefault: UrlPolicy = { ...policy, defaultAction: "deny" };
     expect(resolveAction("https://other.com/", denyByDefault)).toBe("deny");
+  });
+});
+
+describe("findMatchingRuleIndex", () => {
+  const policy: UrlPolicy = {
+    defaultAction: "allow",
+    rules: [
+      { pattern: "https://app.example.com/", matchType: "exact", action: "allow" },
+      { pattern: "https://*.example.com/**", matchType: "glob", action: "deny" },
+    ],
+  };
+
+  test("returns the index of the first matching rule", () => {
+    expect(findMatchingRuleIndex("https://app.example.com/", policy)).toBe(0);
+  });
+  test("later rules match when earlier ones do not", () => {
+    expect(findMatchingRuleIndex("https://docs.example.com/page", policy)).toBe(1);
+  });
+  test("no match returns null", () => {
+    expect(findMatchingRuleIndex("https://other.com/", policy)).toBe(null);
   });
 });
 

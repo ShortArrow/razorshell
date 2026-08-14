@@ -94,5 +94,13 @@
   "keymap_reset_all": {
     "message": "setel ulang semua",
     "description": "reset all"
+  },
+  "url_probe_placeholder": {
+    "message": "URL untuk diperiksa",
+    "description": "URL to check"
+  },
+  "tooltip_url_probe": {
+    "message": "Menampilkan aturan mana yang cocok dengan URL ini; baris yang cocok akan disorot",
+    "description": "Shows which rule this URL hits; the matching row is highlighted"
   }
 }

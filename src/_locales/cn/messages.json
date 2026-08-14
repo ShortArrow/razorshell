@@ -94,5 +94,13 @@
   "keymap_reset_all": {
     "message": "全部重置",
     "description": "reset all"
+  },
+  "url_probe_placeholder": {
+    "message": "要检查的网址",
+    "description": "URL to check"
+  },
+  "tooltip_url_probe": {
+    "message": "显示此网址命中哪条规则，匹配的行会高亮显示",
+    "description": "Shows which rule this URL hits; the matching row is highlighted"
   }
 }

@@ -94,5 +94,13 @@
   "keymap_reset_all": {
     "message": "استعادة الكل",
     "description": "reset all"
+  },
+  "url_probe_placeholder": {
+    "message": "رابط للتحقق",
+    "description": "URL to check"
+  },
+  "tooltip_url_probe": {
+    "message": "يعرض القاعدة التي يطابقها هذا الرابط، ويتم تمييز الصف المطابق",
+    "description": "Shows which rule this URL hits; the matching row is highlighted"
   }
 }

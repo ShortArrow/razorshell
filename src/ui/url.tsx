@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { ChevronDownIcon, ChevronUpIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { getMessage } from '../languages';
 import { loadUrlPolicy, saveUrlPolicy } from '../urlpolicy';
-import { MatchType, RuleAction, UrlPolicy, UrlRule, defaultUrlPolicy } from '../urlrules';
+import { MatchType, RuleAction, UrlPolicy, UrlRule, defaultUrlPolicy, findMatchingRuleIndex } from '../urlrules';
 
 const matchTypes: MatchType[] = ['exact', 'glob', 'regex'];
 const ruleActions: RuleAction[] = ['allow', 'deny'];
@@ -33,6 +33,10 @@ export function UrlApp() {
   const [matchType, setMatchType] = useState<MatchType>('exact');
   const [action, setAction] = useState<RuleAction>('deny');
   const [patternError, setPatternError] = useState<boolean>(false);
+  const [probe, setProbe] = useState<string>('');
+
+  const probedIndex = probe === '' ? null : findMatchingRuleIndex(probe, policy);
+  const probedRule = probedIndex === null ? null : policy.rules[probedIndex];
 
   useEffect(() => {
     const fetchPolicy = async () => {
@@ -110,6 +114,27 @@ export function UrlApp() {
         <button className='btn btn-primary join-item' onClick={addRule}>add rule</button>
       </div>
       {patternError ? <p className='text-error'>invalid regular expression</p> : null}
+      <div className='flex items-center gap-2'>
+        <div className='tooltip tooltip-top grow' data-tip={getMessage('tooltip_url_probe')()}>
+          <input
+            type='url'
+            data-testid='url-probe-input'
+            className='input input-bordered input-sm w-full'
+            placeholder={getMessage('url_probe_placeholder')()}
+            value={probe}
+            onChange={(e) => setProbe(e.target.value)}
+          />
+        </div>
+        <div className='flex justify-start items-center min-w-32 h-8'>
+          {
+            probe === ''
+              ? null
+              : <span data-testid='url-probe-result' className={actionBadgeClass(probedRule ? probedRule.action : policy.defaultAction)}>
+                {probedRule ? probedRule.action : `default: ${policy.defaultAction}`}
+              </span>
+          }
+        </div>
+      </div>
       <table className='table'>
         <thead>
           <tr>
@@ -125,7 +150,8 @@ export function UrlApp() {
         <tbody>
           {
             policy.rules.map((rule, index) => {
-              return <tr key={index}>
+              const matched = index === probedIndex;
+              return <tr key={index} className={matched ? 'bg-base-200' : undefined} data-matched={matched ? 'true' : undefined}>
                 <td>{index + 1}</td>
                 <td><span className={actionBadgeClass(rule.action)}>{rule.action}</span></td>
                 <td><span className='badge badge-outline'>{rule.matchType}</span></td>

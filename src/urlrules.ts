@@ -81,6 +81,18 @@ export function resolveAction(url: string, policy: UrlPolicy): RuleAction {
 }
 
 /**
+ * @fn findMatchingRuleIndex
+ * @brief Locate the first rule matching a url.
+ * @param string url - The full page url
+ * @param UrlPolicy policy - The policy to evaluate
+ * @return number | null - The index of the first matching rule, or null when none matches
+ */
+export function findMatchingRuleIndex(url: string, policy: UrlPolicy): number | null {
+  const index = policy.rules.findIndex((rule) => matchesRule(url, rule));
+  return index === -1 ? null : index;
+}
+
+/**
  * @fn migrateLegacyUrls
  * @brief Convert the legacy url denylist into a policy of exact deny rules.
  * @param string[] urls - The legacy url list

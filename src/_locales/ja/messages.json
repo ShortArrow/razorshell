@@ -94,5 +94,13 @@
   "keymap_reset_all": {
     "message": "全てリセット",
     "description": "reset all"
+  },
+  "url_probe_placeholder": {
+    "message": "確認したいURL",
+    "description": "URL to check"
+  },
+  "tooltip_url_probe": {
+    "message": "このURLがどのルールにヒットするか表示します。該当行がハイライトされます",
+    "description": "Shows which rule this URL hits; the matching row is highlighted"
   }
 }

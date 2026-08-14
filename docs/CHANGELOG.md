@@ -23,6 +23,9 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   is rejected with that row named (ADR-0004). Changes reach open
   tabs immediately, and a key match now runs only the first matching
   binding.
+- A URL tester above the rule list: type a URL and the first rule it
+  hits is highlighted, with the resulting action shown as a badge —
+  including when only the default action applies.
 - Tooltips on the options page controls — default policy, match
   type, rule action, rule ordering, language select, test area — in
   all eleven locales.

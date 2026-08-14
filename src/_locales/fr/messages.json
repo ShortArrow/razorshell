@@ -94,5 +94,13 @@
   "keymap_reset_all": {
     "message": "tout réinitialiser",
     "description": "reset all"
+  },
+  "url_probe_placeholder": {
+    "message": "URL à vérifier",
+    "description": "URL to check"
+  },
+  "tooltip_url_probe": {
+    "message": "Indique quelle règle correspond à cette URL ; la ligne correspondante est mise en évidence",
+    "description": "Shows which rule this URL hits; the matching row is highlighted"
   }
 }

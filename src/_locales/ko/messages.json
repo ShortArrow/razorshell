@@ -94,5 +94,13 @@
   "keymap_reset_all": {
     "message": "전체 초기화",
     "description": "reset all"
+  },
+  "url_probe_placeholder": {
+    "message": "확인할 URL",
+    "description": "URL to check"
+  },
+  "tooltip_url_probe": {
+    "message": "이 URL이 어떤 규칙에 걸리는지 표시하며, 일치하는 행이 강조됩니다",
+    "description": "Shows which rule this URL hits; the matching row is highlighted"
   }
 }
