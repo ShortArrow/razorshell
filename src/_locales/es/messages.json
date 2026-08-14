@@ -2,5 +2,65 @@
   "name": {
     "message": "Razorshell",
     "description": "Extension name"
+  },
+  "description": {
+    "message": "Esta extensión del navegador añade a los cuadros de texto atajos de teclado similares a los del intérprete bash. ",
+    "description": "Extension description"
+  },
+  "move_cursor_to_the_beginning": {
+    "message": "Mover el cursor al principio",
+    "description": "Move cursor to the beginning"
+  },
+  "move_cursor_to_the_end": {
+    "message": "Mover el cursor al final",
+    "description": "Move cursor to the end"
+  },
+  "delete_to_the_end_of_the_line": {
+    "message": "Borrar hasta el final de la línea",
+    "description": "Delete to the end of the line"
+  },
+  "move_cursor_to_the_next_character": {
+    "message": "Mover el cursor al carácter siguiente",
+    "description": "Move cursor to the next character"
+  },
+  "move_cursor_to_the_previous_character": {
+    "message": "Mover el cursor al carácter anterior",
+    "description": "Move cursor to the previous character"
+  },
+  "move_cursor_to_the_next_word": {
+    "message": "Mover el cursor a la palabra siguiente",
+    "description": "Move cursor to the next word"
+  },
+  "move_cursor_to_the_previous_word": {
+    "message": "Mover el cursor a la palabra anterior",
+    "description": "Move cursor to the previous word"
+  },
+  "delete_to_the_beginning_of_the_line": {
+    "message": "Borrar hasta el principio de la línea",
+    "description": "Delete to the beginning of the line"
+  },
+  "tooltip_default_policy": {
+    "message": "Se aplica cuando ninguna regla coincide",
+    "description": "Applied when no rule matches"
+  },
+  "tooltip_match_type": {
+    "message": "exact: la URL completa. glob: * permanece en un segmento, ** cruza /. regex: RegExp de JavaScript",
+    "description": "exact: whole URL. glob: * stays in one segment, ** crosses /. regex: JavaScript RegExp"
+  },
+  "tooltip_rule_action": {
+    "message": "allow activa los atajos de teclado, deny los desactiva",
+    "description": "allow enables the keybindings, deny disables them"
+  },
+  "tooltip_rule_order": {
+    "message": "Las reglas se aplican de arriba abajo; gana la primera coincidencia",
+    "description": "Rules apply top to bottom; the first match wins"
+  },
+  "tooltip_language_select": {
+    "message": "Sustituye el idioma de la página de opciones; auto sigue al navegador",
+    "description": "Overrides the options page language; auto follows the browser"
+  },
+  "tooltip_test_area": {
+    "message": "Pruebe aquí los atajos de teclado",
+    "description": "Try the keybindings here"
   }
 }

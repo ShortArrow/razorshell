@@ -2,5 +2,65 @@
   "name": {
     "message": "Razorshell",
     "description": "Extension name"
+  },
+  "description": {
+    "message": "Diese Browsererweiterung fügt Textfeldern Tastenkürzel im Stil der Bash-Shell hinzu. ",
+    "description": "Extension description"
+  },
+  "move_cursor_to_the_beginning": {
+    "message": "Cursor an den Anfang bewegen",
+    "description": "Move cursor to the beginning"
+  },
+  "move_cursor_to_the_end": {
+    "message": "Cursor ans Ende bewegen",
+    "description": "Move cursor to the end"
+  },
+  "delete_to_the_end_of_the_line": {
+    "message": "Bis zum Zeilenende löschen",
+    "description": "Delete to the end of the line"
+  },
+  "move_cursor_to_the_next_character": {
+    "message": "Cursor zum nächsten Zeichen bewegen",
+    "description": "Move cursor to the next character"
+  },
+  "move_cursor_to_the_previous_character": {
+    "message": "Cursor zum vorherigen Zeichen bewegen",
+    "description": "Move cursor to the previous character"
+  },
+  "move_cursor_to_the_next_word": {
+    "message": "Cursor zum nächsten Wort bewegen",
+    "description": "Move cursor to the next word"
+  },
+  "move_cursor_to_the_previous_word": {
+    "message": "Cursor zum vorherigen Wort bewegen",
+    "description": "Move cursor to the previous word"
+  },
+  "delete_to_the_beginning_of_the_line": {
+    "message": "Bis zum Zeilenanfang löschen",
+    "description": "Delete to the beginning of the line"
+  },
+  "tooltip_default_policy": {
+    "message": "Wird angewendet, wenn keine Regel zutrifft",
+    "description": "Applied when no rule matches"
+  },
+  "tooltip_match_type": {
+    "message": "exact: gesamte URL. glob: * bleibt in einem Segment, ** überschreitet /. regex: JavaScript-RegExp",
+    "description": "exact: whole URL. glob: * stays in one segment, ** crosses /. regex: JavaScript RegExp"
+  },
+  "tooltip_rule_action": {
+    "message": "allow aktiviert die Tastenkürzel, deny deaktiviert sie",
+    "description": "allow enables the keybindings, deny disables them"
+  },
+  "tooltip_rule_order": {
+    "message": "Regeln gelten von oben nach unten; die erste Übereinstimmung gewinnt",
+    "description": "Rules apply top to bottom; the first match wins"
+  },
+  "tooltip_language_select": {
+    "message": "Überschreibt die Sprache der Optionsseite; auto folgt dem Browser",
+    "description": "Overrides the options page language; auto follows the browser"
+  },
+  "tooltip_test_area": {
+    "message": "Probieren Sie die Tastenkürzel hier aus",
+    "description": "Try the keybindings here"
   }
 }

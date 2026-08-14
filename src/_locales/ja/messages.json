@@ -38,5 +38,29 @@
   "delete_to_the_beginning_of_the_line": {
     "message": "行の先頭まで削除",
     "description": "Delete to the beginning of the line"
+  },
+  "tooltip_default_policy": {
+    "message": "どのルールにもマッチしないときに適用されます",
+    "description": "Applied when no rule matches"
+  },
+  "tooltip_match_type": {
+    "message": "exact: URL全体一致。glob: *はセグメント内、**は/をまたぐ。regex: JavaScriptの正規表現",
+    "description": "exact: whole URL. glob: * stays in one segment, ** crosses /. regex: JavaScript RegExp"
+  },
+  "tooltip_rule_action": {
+    "message": "allowでキーバインドを有効化、denyで無効化",
+    "description": "allow enables the keybindings, deny disables them"
+  },
+  "tooltip_rule_order": {
+    "message": "ルールは上から順に評価され、最初にマッチしたものが適用されます",
+    "description": "Rules apply top to bottom; the first match wins"
+  },
+  "tooltip_language_select": {
+    "message": "オプションページの表示言語を上書きします。autoはブラウザ設定に従います",
+    "description": "Overrides the options page language; auto follows the browser"
+  },
+  "tooltip_test_area": {
+    "message": "ここでキーバインドを試せます",
+    "description": "Try the keybindings here"
   }
 }

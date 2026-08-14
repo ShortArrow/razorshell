@@ -2,5 +2,65 @@
   "name": {
     "message": "Razorshell",
     "description": "Extension name"
+  },
+  "description": {
+    "message": "Cette extension de navigateur ajoute aux champs de texte des raccourcis clavier inspirés du shell bash. ",
+    "description": "Extension description"
+  },
+  "move_cursor_to_the_beginning": {
+    "message": "Déplacer le curseur au début",
+    "description": "Move cursor to the beginning"
+  },
+  "move_cursor_to_the_end": {
+    "message": "Déplacer le curseur à la fin",
+    "description": "Move cursor to the end"
+  },
+  "delete_to_the_end_of_the_line": {
+    "message": "Supprimer jusqu'à la fin de la ligne",
+    "description": "Delete to the end of the line"
+  },
+  "move_cursor_to_the_next_character": {
+    "message": "Déplacer le curseur au caractère suivant",
+    "description": "Move cursor to the next character"
+  },
+  "move_cursor_to_the_previous_character": {
+    "message": "Déplacer le curseur au caractère précédent",
+    "description": "Move cursor to the previous character"
+  },
+  "move_cursor_to_the_next_word": {
+    "message": "Déplacer le curseur au mot suivant",
+    "description": "Move cursor to the next word"
+  },
+  "move_cursor_to_the_previous_word": {
+    "message": "Déplacer le curseur au mot précédent",
+    "description": "Move cursor to the previous word"
+  },
+  "delete_to_the_beginning_of_the_line": {
+    "message": "Supprimer jusqu'au début de la ligne",
+    "description": "Delete to the beginning of the line"
+  },
+  "tooltip_default_policy": {
+    "message": "Appliqué lorsqu'aucune règle ne correspond",
+    "description": "Applied when no rule matches"
+  },
+  "tooltip_match_type": {
+    "message": "exact : l'URL entière. glob : * reste dans un segment, ** franchit /. regex : RegExp JavaScript",
+    "description": "exact: whole URL. glob: * stays in one segment, ** crosses /. regex: JavaScript RegExp"
+  },
+  "tooltip_rule_action": {
+    "message": "allow active les raccourcis clavier, deny les désactive",
+    "description": "allow enables the keybindings, deny disables them"
+  },
+  "tooltip_rule_order": {
+    "message": "Les règles s'appliquent de haut en bas ; la première correspondance l'emporte",
+    "description": "Rules apply top to bottom; the first match wins"
+  },
+  "tooltip_language_select": {
+    "message": "Remplace la langue de la page d'options ; auto suit le navigateur",
+    "description": "Overrides the options page language; auto follows the browser"
+  },
+  "tooltip_test_area": {
+    "message": "Essayez les raccourcis clavier ici",
+    "description": "Try the keybindings here"
   }
 }

@@ -2,5 +2,65 @@
   "name": {
     "message": "Razorshell",
     "description": "Extension name"
+  },
+  "description": {
+    "message": "이 브라우저 확장 프로그램은 텍스트 상자에 bash 셸과 비슷한 키보드 단축키를 추가합니다. ",
+    "description": "Extension description"
+  },
+  "move_cursor_to_the_beginning": {
+    "message": "커서를 줄 맨 앞으로 이동",
+    "description": "Move cursor to the beginning"
+  },
+  "move_cursor_to_the_end": {
+    "message": "커서를 줄 맨 뒤로 이동",
+    "description": "Move cursor to the end"
+  },
+  "delete_to_the_end_of_the_line": {
+    "message": "줄 끝까지 삭제",
+    "description": "Delete to the end of the line"
+  },
+  "move_cursor_to_the_next_character": {
+    "message": "커서를 다음 문자로 이동",
+    "description": "Move cursor to the next character"
+  },
+  "move_cursor_to_the_previous_character": {
+    "message": "커서를 이전 문자로 이동",
+    "description": "Move cursor to the previous character"
+  },
+  "move_cursor_to_the_next_word": {
+    "message": "커서를 다음 단어로 이동",
+    "description": "Move cursor to the next word"
+  },
+  "move_cursor_to_the_previous_word": {
+    "message": "커서를 이전 단어로 이동",
+    "description": "Move cursor to the previous word"
+  },
+  "delete_to_the_beginning_of_the_line": {
+    "message": "줄 맨 앞까지 삭제",
+    "description": "Delete to the beginning of the line"
+  },
+  "tooltip_default_policy": {
+    "message": "어떤 규칙에도 일치하지 않을 때 적용됩니다",
+    "description": "Applied when no rule matches"
+  },
+  "tooltip_match_type": {
+    "message": "exact: URL 전체 일치. glob: *는 한 세그먼트 내, **는 /를 넘어감. regex: JavaScript 정규식",
+    "description": "exact: whole URL. glob: * stays in one segment, ** crosses /. regex: JavaScript RegExp"
+  },
+  "tooltip_rule_action": {
+    "message": "allow는 단축키를 활성화하고 deny는 비활성화합니다",
+    "description": "allow enables the keybindings, deny disables them"
+  },
+  "tooltip_rule_order": {
+    "message": "규칙은 위에서 아래로 적용되며 처음 일치한 규칙이 우선합니다",
+    "description": "Rules apply top to bottom; the first match wins"
+  },
+  "tooltip_language_select": {
+    "message": "옵션 페이지의 표시 언어를 덮어씁니다. auto는 브라우저 설정을 따릅니다",
+    "description": "Overrides the options page language; auto follows the browser"
+  },
+  "tooltip_test_area": {
+    "message": "여기에서 단축키를 시험해 보세요",
+    "description": "Try the keybindings here"
   }
 }

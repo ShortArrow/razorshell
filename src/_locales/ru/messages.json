@@ -2,5 +2,65 @@
   "name": {
     "message": "Razorshell",
     "description": "Extension name"
+  },
+  "description": {
+    "message": "Это расширение браузера добавляет в текстовые поля сочетания клавиш в стиле оболочки bash. ",
+    "description": "Extension description"
+  },
+  "move_cursor_to_the_beginning": {
+    "message": "Переместить курсор в начало строки",
+    "description": "Move cursor to the beginning"
+  },
+  "move_cursor_to_the_end": {
+    "message": "Переместить курсор в конец строки",
+    "description": "Move cursor to the end"
+  },
+  "delete_to_the_end_of_the_line": {
+    "message": "Удалить до конца строки",
+    "description": "Delete to the end of the line"
+  },
+  "move_cursor_to_the_next_character": {
+    "message": "Переместить курсор к следующему символу",
+    "description": "Move cursor to the next character"
+  },
+  "move_cursor_to_the_previous_character": {
+    "message": "Переместить курсор к предыдущему символу",
+    "description": "Move cursor to the previous character"
+  },
+  "move_cursor_to_the_next_word": {
+    "message": "Переместить курсор к следующему слову",
+    "description": "Move cursor to the next word"
+  },
+  "move_cursor_to_the_previous_word": {
+    "message": "Переместить курсор к предыдущему слову",
+    "description": "Move cursor to the previous word"
+  },
+  "delete_to_the_beginning_of_the_line": {
+    "message": "Удалить до начала строки",
+    "description": "Delete to the beginning of the line"
+  },
+  "tooltip_default_policy": {
+    "message": "Применяется, когда ни одно правило не подходит",
+    "description": "Applied when no rule matches"
+  },
+  "tooltip_match_type": {
+    "message": "exact: URL целиком. glob: * остаётся в пределах сегмента, ** пересекает /. regex: регулярное выражение JavaScript",
+    "description": "exact: whole URL. glob: * stays in one segment, ** crosses /. regex: JavaScript RegExp"
+  },
+  "tooltip_rule_action": {
+    "message": "allow включает сочетания клавиш, deny отключает их",
+    "description": "allow enables the keybindings, deny disables them"
+  },
+  "tooltip_rule_order": {
+    "message": "Правила применяются сверху вниз; побеждает первое совпадение",
+    "description": "Rules apply top to bottom; the first match wins"
+  },
+  "tooltip_language_select": {
+    "message": "Переопределяет язык страницы настроек; auto следует за браузером",
+    "description": "Overrides the options page language; auto follows the browser"
+  },
+  "tooltip_test_area": {
+    "message": "Попробуйте сочетания клавиш здесь",
+    "description": "Try the keybindings here"
   }
 }

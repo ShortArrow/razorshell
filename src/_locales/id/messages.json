@@ -2,5 +2,65 @@
   "name": {
     "message": "Razorshell",
     "description": "Extension name"
+  },
+  "description": {
+    "message": "Ekstensi peramban ini menambahkan pintasan papan ketik ala shell bash ke kotak teks. ",
+    "description": "Extension description"
+  },
+  "move_cursor_to_the_beginning": {
+    "message": "Pindahkan kursor ke awal baris",
+    "description": "Move cursor to the beginning"
+  },
+  "move_cursor_to_the_end": {
+    "message": "Pindahkan kursor ke akhir baris",
+    "description": "Move cursor to the end"
+  },
+  "delete_to_the_end_of_the_line": {
+    "message": "Hapus sampai akhir baris",
+    "description": "Delete to the end of the line"
+  },
+  "move_cursor_to_the_next_character": {
+    "message": "Pindahkan kursor ke karakter berikutnya",
+    "description": "Move cursor to the next character"
+  },
+  "move_cursor_to_the_previous_character": {
+    "message": "Pindahkan kursor ke karakter sebelumnya",
+    "description": "Move cursor to the previous character"
+  },
+  "move_cursor_to_the_next_word": {
+    "message": "Pindahkan kursor ke kata berikutnya",
+    "description": "Move cursor to the next word"
+  },
+  "move_cursor_to_the_previous_word": {
+    "message": "Pindahkan kursor ke kata sebelumnya",
+    "description": "Move cursor to the previous word"
+  },
+  "delete_to_the_beginning_of_the_line": {
+    "message": "Hapus sampai awal baris",
+    "description": "Delete to the beginning of the line"
+  },
+  "tooltip_default_policy": {
+    "message": "Diterapkan bila tidak ada aturan yang cocok",
+    "description": "Applied when no rule matches"
+  },
+  "tooltip_match_type": {
+    "message": "exact: seluruh URL. glob: * tetap dalam satu segmen, ** melintasi /. regex: RegExp JavaScript",
+    "description": "exact: whole URL. glob: * stays in one segment, ** crosses /. regex: JavaScript RegExp"
+  },
+  "tooltip_rule_action": {
+    "message": "allow mengaktifkan pintasan papan ketik, deny menonaktifkannya",
+    "description": "allow enables the keybindings, deny disables them"
+  },
+  "tooltip_rule_order": {
+    "message": "Aturan dievaluasi dari atas ke bawah; kecocokan pertama yang berlaku",
+    "description": "Rules apply top to bottom; the first match wins"
+  },
+  "tooltip_language_select": {
+    "message": "Menimpa bahasa halaman opsi; auto mengikuti peramban",
+    "description": "Overrides the options page language; auto follows the browser"
+  },
+  "tooltip_test_area": {
+    "message": "Coba pintasan papan ketik di sini",
+    "description": "Try the keybindings here"
   }
 }

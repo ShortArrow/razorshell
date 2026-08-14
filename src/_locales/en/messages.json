@@ -38,5 +38,29 @@
   "delete_to_the_beginning_of_the_line": {
     "message": "Delete to the beginning of the line",
     "description": "Delete to the beginning of the line"
+  },
+  "tooltip_default_policy": {
+    "message": "Applied when no rule matches",
+    "description": "Applied when no rule matches"
+  },
+  "tooltip_match_type": {
+    "message": "exact: whole URL. glob: * stays in one segment, ** crosses /. regex: JavaScript RegExp",
+    "description": "exact: whole URL. glob: * stays in one segment, ** crosses /. regex: JavaScript RegExp"
+  },
+  "tooltip_rule_action": {
+    "message": "allow enables the keybindings, deny disables them",
+    "description": "allow enables the keybindings, deny disables them"
+  },
+  "tooltip_rule_order": {
+    "message": "Rules apply top to bottom; the first match wins",
+    "description": "Rules apply top to bottom; the first match wins"
+  },
+  "tooltip_language_select": {
+    "message": "Overrides the options page language; auto follows the browser",
+    "description": "Overrides the options page language; auto follows the browser"
+  },
+  "tooltip_test_area": {
+    "message": "Try the keybindings here",
+    "description": "Try the keybindings here"
   }
 }

@@ -2,5 +2,65 @@
   "name": {
     "message": "Razorshell",
     "description": "Extension name"
+  },
+  "description": {
+    "message": "يضيف امتداد المتصفح هذا اختصارات لوحة مفاتيح شبيهة بصدفة bash إلى مربعات النص. ",
+    "description": "Extension description"
+  },
+  "move_cursor_to_the_beginning": {
+    "message": "نقل المؤشر إلى بداية السطر",
+    "description": "Move cursor to the beginning"
+  },
+  "move_cursor_to_the_end": {
+    "message": "نقل المؤشر إلى نهاية السطر",
+    "description": "Move cursor to the end"
+  },
+  "delete_to_the_end_of_the_line": {
+    "message": "الحذف حتى نهاية السطر",
+    "description": "Delete to the end of the line"
+  },
+  "move_cursor_to_the_next_character": {
+    "message": "نقل المؤشر إلى الحرف التالي",
+    "description": "Move cursor to the next character"
+  },
+  "move_cursor_to_the_previous_character": {
+    "message": "نقل المؤشر إلى الحرف السابق",
+    "description": "Move cursor to the previous character"
+  },
+  "move_cursor_to_the_next_word": {
+    "message": "نقل المؤشر إلى الكلمة التالية",
+    "description": "Move cursor to the next word"
+  },
+  "move_cursor_to_the_previous_word": {
+    "message": "نقل المؤشر إلى الكلمة السابقة",
+    "description": "Move cursor to the previous word"
+  },
+  "delete_to_the_beginning_of_the_line": {
+    "message": "الحذف حتى بداية السطر",
+    "description": "Delete to the beginning of the line"
+  },
+  "tooltip_default_policy": {
+    "message": "يُطبَّق عندما لا تطابق أي قاعدة",
+    "description": "Applied when no rule matches"
+  },
+  "tooltip_match_type": {
+    "message": "exact: عنوان URL بالكامل. glob: تبقى * داخل مقطع واحد، وتتجاوز ** الشرطة /. regex: تعبير JavaScript النمطي",
+    "description": "exact: whole URL. glob: * stays in one segment, ** crosses /. regex: JavaScript RegExp"
+  },
+  "tooltip_rule_action": {
+    "message": "يفعّل allow اختصارات لوحة المفاتيح، ويعطّلها deny",
+    "description": "allow enables the keybindings, deny disables them"
+  },
+  "tooltip_rule_order": {
+    "message": "تُطبَّق القواعد من الأعلى إلى الأسفل، وتفوز أول قاعدة مطابقة",
+    "description": "Rules apply top to bottom; the first match wins"
+  },
+  "tooltip_language_select": {
+    "message": "يتجاوز لغة صفحة الخيارات؛ ويتبع auto إعداد المتصفح",
+    "description": "Overrides the options page language; auto follows the browser"
+  },
+  "tooltip_test_area": {
+    "message": "جرّب اختصارات لوحة المفاتيح هنا",
+    "description": "Try the keybindings here"
   }
 }
