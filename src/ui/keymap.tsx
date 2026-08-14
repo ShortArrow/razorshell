@@ -7,10 +7,9 @@ export function KeymapApp() {
       {
         defaultKeymap.map((key, index) => {
           return (
-            <div className="tooltip tooltip-left"
-              hidden={key.description ? true : false}
+            <div key={index} className="tooltip tooltip-top"
               data-tip={key.description ? key.description() : ""}>
-              <div key={index} className="flex items-center gap-4">
+              <div className="flex items-center gap-4">
                 <p className="flex items-center gap-2">
                   {key.ctrl ? <><kbd className="kbd text-base-content">ctrl</kbd><span>+</span></> : ''}
                   {key.alt ? <><kbd className="kbd text-base-content">alt</kbd><span>+</span></> : ''}
