@@ -24,7 +24,7 @@ function swapped(rules: UrlRule[], index: number, target: number): UrlRule[] {
 }
 
 function actionBadgeClass(action: RuleAction): string {
-  return action === 'allow' ? 'badge badge-primary' : 'badge badge-secondary';
+  return action === 'allow' ? 'badge badge-success' : 'badge badge-error';
 }
 
 export function UrlApp() {
