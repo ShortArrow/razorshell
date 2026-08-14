@@ -112,7 +112,19 @@ export function KeymapApp() {
 
   return (
     <div className='flex flex-col w-full gap-3'>
-      <h2 className='h2'>Keymap</h2>
+      <div className='flex items-center gap-2'>
+        <h2 className='h2 m-0'>Keymap</h2>
+        <button
+          className='btn btn-sm btn-ghost btn-square'
+          data-testid='keymap-reset-all'
+          aria-label={getMessage('keymap_reset_all')()}
+          title={getMessage('keymap_reset_all')()}
+          disabled={overriddenCount === 0}
+          onClick={resetAll}
+        >
+          <ArrowPathIcon className='w-5 h-5' />
+        </button>
+      </div>
       <table className='table table-sm'>
         <thead>
           <tr>
@@ -174,16 +186,6 @@ export function KeymapApp() {
           ? `${labelOf(conflict.id)} — ${getMessage('keymap_conflict_with')()}${labelOf(conflict.withId)}`
           : ''}
       </p>
-      <div>
-        <button
-          className='btn btn-sm'
-          data-testid='keymap-reset-all'
-          disabled={overriddenCount === 0}
-          onClick={resetAll}
-        >
-          {getMessage('keymap_reset_all')()}
-        </button>
-      </div>
     </div>
   );
 }
