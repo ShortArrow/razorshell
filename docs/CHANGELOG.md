@@ -23,6 +23,11 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   is rejected with that row named (ADR-0004). Changes reach open
   tabs immediately, and a key match now runs only the first matching
   binding.
+- The toolbar icon shows an "off" badge on tabs where the URL policy
+  disables the keybindings, so the extension's own state is visible
+  next to Chrome's site-access indicator. The two stay separate
+  layers: Chrome decides whether the content script is injected at
+  all, the policy decides whether an injected script acts.
 - Conflict inspector: clicking the extension icon puts the page in
   inspect mode; clicking a text field probes every current binding
   and lists the ones the page already consumes, as an in-page toast

@@ -11,12 +11,19 @@ import { UrlPolicy, resolveAction } from "./urlrules";
 console.log("extension razorshell loaded");
 
 const inspectMessage = "razorshell-inspect";
+const stateMessage = "razorshell-state";
 
 let enabled = true;
 let inspecting = false;
 
+function reportState(): void {
+  if (window !== window.top) return;
+  chrome.runtime.sendMessage({ type: stateMessage, enabled }).catch(() => {});
+}
+
 function applyUrlPolicy(policy: UrlPolicy) {
   enabled = resolveAction(location.href, policy) !== "deny";
+  reportState();
 }
 
 loadUrlPolicy().then(applyUrlPolicy);
