@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowPathIcon, EllipsisHorizontalIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
+import { ArrowPathIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import { keyChord } from "../keychord";
 import { defaultKeymap } from "../keymap";
 import { Chord, findConflict } from "../keymapmerge";
@@ -159,7 +159,7 @@ export function KeymapApp() {
                       onClick={() => startCapture(entry.id)}
                     >
                       {capturing === entry.id
-                        ? <EllipsisHorizontalIcon className='w-4 h-4' />
+                        ? <span className='loading loading-dots loading-xs' />
                         : <PencilSquareIcon className='w-4 h-4' />}
                     </button>
                     <button
