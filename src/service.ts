@@ -7,7 +7,7 @@
 
 const inspectMessage = "razorshell-inspect";
 const stateMessage = "razorshell-state";
-const disabledBadgeText = "×";
+const disabledBadgeText = "✕";
 const disabledBadgeColor = "#b91c1c";
 
 chrome.action.onClicked.addListener((tab) => {
