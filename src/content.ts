@@ -1,18 +1,20 @@
 import { defaultKeymap, keymaching } from "./keymap";
 import { debug } from "./debug";
+import { TextField } from "./operation";
 
 console.log("extension razorshell loaded");
-const query = [
-  'input[type="text"]',
-  'input[type="search"]',
-  'input[type="url"]',
-  'input[type="tel"]',
-  'input[type="email"]',
-].join(", ");
-// select all elements that can input single line text
-const textInputs = document.querySelectorAll<HTMLInputElement>(query);
 
-export function keyEventHandling(event: KeyboardEvent, textinput: HTMLInputElement) {
+const targetInputTypes = ["text", "search", "url", "tel", "email"];
+
+export function isTextField(target: EventTarget | null): target is TextField {
+  if (target instanceof HTMLTextAreaElement) return true;
+  return (
+    target instanceof HTMLInputElement &&
+    targetInputTypes.includes(target.type)
+  );
+}
+
+export function keyEventHandling(event: KeyboardEvent, textinput: TextField) {
   debug.logKey(event);
   defaultKeymap.forEach((keymap) => {
     if (!keymaching(event, keymap)) {
@@ -24,17 +26,14 @@ export function keyEventHandling(event: KeyboardEvent, textinput: HTMLInputEleme
   });
 }
 
-function eventListenerInjection(textinput: HTMLInputElement) {
-  textinput.addEventListener(
-    "keydown",
-    (event) => keyEventHandling(event, textinput),
-  );
-}
-
-// Main logic of the extension from here.
-
-if (textInputs.length === 0) {
-  console.log("nothing targets");
-} else {
-  textInputs.forEach(eventListenerInjection);
-}
+// Delegate at document level so text fields added after page load are
+// also covered, unlike per-element listeners bound once at injection.
+document.addEventListener(
+  "keydown",
+  (event) => {
+    const target = event.target;
+    if (!isTextField(target)) return;
+    keyEventHandling(event, target);
+  },
+  { capture: true },
+);

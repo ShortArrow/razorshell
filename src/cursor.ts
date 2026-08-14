@@ -23,6 +23,14 @@ export const cursor = {
     }
     return cursor;
   },
+  getTopOfLine(text: string, cursor: number): number {
+    if (cursor === 0) return 0;
+    return text.lastIndexOf("\n", cursor - 1) + 1;
+  },
+  getEndOfLine(text: string, cursor: number): number {
+    const newline = text.indexOf("\n", cursor);
+    return newline === -1 ? text.length : newline;
+  },
   getEndOfWord(text: string, cursor: number): number {
     const sliced = text.slice(cursor);
     if (sliced === "") return text.length;
