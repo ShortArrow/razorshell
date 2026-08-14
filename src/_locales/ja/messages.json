@@ -62,5 +62,37 @@
   "tooltip_test_area": {
     "message": "ここでキーバインドを試せます",
     "description": "Try the keybindings here"
+  },
+  "keymap_col_action": {
+    "message": "操作",
+    "description": "action"
+  },
+  "keymap_col_default": {
+    "message": "デフォルト",
+    "description": "default"
+  },
+  "keymap_col_current": {
+    "message": "現在",
+    "description": "current"
+  },
+  "keymap_rebind": {
+    "message": "再設定",
+    "description": "rebind"
+  },
+  "keymap_press_key": {
+    "message": "キーを入力...",
+    "description": "press a key..."
+  },
+  "keymap_conflict_with": {
+    "message": "次と重複: ",
+    "description": "conflicts with: "
+  },
+  "keymap_reset": {
+    "message": "リセット",
+    "description": "reset"
+  },
+  "keymap_reset_all": {
+    "message": "全てリセット",
+    "description": "reset all"
   }
 }

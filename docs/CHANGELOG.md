@@ -17,6 +17,12 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 - The options test area shows the last keydown — the chord, whether
   the extension handled it, the event code — and the selection range
   of each test field.
+- Keybindings can be rebound from the options page: each row shows
+  the default and current chord, captures a new one on "rebind", and
+  resets per row or all at once. A chord already held by another row
+  is rejected with that row named (ADR-0004). Changes reach open
+  tabs immediately, and a key match now runs only the first matching
+  binding.
 - Tooltips on the options page controls — default policy, match
   type, rule action, rule ordering, language select, test area — in
   all eleven locales.

@@ -62,5 +62,37 @@
   "tooltip_test_area": {
     "message": "Teste os atalhos de teclado aqui",
     "description": "Try the keybindings here"
+  },
+  "keymap_col_action": {
+    "message": "ação",
+    "description": "action"
+  },
+  "keymap_col_default": {
+    "message": "padrão",
+    "description": "default"
+  },
+  "keymap_col_current": {
+    "message": "atual",
+    "description": "current"
+  },
+  "keymap_rebind": {
+    "message": "redefinir atalho",
+    "description": "rebind"
+  },
+  "keymap_press_key": {
+    "message": "pressione uma tecla...",
+    "description": "press a key..."
+  },
+  "keymap_conflict_with": {
+    "message": "conflita com: ",
+    "description": "conflicts with: "
+  },
+  "keymap_reset": {
+    "message": "restaurar",
+    "description": "reset"
+  },
+  "keymap_reset_all": {
+    "message": "restaurar tudo",
+    "description": "reset all"
   }
 }

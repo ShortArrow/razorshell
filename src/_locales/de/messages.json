@@ -62,5 +62,37 @@
   "tooltip_test_area": {
     "message": "Probieren Sie die Tastenkürzel hier aus",
     "description": "Try the keybindings here"
+  },
+  "keymap_col_action": {
+    "message": "Aktion",
+    "description": "action"
+  },
+  "keymap_col_default": {
+    "message": "Standard",
+    "description": "default"
+  },
+  "keymap_col_current": {
+    "message": "Aktuell",
+    "description": "current"
+  },
+  "keymap_rebind": {
+    "message": "neu belegen",
+    "description": "rebind"
+  },
+  "keymap_press_key": {
+    "message": "Taste drücken...",
+    "description": "press a key..."
+  },
+  "keymap_conflict_with": {
+    "message": "Konflikt mit: ",
+    "description": "conflicts with: "
+  },
+  "keymap_reset": {
+    "message": "zurücksetzen",
+    "description": "reset"
+  },
+  "keymap_reset_all": {
+    "message": "alle zurücksetzen",
+    "description": "reset all"
   }
 }

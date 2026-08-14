@@ -62,5 +62,37 @@
   "tooltip_test_area": {
     "message": "Попробуйте сочетания клавиш здесь",
     "description": "Try the keybindings here"
+  },
+  "keymap_col_action": {
+    "message": "действие",
+    "description": "action"
+  },
+  "keymap_col_default": {
+    "message": "по умолчанию",
+    "description": "default"
+  },
+  "keymap_col_current": {
+    "message": "текущее",
+    "description": "current"
+  },
+  "keymap_rebind": {
+    "message": "переназначить",
+    "description": "rebind"
+  },
+  "keymap_press_key": {
+    "message": "нажмите клавишу...",
+    "description": "press a key..."
+  },
+  "keymap_conflict_with": {
+    "message": "конфликтует с: ",
+    "description": "conflicts with: "
+  },
+  "keymap_reset": {
+    "message": "сбросить",
+    "description": "reset"
+  },
+  "keymap_reset_all": {
+    "message": "сбросить все",
+    "description": "reset all"
   }
 }

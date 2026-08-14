@@ -3,6 +3,7 @@ import { cursor } from "./cursor";
 export type TextField = HTMLInputElement | HTMLTextAreaElement;
 
 export interface Keymap {
+  id: string;
   label: string;
   operation: (textinput: TextField) => void;
   description?: () => string;

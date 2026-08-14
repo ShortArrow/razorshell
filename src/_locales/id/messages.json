@@ -62,5 +62,37 @@
   "tooltip_test_area": {
     "message": "Coba pintasan papan ketik di sini",
     "description": "Try the keybindings here"
+  },
+  "keymap_col_action": {
+    "message": "tindakan",
+    "description": "action"
+  },
+  "keymap_col_default": {
+    "message": "bawaan",
+    "description": "default"
+  },
+  "keymap_col_current": {
+    "message": "saat ini",
+    "description": "current"
+  },
+  "keymap_rebind": {
+    "message": "atur ulang",
+    "description": "rebind"
+  },
+  "keymap_press_key": {
+    "message": "tekan sebuah tombol...",
+    "description": "press a key..."
+  },
+  "keymap_conflict_with": {
+    "message": "bentrok dengan: ",
+    "description": "conflicts with: "
+  },
+  "keymap_reset": {
+    "message": "setel ulang",
+    "description": "reset"
+  },
+  "keymap_reset_all": {
+    "message": "setel ulang semua",
+    "description": "reset all"
   }
 }

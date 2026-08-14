@@ -62,5 +62,37 @@
   "tooltip_test_area": {
     "message": "Try the keybindings here",
     "description": "Try the keybindings here"
+  },
+  "keymap_col_action": {
+    "message": "action",
+    "description": "action"
+  },
+  "keymap_col_default": {
+    "message": "default",
+    "description": "default"
+  },
+  "keymap_col_current": {
+    "message": "current",
+    "description": "current"
+  },
+  "keymap_rebind": {
+    "message": "rebind",
+    "description": "rebind"
+  },
+  "keymap_press_key": {
+    "message": "press a key...",
+    "description": "press a key..."
+  },
+  "keymap_conflict_with": {
+    "message": "conflicts with: ",
+    "description": "conflicts with: "
+  },
+  "keymap_reset": {
+    "message": "reset",
+    "description": "reset"
+  },
+  "keymap_reset_all": {
+    "message": "reset all",
+    "description": "reset all"
   }
 }

@@ -1,4 +1,5 @@
 import { isTextField, keyEventHandling } from "./keyhandling";
+import { initKeymap } from "./keymapstore";
 import { loadUrlPolicy, subscribeUrlPolicy } from "./urlpolicy";
 import { UrlPolicy, resolveAction } from "./urlrules";
 
@@ -12,6 +13,7 @@ function applyUrlPolicy(policy: UrlPolicy) {
 
 loadUrlPolicy().then(applyUrlPolicy);
 subscribeUrlPolicy(applyUrlPolicy);
+initKeymap();
 
 // Delegate at document level so text fields added after page load are
 // also covered, unlike per-element listeners bound once at injection.

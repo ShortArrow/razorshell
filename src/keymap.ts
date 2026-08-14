@@ -27,6 +27,7 @@ export function keymaching(event: KeyboardEvent, key: Keymap): boolean {
 
 export const defaultKeymap: Keymap[] = [
   {
+    id: "move_cursor_to_the_beginning",
     label: "move cursor to the beginning",
     description: getMessage("move_cursor_to_the_beginning"),
     operation: operation.moveToTOL,
@@ -34,6 +35,7 @@ export const defaultKeymap: Keymap[] = [
     key: "a",
   },
   {
+    id: "move_cursor_to_the_end",
     label: "move cursor to the end",
     description: getMessage("move_cursor_to_the_end"),
     operation: operation.moveToEOL,
@@ -41,6 +43,7 @@ export const defaultKeymap: Keymap[] = [
     key: "e",
   },
   {
+    id: "delete_to_the_end_of_the_line",
     label: "delete to the end of the line",
     description: getMessage("delete_to_the_end_of_the_line"),
     operation: operation.deleteToEOL,
@@ -48,6 +51,7 @@ export const defaultKeymap: Keymap[] = [
     key: "k",
   },
   {
+    id: "move_cursor_to_the_next_character",
     label: "move cursor to the next character",
     description: getMessage("move_cursor_to_the_next_character"),
     operation: operation.moveToNextChar,
@@ -55,6 +59,7 @@ export const defaultKeymap: Keymap[] = [
     key: "f",
   },
   {
+    id: "move_cursor_to_the_previous_character",
     label: "move cursor to the previous character",
     description: getMessage("move_cursor_to_the_previous_character"),
     operation: operation.moveToPreviousChar,
@@ -62,6 +67,7 @@ export const defaultKeymap: Keymap[] = [
     key: "b",
   },
   {
+    id: "move_cursor_to_the_next_word",
     label: "move cursor to the next word",
     description: getMessage("move_cursor_to_the_next_word"),
     operation: operation.moveToEndOfWord,
@@ -69,6 +75,7 @@ export const defaultKeymap: Keymap[] = [
     key: "f",
   },
   {
+    id: "move_cursor_to_the_previous_word",
     label: "move cursor to the previous word",
     description: getMessage("move_cursor_to_the_previous_word"),
     operation: operation.moveToTopOfWord,
@@ -76,6 +83,7 @@ export const defaultKeymap: Keymap[] = [
     key: "b",
   },
   {
+    id: "delete_to_the_beginning_of_the_line",
     label: "delete to the beginning of the line",
     description: getMessage("delete_to_the_beginning_of_the_line"),
     operation: operation.deleteToTOL,

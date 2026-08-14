@@ -62,5 +62,37 @@
   "tooltip_test_area": {
     "message": "جرّب اختصارات لوحة المفاتيح هنا",
     "description": "Try the keybindings here"
+  },
+  "keymap_col_action": {
+    "message": "الإجراء",
+    "description": "action"
+  },
+  "keymap_col_default": {
+    "message": "الافتراضي",
+    "description": "default"
+  },
+  "keymap_col_current": {
+    "message": "الحالي",
+    "description": "current"
+  },
+  "keymap_rebind": {
+    "message": "إعادة التعيين",
+    "description": "rebind"
+  },
+  "keymap_press_key": {
+    "message": "اضغط مفتاحًا...",
+    "description": "press a key..."
+  },
+  "keymap_conflict_with": {
+    "message": "يتعارض مع: ",
+    "description": "conflicts with: "
+  },
+  "keymap_reset": {
+    "message": "استعادة",
+    "description": "reset"
+  },
+  "keymap_reset_all": {
+    "message": "استعادة الكل",
+    "description": "reset all"
   }
 }

@@ -1,6 +1,7 @@
-import { defaultKeymap, keymaching } from "./keymap";
+import { keymaching } from "./keymap";
+import { getActiveKeymap } from "./keymapstore";
 import { debug } from "./debug";
-import { TextField } from "./operation";
+import { Keymap, TextField } from "./operation";
 
 const targetInputTypes = ["text", "search", "url", "tel", "email"];
 
@@ -16,17 +17,22 @@ export function isTextField(target: EventTarget | null): target is TextField {
 }
 
 /**
- * Runs every keymap entry matching the event against the given text field,
- * cancelling the default action for each match.
+ * Runs the first keymap entry matching the event against the given text field,
+ * cancelling the default action. A chord bound twice fires only its first entry,
+ * and an unmatched event is left untouched.
+ */
+export function dispatchKey(event: KeyboardEvent, textinput: TextField, keymap: Keymap[]): void {
+  const matched = keymap.find((entry) => keymaching(event, entry));
+  if (!matched) return;
+  console.debug("key matched");
+  event.preventDefault(); // cancel default action
+  matched.operation(textinput);
+}
+
+/**
+ * Dispatches the event against the keymap currently in force.
  */
 export function keyEventHandling(event: KeyboardEvent, textinput: TextField) {
   debug.logKey(event);
-  defaultKeymap.forEach((keymap) => {
-    if (!keymaching(event, keymap)) {
-      return;
-    }
-    console.debug("key matched");
-    event.preventDefault(); // cancel default action
-    keymap.operation(textinput);
-  });
+  dispatchKey(event, textinput, getActiveKeymap());
 }

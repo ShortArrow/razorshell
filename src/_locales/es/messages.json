@@ -62,5 +62,37 @@
   "tooltip_test_area": {
     "message": "Pruebe aquí los atajos de teclado",
     "description": "Try the keybindings here"
+  },
+  "keymap_col_action": {
+    "message": "acción",
+    "description": "action"
+  },
+  "keymap_col_default": {
+    "message": "predeterminado",
+    "description": "default"
+  },
+  "keymap_col_current": {
+    "message": "actual",
+    "description": "current"
+  },
+  "keymap_rebind": {
+    "message": "reasignar",
+    "description": "rebind"
+  },
+  "keymap_press_key": {
+    "message": "pulsa una tecla...",
+    "description": "press a key..."
+  },
+  "keymap_conflict_with": {
+    "message": "entra en conflicto con: ",
+    "description": "conflicts with: "
+  },
+  "keymap_reset": {
+    "message": "restablecer",
+    "description": "reset"
+  },
+  "keymap_reset_all": {
+    "message": "restablecer todo",
+    "description": "reset all"
   }
 }

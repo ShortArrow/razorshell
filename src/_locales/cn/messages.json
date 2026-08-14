@@ -62,5 +62,37 @@
   "tooltip_test_area": {
     "message": "在这里试用快捷键",
     "description": "Try the keybindings here"
+  },
+  "keymap_col_action": {
+    "message": "操作",
+    "description": "action"
+  },
+  "keymap_col_default": {
+    "message": "默认",
+    "description": "default"
+  },
+  "keymap_col_current": {
+    "message": "当前",
+    "description": "current"
+  },
+  "keymap_rebind": {
+    "message": "重新绑定",
+    "description": "rebind"
+  },
+  "keymap_press_key": {
+    "message": "请按一个键...",
+    "description": "press a key..."
+  },
+  "keymap_conflict_with": {
+    "message": "与以下冲突: ",
+    "description": "conflicts with: "
+  },
+  "keymap_reset": {
+    "message": "重置",
+    "description": "reset"
+  },
+  "keymap_reset_all": {
+    "message": "全部重置",
+    "description": "reset all"
   }
 }

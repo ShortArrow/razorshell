@@ -62,5 +62,37 @@
   "tooltip_test_area": {
     "message": "여기에서 단축키를 시험해 보세요",
     "description": "Try the keybindings here"
+  },
+  "keymap_col_action": {
+    "message": "동작",
+    "description": "action"
+  },
+  "keymap_col_default": {
+    "message": "기본값",
+    "description": "default"
+  },
+  "keymap_col_current": {
+    "message": "현재",
+    "description": "current"
+  },
+  "keymap_rebind": {
+    "message": "다시 지정",
+    "description": "rebind"
+  },
+  "keymap_press_key": {
+    "message": "키를 누르세요...",
+    "description": "press a key..."
+  },
+  "keymap_conflict_with": {
+    "message": "다음과 중복: ",
+    "description": "conflicts with: "
+  },
+  "keymap_reset": {
+    "message": "초기화",
+    "description": "reset"
+  },
+  "keymap_reset_all": {
+    "message": "전체 초기화",
+    "description": "reset all"
   }
 }
