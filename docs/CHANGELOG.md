@@ -5,6 +5,15 @@ Notable changes to Razorshell. The format is based on
 
 ## [Unreleased]
 
+### Fixed
+
+- The options page title image, broken since a 2024 path refactor left
+  `src/images/razorshell.svg` as a 26-byte stub containing only the
+  string `../../image/razorshell.svg`. The artwork now lives at
+  `image/razorshell.svg` and is bundled from there; the packaged
+  `images/` directory ships only the files the manifest and options
+  page reference.
+
 ### Added
 
 - URL allow/deny policy: ordered rules evaluated first-match-wins

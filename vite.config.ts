@@ -10,7 +10,17 @@ export default defineConfig({
       targets: [
         { src: 'src/options.html', dest: '.', rename: { stripBase: 1 } },
         { src: 'src/manifest.json', dest: '.', rename: { stripBase: 1 } },
-        { src: 'src/images', dest: '.', rename: { stripBase: 1 } },
+        {
+          src: [
+            'src/images/16.png',
+            'src/images/32.png',
+            'src/images/48.png',
+            'src/images/128.png',
+            'src/images/icon.svg',
+          ],
+          dest: '.',
+          rename: { stripBase: 1 },
+        },
         { src: 'src/_locales', dest: '.', rename: { stripBase: 1 } },
       ],
     })

@@ -1,4 +1,4 @@
-import iconImage from '../images/razorshell.svg'
+import iconImage from '../../image/razorshell.svg'
 export function TitleApp() {
   return <>
     <div className='flex flex-col items-center gap-3'>
