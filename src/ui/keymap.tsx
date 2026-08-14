@@ -128,9 +128,9 @@ export function KeymapApp() {
       <table className='table table-sm'>
         <thead>
           <tr>
-            <th>{getMessage('keymap_col_action')()}</th>
-            <th>{getMessage('keymap_col_default')()}</th>
-            <th>{getMessage('keymap_col_current')()}</th>
+            <th>action</th>
+            <th>default</th>
+            <th>current</th>
             <th></th>
           </tr>
         </thead>
@@ -183,7 +183,7 @@ export function KeymapApp() {
         data-testid={conflict ? `conflict-${conflict.id}` : 'keymap-no-conflict'}
       >
         {conflict
-          ? `${labelOf(conflict.id)} — ${getMessage('keymap_conflict_with')()}${labelOf(conflict.withId)}`
+          ? `${labelOf(conflict.id)} — conflicts with: ${labelOf(conflict.withId)}`
           : ''}
       </p>
     </div>

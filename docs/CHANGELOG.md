@@ -56,6 +56,9 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ### Changed
 
+- Options page strings outside tooltips are English literals; only
+  tooltips (and the extension description) localize (ADR-0007). Six
+  message keys leave all eleven locales.
 - The keymap list is a compact table instead of a stack of rows, and
   its tooltips open upward.
 

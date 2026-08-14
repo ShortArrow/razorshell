@@ -29,7 +29,7 @@ export function RichTextApp() {
             checked={enabled}
             onChange={(e) => apply(e.target.checked)}
           />
-          <span className='label-text'>{getMessage('richtext_label')()}</span>
+          <span className='label-text'>Enable in rich text editors</span>
         </label>
       </div>
     </div>

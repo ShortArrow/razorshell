@@ -63,18 +63,6 @@
     "message": "Essayez les raccourcis clavier ici",
     "description": "Try the keybindings here"
   },
-  "keymap_col_action": {
-    "message": "action",
-    "description": "action"
-  },
-  "keymap_col_default": {
-    "message": "par défaut",
-    "description": "default"
-  },
-  "keymap_col_current": {
-    "message": "actuel",
-    "description": "current"
-  },
   "keymap_rebind": {
     "message": "réattribuer",
     "description": "rebind"
@@ -83,10 +71,6 @@
     "message": "appuyez sur une touche...",
     "description": "press a key..."
   },
-  "keymap_conflict_with": {
-    "message": "en conflit avec : ",
-    "description": "conflicts with: "
-  },
   "keymap_reset": {
     "message": "réinitialiser",
     "description": "reset"
@@ -94,10 +78,6 @@
   "keymap_reset_all": {
     "message": "tout réinitialiser",
     "description": "reset all"
-  },
-  "url_probe_placeholder": {
-    "message": "URL à vérifier",
-    "description": "URL to check"
   },
   "tooltip_url_probe": {
     "message": "Indique quelle règle correspond à cette URL ; la ligne correspondante est mise en évidence",
@@ -122,10 +102,6 @@
   "inspect_unknown_listeners": {
     "message": "Écouteurs keydown non analysables : ",
     "description": "keydown listeners that could not be analyzed: "
-  },
-  "richtext_label": {
-    "message": "Activer dans les éditeurs de texte enrichi",
-    "description": "Enable in rich text editors"
   },
   "tooltip_richtext": {
     "message": "Applique les raccourcis dans les éditeurs contenteditable. Des sites comme Gmail ont leurs propres raccourcis ; utilisez l'inspecteur pour vérifier les conflits",

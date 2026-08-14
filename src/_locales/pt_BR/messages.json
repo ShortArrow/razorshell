@@ -63,18 +63,6 @@
     "message": "Teste os atalhos de teclado aqui",
     "description": "Try the keybindings here"
   },
-  "keymap_col_action": {
-    "message": "ação",
-    "description": "action"
-  },
-  "keymap_col_default": {
-    "message": "padrão",
-    "description": "default"
-  },
-  "keymap_col_current": {
-    "message": "atual",
-    "description": "current"
-  },
   "keymap_rebind": {
     "message": "redefinir atalho",
     "description": "rebind"
@@ -83,10 +71,6 @@
     "message": "pressione uma tecla...",
     "description": "press a key..."
   },
-  "keymap_conflict_with": {
-    "message": "conflita com: ",
-    "description": "conflicts with: "
-  },
   "keymap_reset": {
     "message": "restaurar",
     "description": "reset"
@@ -94,10 +78,6 @@
   "keymap_reset_all": {
     "message": "restaurar tudo",
     "description": "reset all"
-  },
-  "url_probe_placeholder": {
-    "message": "URL para verificar",
-    "description": "URL to check"
   },
   "tooltip_url_probe": {
     "message": "Mostra qual regra esta URL atinge; a linha correspondente fica destacada",
@@ -122,10 +102,6 @@
   "inspect_unknown_listeners": {
     "message": "Ouvintes de keydown que não puderam ser analisados: ",
     "description": "keydown listeners that could not be analyzed: "
-  },
-  "richtext_label": {
-    "message": "Ativar em editores de texto formatado",
-    "description": "Enable in rich text editors"
   },
   "tooltip_richtext": {
     "message": "Aplica os atalhos dentro de editores baseados em contenteditable. Sites como o Gmail têm atalhos próprios; use o inspetor para verificar conflitos",

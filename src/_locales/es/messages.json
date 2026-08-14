@@ -63,18 +63,6 @@
     "message": "Pruebe aquí los atajos de teclado",
     "description": "Try the keybindings here"
   },
-  "keymap_col_action": {
-    "message": "acción",
-    "description": "action"
-  },
-  "keymap_col_default": {
-    "message": "predeterminado",
-    "description": "default"
-  },
-  "keymap_col_current": {
-    "message": "actual",
-    "description": "current"
-  },
   "keymap_rebind": {
     "message": "reasignar",
     "description": "rebind"
@@ -83,10 +71,6 @@
     "message": "pulsa una tecla...",
     "description": "press a key..."
   },
-  "keymap_conflict_with": {
-    "message": "entra en conflicto con: ",
-    "description": "conflicts with: "
-  },
   "keymap_reset": {
     "message": "restablecer",
     "description": "reset"
@@ -94,10 +78,6 @@
   "keymap_reset_all": {
     "message": "restablecer todo",
     "description": "reset all"
-  },
-  "url_probe_placeholder": {
-    "message": "URL para comprobar",
-    "description": "URL to check"
   },
   "tooltip_url_probe": {
     "message": "Muestra qué regla coincide con esta URL; la fila coincidente se resalta",
@@ -122,10 +102,6 @@
   "inspect_unknown_listeners": {
     "message": "Detectores de keydown que no se pudieron analizar: ",
     "description": "keydown listeners that could not be analyzed: "
-  },
-  "richtext_label": {
-    "message": "Activar en editores de texto enriquecido",
-    "description": "Enable in rich text editors"
   },
   "tooltip_richtext": {
     "message": "Aplica los atajos dentro de editores basados en contenteditable. Sitios como Gmail tienen sus propios atajos; usa el inspector para comprobar conflictos",

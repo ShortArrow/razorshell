@@ -63,18 +63,6 @@
     "message": "جرّب اختصارات لوحة المفاتيح هنا",
     "description": "Try the keybindings here"
   },
-  "keymap_col_action": {
-    "message": "الإجراء",
-    "description": "action"
-  },
-  "keymap_col_default": {
-    "message": "الافتراضي",
-    "description": "default"
-  },
-  "keymap_col_current": {
-    "message": "الحالي",
-    "description": "current"
-  },
   "keymap_rebind": {
     "message": "إعادة التعيين",
     "description": "rebind"
@@ -83,10 +71,6 @@
     "message": "اضغط مفتاحًا...",
     "description": "press a key..."
   },
-  "keymap_conflict_with": {
-    "message": "يتعارض مع: ",
-    "description": "conflicts with: "
-  },
   "keymap_reset": {
     "message": "استعادة",
     "description": "reset"
@@ -94,10 +78,6 @@
   "keymap_reset_all": {
     "message": "استعادة الكل",
     "description": "reset all"
-  },
-  "url_probe_placeholder": {
-    "message": "رابط للتحقق",
-    "description": "URL to check"
   },
   "tooltip_url_probe": {
     "message": "يعرض القاعدة التي يطابقها هذا الرابط، ويتم تمييز الصف المطابق",
@@ -122,10 +102,6 @@
   "inspect_unknown_listeners": {
     "message": "مستمعو keydown الذين تعذر تحليلهم: ",
     "description": "keydown listeners that could not be analyzed: "
-  },
-  "richtext_label": {
-    "message": "التفعيل في محرّرات النص المنسّق",
-    "description": "Enable in rich text editors"
   },
   "tooltip_richtext": {
     "message": "يطبّق اختصارات المفاتيح داخل المحرّرات المبنية على contenteditable. مواقع مثل Gmail لديها اختصاراتها الخاصة، لذا تحقّق من التعارضات باستخدام أداة الفحص",

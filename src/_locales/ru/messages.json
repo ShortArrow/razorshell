@@ -63,18 +63,6 @@
     "message": "Попробуйте сочетания клавиш здесь",
     "description": "Try the keybindings here"
   },
-  "keymap_col_action": {
-    "message": "действие",
-    "description": "action"
-  },
-  "keymap_col_default": {
-    "message": "по умолчанию",
-    "description": "default"
-  },
-  "keymap_col_current": {
-    "message": "текущее",
-    "description": "current"
-  },
   "keymap_rebind": {
     "message": "переназначить",
     "description": "rebind"
@@ -83,10 +71,6 @@
     "message": "нажмите клавишу...",
     "description": "press a key..."
   },
-  "keymap_conflict_with": {
-    "message": "конфликтует с: ",
-    "description": "conflicts with: "
-  },
   "keymap_reset": {
     "message": "сбросить",
     "description": "reset"
@@ -94,10 +78,6 @@
   "keymap_reset_all": {
     "message": "сбросить все",
     "description": "reset all"
-  },
-  "url_probe_placeholder": {
-    "message": "URL для проверки",
-    "description": "URL to check"
   },
   "tooltip_url_probe": {
     "message": "Показывает, какому правилу соответствует этот URL; совпавшая строка подсвечивается",
@@ -122,10 +102,6 @@
   "inspect_unknown_listeners": {
     "message": "Не поддающиеся анализу обработчики keydown: ",
     "description": "keydown listeners that could not be analyzed: "
-  },
-  "richtext_label": {
-    "message": "Включить в редакторах форматированного текста",
-    "description": "Enable in rich text editors"
   },
   "tooltip_richtext": {
     "message": "Применяет сочетания клавиш в редакторах на основе contenteditable. У сайтов вроде Gmail есть свои сочетания; проверьте конфликты через инспектор",

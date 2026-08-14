@@ -63,18 +63,6 @@
     "message": "여기에서 단축키를 시험해 보세요",
     "description": "Try the keybindings here"
   },
-  "keymap_col_action": {
-    "message": "동작",
-    "description": "action"
-  },
-  "keymap_col_default": {
-    "message": "기본값",
-    "description": "default"
-  },
-  "keymap_col_current": {
-    "message": "현재",
-    "description": "current"
-  },
   "keymap_rebind": {
     "message": "다시 지정",
     "description": "rebind"
@@ -83,10 +71,6 @@
     "message": "키를 누르세요...",
     "description": "press a key..."
   },
-  "keymap_conflict_with": {
-    "message": "다음과 중복: ",
-    "description": "conflicts with: "
-  },
   "keymap_reset": {
     "message": "초기화",
     "description": "reset"
@@ -94,10 +78,6 @@
   "keymap_reset_all": {
     "message": "전체 초기화",
     "description": "reset all"
-  },
-  "url_probe_placeholder": {
-    "message": "확인할 URL",
-    "description": "URL to check"
   },
   "tooltip_url_probe": {
     "message": "이 URL이 어떤 규칙에 걸리는지 표시하며, 일치하는 행이 강조됩니다",
@@ -122,10 +102,6 @@
   "inspect_unknown_listeners": {
     "message": "분석할 수 없는 keydown 리스너: ",
     "description": "keydown listeners that could not be analyzed: "
-  },
-  "richtext_label": {
-    "message": "리치 텍스트 편집기에서 사용",
-    "description": "Enable in rich text editors"
   },
   "tooltip_richtext": {
     "message": "contenteditable 기반 편집기에서도 단축키를 적용합니다. Gmail 등은 자체 단축키가 있으니 인스펙터로 충돌을 확인하세요",

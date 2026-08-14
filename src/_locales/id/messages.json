@@ -63,18 +63,6 @@
     "message": "Coba pintasan papan ketik di sini",
     "description": "Try the keybindings here"
   },
-  "keymap_col_action": {
-    "message": "tindakan",
-    "description": "action"
-  },
-  "keymap_col_default": {
-    "message": "bawaan",
-    "description": "default"
-  },
-  "keymap_col_current": {
-    "message": "saat ini",
-    "description": "current"
-  },
   "keymap_rebind": {
     "message": "atur ulang",
     "description": "rebind"
@@ -83,10 +71,6 @@
     "message": "tekan sebuah tombol...",
     "description": "press a key..."
   },
-  "keymap_conflict_with": {
-    "message": "bentrok dengan: ",
-    "description": "conflicts with: "
-  },
   "keymap_reset": {
     "message": "setel ulang",
     "description": "reset"
@@ -94,10 +78,6 @@
   "keymap_reset_all": {
     "message": "setel ulang semua",
     "description": "reset all"
-  },
-  "url_probe_placeholder": {
-    "message": "URL untuk diperiksa",
-    "description": "URL to check"
   },
   "tooltip_url_probe": {
     "message": "Menampilkan aturan mana yang cocok dengan URL ini; baris yang cocok akan disorot",
@@ -122,10 +102,6 @@
   "inspect_unknown_listeners": {
     "message": "Listener keydown yang tidak dapat dianalisis: ",
     "description": "keydown listeners that could not be analyzed: "
-  },
-  "richtext_label": {
-    "message": "Aktifkan di editor teks kaya",
-    "description": "Enable in rich text editors"
   },
   "tooltip_richtext": {
     "message": "Menerapkan pintasan di dalam editor berbasis contenteditable. Situs seperti Gmail punya pintasan sendiri; gunakan inspektur untuk memeriksa benturan",

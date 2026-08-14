@@ -63,18 +63,6 @@
     "message": "在这里试用快捷键",
     "description": "Try the keybindings here"
   },
-  "keymap_col_action": {
-    "message": "操作",
-    "description": "action"
-  },
-  "keymap_col_default": {
-    "message": "默认",
-    "description": "default"
-  },
-  "keymap_col_current": {
-    "message": "当前",
-    "description": "current"
-  },
   "keymap_rebind": {
     "message": "重新绑定",
     "description": "rebind"
@@ -83,10 +71,6 @@
     "message": "请按一个键...",
     "description": "press a key..."
   },
-  "keymap_conflict_with": {
-    "message": "与以下冲突: ",
-    "description": "conflicts with: "
-  },
   "keymap_reset": {
     "message": "重置",
     "description": "reset"
@@ -94,10 +78,6 @@
   "keymap_reset_all": {
     "message": "全部重置",
     "description": "reset all"
-  },
-  "url_probe_placeholder": {
-    "message": "要检查的网址",
-    "description": "URL to check"
   },
   "tooltip_url_probe": {
     "message": "显示此网址命中哪条规则，匹配的行会高亮显示",
@@ -122,10 +102,6 @@
   "inspect_unknown_listeners": {
     "message": "无法解析的 keydown 监听器: ",
     "description": "keydown listeners that could not be analyzed: "
-  },
-  "richtext_label": {
-    "message": "在富文本编辑器中启用",
-    "description": "Enable in rich text editors"
   },
   "tooltip_richtext": {
     "message": "在基于 contenteditable 的编辑器中也应用快捷键。Gmail 等网站有自己的快捷键，请使用检查器确认是否冲突",

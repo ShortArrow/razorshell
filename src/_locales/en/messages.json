@@ -63,18 +63,6 @@
     "message": "Try the keybindings here",
     "description": "Try the keybindings here"
   },
-  "keymap_col_action": {
-    "message": "action",
-    "description": "action"
-  },
-  "keymap_col_default": {
-    "message": "default",
-    "description": "default"
-  },
-  "keymap_col_current": {
-    "message": "current",
-    "description": "current"
-  },
   "keymap_rebind": {
     "message": "rebind",
     "description": "rebind"
@@ -83,10 +71,6 @@
     "message": "press a key...",
     "description": "press a key..."
   },
-  "keymap_conflict_with": {
-    "message": "conflicts with: ",
-    "description": "conflicts with: "
-  },
   "keymap_reset": {
     "message": "reset",
     "description": "reset"
@@ -94,10 +78,6 @@
   "keymap_reset_all": {
     "message": "reset all",
     "description": "reset all"
-  },
-  "url_probe_placeholder": {
-    "message": "URL to check",
-    "description": "URL to check"
   },
   "tooltip_url_probe": {
     "message": "Shows which rule this URL hits; the matching row is highlighted",
@@ -122,10 +102,6 @@
   "inspect_unknown_listeners": {
     "message": "keydown listeners that could not be analyzed: ",
     "description": "keydown listeners that could not be analyzed: "
-  },
-  "richtext_label": {
-    "message": "Enable in rich text editors",
-    "description": "Enable in rich text editors"
   },
   "tooltip_richtext": {
     "message": "Applies the keybindings inside contenteditable editors. Sites like Gmail have their own shortcuts; use the inspector to check for conflicts",

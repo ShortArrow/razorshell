@@ -120,7 +120,7 @@ export function UrlApp() {
             type='url'
             data-testid='url-probe-input'
             className='input input-bordered input-sm w-full'
-            placeholder={getMessage('url_probe_placeholder')()}
+            placeholder='URL to check'
             value={probe}
             onChange={(e) => setProbe(e.target.value)}
           />

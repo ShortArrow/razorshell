@@ -16,3 +16,5 @@ record names the files it concerns and is frozen when written.
 - [ADR-0006](0006-inspector-never-dispatches.md) — the inspector
   never dispatches key events; it reads handler code, admits what it
   cannot analyze, and confirms from real input
+- [ADR-0007](0007-options-page-language-policy.md) — the options page
+  localizes tooltips only; other strings are English literals
