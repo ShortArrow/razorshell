@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { keyChord } from "../keychord";
 import { defaultKeymap } from "../keymap";
 import { Chord, findConflict } from "../keymapmerge";
@@ -146,11 +147,13 @@ export function KeymapApp() {
                       {capturing === entry.id ? getMessage('keymap_press_key')() : getMessage('keymap_rebind')()}
                     </button>
                     <button
-                      className={`btn btn-sm btn-ghost w-20 ${overridden ? '' : 'invisible'}`}
+                      className={`btn btn-sm btn-ghost btn-square ${overridden ? '' : 'invisible'}`}
                       data-testid={`reset-${entry.id}`}
+                      aria-label={getMessage('keymap_reset')()}
+                      title={getMessage('keymap_reset')()}
                       onClick={() => resetOne(entry.id)}
                     >
-                      {getMessage('keymap_reset')()}
+                      <ArrowPathIcon className='w-4 h-4' />
                     </button>
                   </div>
                 </td>
