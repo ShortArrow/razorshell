@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowPathIcon } from "@heroicons/react/24/outline";
+import { ArrowPathIcon, EllipsisHorizontalIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import { keyChord } from "../keychord";
 import { defaultKeymap } from "../keymap";
 import { Chord, findConflict } from "../keymapmerge";
@@ -140,11 +140,15 @@ export function KeymapApp() {
                 <td>
                   <div className='flex items-center gap-2'>
                     <button
-                      className='btn btn-sm w-32'
+                      className='btn btn-sm btn-square'
                       data-testid={`rebind-${entry.id}`}
+                      aria-label={capturing === entry.id ? getMessage('keymap_press_key')() : getMessage('keymap_rebind')()}
+                      title={capturing === entry.id ? getMessage('keymap_press_key')() : getMessage('keymap_rebind')()}
                       onClick={() => startCapture(entry.id)}
                     >
-                      {capturing === entry.id ? getMessage('keymap_press_key')() : getMessage('keymap_rebind')()}
+                      {capturing === entry.id
+                        ? <EllipsisHorizontalIcon className='w-4 h-4' />
+                        : <PencilSquareIcon className='w-4 h-4' />}
                     </button>
                     <button
                       className={`btn btn-sm btn-ghost btn-square ${overridden ? '' : 'invisible'}`}
