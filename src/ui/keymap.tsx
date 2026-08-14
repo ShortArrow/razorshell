@@ -140,16 +140,16 @@ export function KeymapApp() {
             const overridden = isOverridden(entry, fallback);
             return (
               <tr key={entry.id}>
-                <td>
+                <td className='align-middle'>
                   <span className='tooltip tooltip-top' data-tip={entry.description ? entry.description() : ""}>
                     {entry.label}
                   </span>
                 </td>
-                <td><ChordView entry={fallback} /></td>
-                <td>
+                <td className='align-middle'><ChordView entry={fallback} /></td>
+                <td className='align-middle'>
                   <ChordView entry={entry} testid={`current-${entry.id}`} overridden={overridden} />
                 </td>
-                <td>
+                <td className='align-middle'>
                   <div className='flex items-center gap-2'>
                     <button
                       className='btn btn-sm btn-square'
