@@ -32,7 +32,7 @@ function StatusPanel({ status }: { status: LastStatus | null }) {
     <span className="flex items-center gap-1">
       {status.chord.map((label, index) => <kbd key={index} className="kbd kbd-sm text-base-content">{label}</kbd>)}
     </span>
-    <span className={status.handled ? "badge badge-success" : "badge badge-ghost"}>
+    <span className={status.handled ? "badge badge-primary" : "badge badge-ghost"}>
       {status.handled ? "handled" : "pass-through"}
     </span>
     <code className="text-xs opacity-60">{status.code}</code>
