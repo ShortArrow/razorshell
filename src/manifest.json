@@ -7,7 +7,6 @@
   "permissions": [
     "activeTab",
     "scripting",
-    "commands",
     "storage"
   ],
   "content_scripts": [
@@ -15,6 +14,7 @@
       "matches": [
         "<all_urls>"
       ],
+      "all_frames": true,
       "js": [
         "content.js"
       ]
@@ -41,15 +41,6 @@
   },
   "background": {
     "service_worker": "service.js"
-  },
-  "commands": {
-    "_execute_action": {
-      "suggested_key": {
-        "default": "Ctrl+W",
-        "mac": "Command+W"
-      },
-      "description": "Delete word left of the cursor in a text box"
-    }
   },
   "host_permissions": [
     "*://*/*"
