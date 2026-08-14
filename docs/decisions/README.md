@@ -11,3 +11,5 @@ record names the files it concerns and is frozen when written.
   is a separate IIFE build
 - [ADR-0004](0004-keymap-override-layers.md) — keymap overrides
   layer as default < lua < gui; only the GUI rejects conflicts
+- [ADR-0005](0005-contenteditable-support.md) — contenteditable
+  support is opt-in and Selection-based

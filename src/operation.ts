@@ -6,6 +6,7 @@ export interface Keymap {
   id: string;
   label: string;
   operation: (textinput: TextField) => void;
+  editableOperation?: (root: HTMLElement) => void;
   description?: () => string;
   key: string;
   alt?: boolean;

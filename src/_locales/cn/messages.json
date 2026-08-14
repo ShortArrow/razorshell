@@ -114,5 +114,13 @@
   "inspect_no_conflicts": {
     "message": "此文本框中没有冲突的快捷键",
     "description": "No conflicting shortcuts in this field"
+  },
+  "richtext_label": {
+    "message": "在富文本编辑器中启用",
+    "description": "Enable in rich text editors"
+  },
+  "tooltip_richtext": {
+    "message": "在基于 contenteditable 的编辑器中也应用快捷键。Gmail 等网站有自己的快捷键，请使用检查器确认是否冲突",
+    "description": "Applies the keybindings inside contenteditable editors. Sites like Gmail have their own shortcuts; use the inspector to check for conflicts"
   }
 }

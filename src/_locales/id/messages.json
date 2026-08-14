@@ -114,5 +114,13 @@
   "inspect_no_conflicts": {
     "message": "Tidak ada pintasan yang berbenturan di kolom ini",
     "description": "No conflicting shortcuts in this field"
+  },
+  "richtext_label": {
+    "message": "Aktifkan di editor teks kaya",
+    "description": "Enable in rich text editors"
+  },
+  "tooltip_richtext": {
+    "message": "Menerapkan pintasan di dalam editor berbasis contenteditable. Situs seperti Gmail punya pintasan sendiri; gunakan inspektur untuk memeriksa benturan",
+    "description": "Applies the keybindings inside contenteditable editors. Sites like Gmail have their own shortcuts; use the inspector to check for conflicts"
   }
 }

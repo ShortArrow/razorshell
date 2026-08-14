@@ -20,6 +20,12 @@
       box-sizing: border-box;
     }
     .state { color: #8cf; }
+    .editable {
+      font-size: 24px;
+      white-space: pre-wrap;
+      border: 1px solid #888;
+      padding: 0.25rem;
+    }
     #keyinfo {
       position: sticky;
       top: 0;
@@ -53,6 +59,11 @@
     <textarea rows="4">first line
 second line
 third</textarea>
+  </label>
+  <label>contenteditable
+    <div contenteditable="true" class="editable">first line
+second line
+third</div>
   </label>
 
   <script>

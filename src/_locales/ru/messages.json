@@ -114,5 +114,13 @@
   "inspect_no_conflicts": {
     "message": "В этом поле нет конфликтующих сочетаний клавиш",
     "description": "No conflicting shortcuts in this field"
+  },
+  "richtext_label": {
+    "message": "Включить в редакторах форматированного текста",
+    "description": "Enable in rich text editors"
+  },
+  "tooltip_richtext": {
+    "message": "Применяет сочетания клавиш в редакторах на основе contenteditable. У сайтов вроде Gmail есть свои сочетания; проверьте конфликты через инспектор",
+    "description": "Applies the keybindings inside contenteditable editors. Sites like Gmail have their own shortcuts; use the inspector to check for conflicts"
   }
 }

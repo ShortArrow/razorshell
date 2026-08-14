@@ -1,6 +1,7 @@
+import { loadContentEditableSetting, subscribeContentEditableSetting } from "./contenteditablesetting";
 import { probeConflicts } from "./inspect";
 import { showToast } from "./inspecttoast";
-import { isTextField, keyEventHandling } from "./keyhandling";
+import { dispatchEditableKey, isEditableTarget, isTextField, keyEventHandling, resolveEventTarget } from "./keyhandling";
 import { keyChord } from "./keychord";
 import { getActiveKeymap, initKeymap } from "./keymapstore";
 import { getMessage } from "./languages";
@@ -15,6 +16,11 @@ const stateMessage = "razorshell-state";
 
 let enabled = true;
 let inspecting = false;
+let editableEnabled = false;
+
+function applyEditableSetting(value: boolean): void {
+  editableEnabled = value;
+}
 
 function reportState(): void {
   if (window !== window.top) return;
@@ -28,6 +34,8 @@ function applyUrlPolicy(policy: UrlPolicy) {
 
 loadUrlPolicy().then(applyUrlPolicy);
 subscribeUrlPolicy(applyUrlPolicy);
+loadContentEditableSetting().then(applyEditableSetting);
+subscribeContentEditableSetting(applyEditableSetting);
 initKeymap();
 
 // Delegate at document level so text fields added after page load are
@@ -37,9 +45,13 @@ document.addEventListener(
   (event) => {
     if (!event.isTrusted) return;
     if (!enabled) return;
-    const target = event.target;
-    if (!isTextField(target)) return;
-    keyEventHandling(event, target);
+    const target = resolveEventTarget(event);
+    if (isTextField(target)) {
+      keyEventHandling(event, target);
+      return;
+    }
+    if (!editableEnabled || !isEditableTarget(target)) return;
+    dispatchEditableKey(event, target, getActiveKeymap());
   },
   { capture: true },
 );
@@ -72,6 +84,30 @@ function inspectField(field: TextField): void {
   reportConflicts(probeConflicts(field, getActiveKeymap()));
 }
 
+function chordEvent(entry: Keymap): KeyboardEvent {
+  return new KeyboardEvent("keydown", {
+    key: entry.key,
+    ctrlKey: entry.ctrl === true,
+    altKey: entry.alt === true,
+    shiftKey: entry.shift === true,
+    bubbles: true,
+    cancelable: true,
+  });
+}
+
+/**
+ * Probes an editable root without the value save and restore probeConflicts
+ * performs, there being no value to hold: an editor cancelling the chord is
+ * assumed not to have written to itself first.
+ */
+function inspectEditable(root: HTMLElement): void {
+  reportConflicts(getActiveKeymap().filter((entry) => {
+    const event = chordEvent(entry);
+    root.dispatchEvent(event);
+    return event.defaultPrevented;
+  }));
+}
+
 function stopInspecting(): void {
   if (!inspecting) return;
   inspecting = false;
@@ -81,12 +117,19 @@ function stopInspecting(): void {
 }
 
 function onInspectClick(event: MouseEvent): void {
-  const target = event.target;
-  if (!isTextField(target)) return;
+  const target = resolveEventTarget(event);
+  if (isTextField(target)) {
+    event.preventDefault();
+    event.stopPropagation();
+    stopInspecting();
+    inspectField(target);
+    return;
+  }
+  if (!editableEnabled || !isEditableTarget(target)) return;
   event.preventDefault();
   event.stopPropagation();
   stopInspecting();
-  inspectField(target);
+  inspectEditable(target);
 }
 
 function onInspectKeydown(event: KeyboardEvent): void {

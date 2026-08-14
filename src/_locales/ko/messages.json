@@ -114,5 +114,13 @@
   "inspect_no_conflicts": {
     "message": "이 텍스트 상자에 충돌하는 단축키가 없습니다",
     "description": "No conflicting shortcuts in this field"
+  },
+  "richtext_label": {
+    "message": "리치 텍스트 편집기에서 사용",
+    "description": "Enable in rich text editors"
+  },
+  "tooltip_richtext": {
+    "message": "contenteditable 기반 편집기에서도 단축키를 적용합니다. Gmail 등은 자체 단축키가 있으니 인스펙터로 충돌을 확인하세요",
+    "description": "Applies the keybindings inside contenteditable editors. Sites like Gmail have their own shortcuts; use the inspector to check for conflicts"
   }
 }

@@ -114,5 +114,13 @@
   "inspect_no_conflicts": {
     "message": "Aucun raccourci en conflit dans ce champ",
     "description": "No conflicting shortcuts in this field"
+  },
+  "richtext_label": {
+    "message": "Activer dans les éditeurs de texte enrichi",
+    "description": "Enable in rich text editors"
+  },
+  "tooltip_richtext": {
+    "message": "Applique les raccourcis dans les éditeurs contenteditable. Des sites comme Gmail ont leurs propres raccourcis ; utilisez l'inspecteur pour vérifier les conflits",
+    "description": "Applies the keybindings inside contenteditable editors. Sites like Gmail have their own shortcuts; use the inspector to check for conflicts"
   }
 }

@@ -114,5 +114,13 @@
   "inspect_no_conflicts": {
     "message": "Keine kollidierenden Tastenkürzel in diesem Feld",
     "description": "No conflicting shortcuts in this field"
+  },
+  "richtext_label": {
+    "message": "In Rich-Text-Editoren aktivieren",
+    "description": "Enable in rich text editors"
+  },
+  "tooltip_richtext": {
+    "message": "Wendet die Tastenkürzel auch in contenteditable-Editoren an. Seiten wie Gmail haben eigene Tastenkürzel; prüfe Konflikte mit dem Inspektor",
+    "description": "Applies the keybindings inside contenteditable editors. Sites like Gmail have their own shortcuts; use the inspector to check for conflicts"
   }
 }

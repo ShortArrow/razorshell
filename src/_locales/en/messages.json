@@ -114,5 +114,13 @@
   "inspect_no_conflicts": {
     "message": "No conflicting shortcuts in this field",
     "description": "No conflicting shortcuts in this field"
+  },
+  "richtext_label": {
+    "message": "Enable in rich text editors",
+    "description": "Enable in rich text editors"
+  },
+  "tooltip_richtext": {
+    "message": "Applies the keybindings inside contenteditable editors. Sites like Gmail have their own shortcuts; use the inspector to check for conflicts",
+    "description": "Applies the keybindings inside contenteditable editors. Sites like Gmail have their own shortcuts; use the inspector to check for conflicts"
   }
 }
