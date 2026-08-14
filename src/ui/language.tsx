@@ -3,6 +3,7 @@ import { availableLocales, normalizeLocale } from "../i18n";
 import {
   getAcceptLanguage,
   getLanguageSetting,
+  getMessage,
   getUILanguage,
   setLanguage,
 } from "../languages";
@@ -39,16 +40,18 @@ export function LangApp() {
       <p>detect language of browser setting</p>
       <div className='flex items-center gap-2'>
         <label htmlFor='language-select'>Display language of this options page</label>
-        <select
-          id='language-select'
-          data-testid='language-select'
-          className='select select-bordered select-sm'
-          value={setting}
-          onChange={(e) => applyLanguage(e.target.value)}
-        >
-          <option value={autoLanguage}>{autoLanguage}</option>
-          {availableLocales.map((locale) => <option key={locale} value={locale}>{locale}</option>)}
-        </select>
+        <div className='tooltip tooltip-top' data-tip={getMessage('tooltip_language_select')()}>
+          <select
+            id='language-select'
+            data-testid='language-select'
+            className='select select-bordered select-sm'
+            value={setting}
+            onChange={(e) => applyLanguage(e.target.value)}
+          >
+            <option value={autoLanguage}>{autoLanguage}</option>
+            {availableLocales.map((locale) => <option key={locale} value={locale}>{locale}</option>)}
+          </select>
+        </div>
       </div>
       <p>
         <span>effective language: </span>

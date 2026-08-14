@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { getMessage } from "../languages";
 import { keyEventHandling } from "../keyhandling";
 import { keyChord, selectionSummary } from "../keychord";
 import { TextField } from "../operation";
@@ -56,7 +57,9 @@ export function TestApp() {
 
   return <>
     <div className="flex flex-col w-full gap-3">
-      <h2 className="h2">Test Area</h2>
+      <h2 className="h2">
+        <span className="tooltip tooltip-bottom" data-tip={getMessage("tooltip_test_area")()}>Test Area</span>
+      </h2>
       <div className="card bg-base-200">
         <div className="card-body gap-3">
           <label className="input input-bordered flex items-center">

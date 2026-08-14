@@ -17,14 +17,25 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 - The options test area shows the last keydown — the chord, whether
   the extension handled it, the event code — and the selection range
   of each test field.
+- Tooltips on the options page controls — default policy, match
+  type, rule action, rule ordering, language select, test area — in
+  all eleven locales.
 - The options page language can be overridden from a select listing
   the eleven packaged locales, with "auto" following the browser as
   before. The current effective language is shown next to it. The
   extension name and description stay in the browser language; Chrome
   resolves those itself.
 
+### Changed
+
+- The keymap list is a compact table instead of a stack of rows, and
+  its tooltips open upward.
+
 ### Fixed
 
+- Nine of the eleven locales carried only the extension name; the
+  description and the keymap descriptions are now translated in all
+  of them, and a test keeps the locale files key-identical.
 - The options test area ran every matched keybinding twice. Key
   handling moved to a module without the content script's document
   listener; both entry points import it.

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ChevronDownIcon, ChevronUpIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { getMessage } from '../languages';
 import { loadUrlPolicy, saveUrlPolicy } from '../urlpolicy';
 import { MatchType, RuleAction, UrlPolicy, UrlRule, defaultUrlPolicy } from '../urlrules';
 
@@ -60,14 +61,16 @@ export function UrlApp() {
       <h2 className='h2'>URL policy</h2>
       <div className='flex items-center gap-2'>
         <label htmlFor='default-action'>Default policy for URLs matching no rule</label>
-        <select
-          id='default-action'
-          className='select select-bordered select-sm'
-          value={policy.defaultAction}
-          onChange={(e) => applyPolicy({ ...policy, defaultAction: e.target.value as RuleAction })}
-        >
-          {ruleActions.map((value) => <option key={value} value={value}>{value}</option>)}
-        </select>
+        <div className='tooltip tooltip-top' data-tip={getMessage('tooltip_default_policy')()}>
+          <select
+            id='default-action'
+            className='select select-bordered select-sm'
+            value={policy.defaultAction}
+            onChange={(e) => applyPolicy({ ...policy, defaultAction: e.target.value as RuleAction })}
+          >
+            {ruleActions.map((value) => <option key={value} value={value}>{value}</option>)}
+          </select>
+        </div>
       </div>
       <div className='join w-full'>
         <label className='input input-bordered join-item flex justify-center items-center grow'>
@@ -83,30 +86,36 @@ export function UrlApp() {
             }}
           />
         </label>
-        <select
-          className='select select-bordered join-item'
-          value={matchType}
-          onChange={(e) => {
-            setMatchType(e.target.value as MatchType);
-            setPatternError(false);
-          }}
-        >
-          {matchTypes.map((value) => <option key={value} value={value}>{value}</option>)}
-        </select>
-        <select
-          className='select select-bordered join-item'
-          value={action}
-          onChange={(e) => setAction(e.target.value as RuleAction)}
-        >
-          {ruleActions.map((value) => <option key={value} value={value}>{value}</option>)}
-        </select>
+        <div className='tooltip tooltip-top' data-tip={getMessage('tooltip_match_type')()}>
+          <select
+            className='select select-bordered join-item'
+            value={matchType}
+            onChange={(e) => {
+              setMatchType(e.target.value as MatchType);
+              setPatternError(false);
+            }}
+          >
+            {matchTypes.map((value) => <option key={value} value={value}>{value}</option>)}
+          </select>
+        </div>
+        <div className='tooltip tooltip-top' data-tip={getMessage('tooltip_rule_action')()}>
+          <select
+            className='select select-bordered join-item'
+            value={action}
+            onChange={(e) => setAction(e.target.value as RuleAction)}
+          >
+            {ruleActions.map((value) => <option key={value} value={value}>{value}</option>)}
+          </select>
+        </div>
         <button className='btn btn-primary join-item' onClick={addRule}>add rule</button>
       </div>
       {patternError ? <p className='text-error'>invalid regular expression</p> : null}
       <table className='table'>
         <thead>
           <tr>
-            <th>#</th>
+            <th>
+              <span className='tooltip tooltip-top' data-tip={getMessage('tooltip_rule_order')()}>#</span>
+            </th>
             <th>action</th>
             <th>match</th>
             <th>pattern</th>

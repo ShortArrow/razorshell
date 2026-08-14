@@ -1,27 +1,30 @@
 import { defaultKeymap } from "../keymap"
 export function KeymapApp() {
   return <>
-    <div className='flex flex-col gap-3'>
+    <div className='flex flex-col w-full gap-3'>
       <h2 className='h2'>Keymap</h2>
-      <p>W.I.P.</p>
-      {
-        defaultKeymap.map((key, index) => {
-          return (
-            <div key={index} className="tooltip tooltip-top"
-              data-tip={key.description ? key.description() : ""}>
-              <div className="flex items-center gap-4">
-                <p className="flex items-center gap-2">
-                  {key.ctrl ? <><kbd className="kbd text-base-content">ctrl</kbd><span>+</span></> : ''}
-                  {key.alt ? <><kbd className="kbd text-base-content">alt</kbd><span>+</span></> : ''}
-                  {key.shift ? <><kbd className="kbd text-base-content">shift</kbd><span>+</span></> : ''}
-                  <kbd className="kbd text-base-content">{key.key}</kbd>
-                </p>
-                <p>{key.label}</p>
-              </div>
-            </div>
-          )
-        })
-      }
+      <table className='table table-xs'>
+        <tbody>
+          {
+            defaultKeymap.map((key, index) => {
+              return (
+                <tr key={index}>
+                  <td>
+                    <span className='tooltip tooltip-top flex items-center gap-1'
+                      data-tip={key.description ? key.description() : ""}>
+                      {key.ctrl ? <><kbd className="kbd kbd-sm text-base-content">ctrl</kbd><span>+</span></> : ''}
+                      {key.alt ? <><kbd className="kbd kbd-sm text-base-content">alt</kbd><span>+</span></> : ''}
+                      {key.shift ? <><kbd className="kbd kbd-sm text-base-content">shift</kbd><span>+</span></> : ''}
+                      <kbd className="kbd kbd-sm text-base-content">{key.key}</kbd>
+                    </span>
+                  </td>
+                  <td>{key.label}</td>
+                </tr>
+              )
+            })
+          }
+        </tbody>
+      </table>
     </div>
   </>
 }
