@@ -115,14 +115,14 @@ export function KeymapApp() {
       <div className='flex items-center gap-2'>
         <h2 className='h2 m-0'>Keymap</h2>
         <button
-          className='btn btn-sm btn-ghost btn-square'
+          className='btn btn-xs btn-ghost btn-square'
           data-testid='keymap-reset-all'
           aria-label={getMessage('keymap_reset_all')()}
           title={getMessage('keymap_reset_all')()}
           disabled={overriddenCount === 0}
           onClick={resetAll}
         >
-          <ArrowPathIcon className='w-5 h-5' />
+          <ArrowPathIcon className='w-4 h-4' />
         </button>
       </div>
       <table className='table table-sm'>
