@@ -12,7 +12,7 @@ const autoLanguage = "auto";
 
 function effectiveLanguage(setting: string, uiLanguage: string): string {
   const locale = normalizeLocale(setting);
-  return locale ?? `browser (auto): ${uiLanguage}`;
+  return locale ?? `auto (${uiLanguage})`;
 }
 
 export function LangApp() {
@@ -35,9 +35,8 @@ export function LangApp() {
   };
 
   return (
-    <div className='flex flex-col w-full gap-3'>
+    <div className='flex flex-col w-full gap-2'>
       <h2 className='h2'>Language</h2>
-      <p>detect language of browser setting</p>
       <div className='flex items-center gap-2'>
         <label htmlFor='language-select'>Display language of this options page</label>
         <div className='tooltip tooltip-top' data-tip={getMessage('tooltip_language_select')()}>
@@ -52,23 +51,18 @@ export function LangApp() {
             {availableLocales.map((locale) => <option key={locale} value={locale}>{locale}</option>)}
           </select>
         </div>
-      </div>
-      <p>
-        <span>effective language: </span>
-        <span className='badge badge-primary' data-testid='effective-language'>
+        <span className='badge badge-primary whitespace-nowrap' data-testid='effective-language'>
           {effectiveLanguage(setting, uiLanguage)}
         </span>
-      </p>
-      <h3>Accept-Language</h3>
-      <div className='flex gap-3'>
-        {
-          acceptLanguages.map((lang, index) => {
-            return <p className='badge' key={index}>{lang}</p>;
-          })
-        }
       </div>
-      <h3>UI Language</h3>
-      <p className='badge'>{uiLanguage}</p>
+      <div className='flex items-center gap-2 text-sm opacity-70'>
+        <span>browser UI:</span>
+        <span className='badge badge-sm badge-ghost'>{uiLanguage}</span>
+        <span>accept:</span>
+        {acceptLanguages.map((lang, index) => (
+          <span className='badge badge-sm badge-ghost' key={index}>{lang}</span>
+        ))}
+      </div>
     </div>
   );
 }
