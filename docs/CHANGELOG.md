@@ -44,10 +44,11 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 - The handled badge follows the selected theme's accent color;
   allow/deny badges keep the theme's semantic success/error colors,
   which carry the permit/block polarity.
-- success/error are overridden in both themes to deep green/red with
-  near-white text; the defaults were light enough that daisyUI paired
-  them with black text in dark mode too. The packaged CSS drops from
-  32 themes to the two the toggle offers.
+- success/error now differ per theme the way primary always has:
+  deep backgrounds with near-white text in light, brighter
+  backgrounds with dark text in dark. The defaults used one palette
+  for both themes. The packaged CSS also drops from 32 themes to the
+  two the toggle offers.
 - Nine of the eleven locales carried only the extension name; the
   description and the keymap descriptions are now translated in all
   of them, and a test keeps the locale files key-identical.
