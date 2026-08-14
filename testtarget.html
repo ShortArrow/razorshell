@@ -20,6 +20,7 @@
       box-sizing: border-box;
     }
     .state { color: #8cf; }
+    .note { color: #fa5; font-size: 16px; display: block; }
     .editable {
       font-size: 24px;
       white-space: pre-wrap;
@@ -44,6 +45,8 @@
     <input type="text" value="hello world new order">
   </label>
   <label>email
+    <span class="note">shortcuts do not apply here: the selection API
+      does not exist on type=email, so razorshell leaves it native</span>
     <input type="email" value="user@example.com">
   </label>
   <label>search
@@ -64,6 +67,7 @@ second line
 third</textarea>
   </label>
   <label>contenteditable
+    <span class="note" id="ce-status">razorshell status unknown</span>
     <div contenteditable="true" class="editable">first line
 second line
 third</div>
@@ -79,6 +83,17 @@ third</div>
           `start=${field.selectionStart} end=${field.selectionEnd} len=${field.value.length}`;
       }, 100);
     });
+
+    const ceStatus = document.getElementById("ce-status");
+    document.addEventListener("razorshell-status", (e) => {
+      const status = JSON.parse(e.detail);
+      ceStatus.textContent = status.contentEditable
+        ? "enabled in options"
+        : "disabled in options: turn on 'Enable in rich text editors' to use shortcuts here";
+    });
+    setInterval(() => {
+      document.dispatchEvent(new CustomEvent("razorshell-status-query"));
+    }, 1000);
 
     document.addEventListener("keydown", (e) => {
       document.getElementById("keyinfo").textContent =

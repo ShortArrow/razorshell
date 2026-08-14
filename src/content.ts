@@ -222,3 +222,11 @@ chrome.runtime.onMessage.addListener((message: { type?: string }) => {
   if (message.type !== inspectMessage) return;
   startInspecting();
 });
+
+document.addEventListener("razorshell-status-query", () => {
+  document.dispatchEvent(
+    new CustomEvent("razorshell-status", {
+      detail: JSON.stringify({ enabled, contentEditable: editableEnabled }),
+    }),
+  );
+});
