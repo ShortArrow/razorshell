@@ -1,59 +1,77 @@
-<html style="
-  background-color:black;
-  color:white;
-  height:100%;
-  width:100%;
-  font-size:xxx-large;
-  ">
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charaset="utf8">
+  <meta charset="utf-8">
+  <title>razorshell test target</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: monospace;
+      font-size: 20px;
+      max-width: 60rem;
+      margin: 2rem auto;
+    }
+    label { display: block; margin-top: 1.5rem; }
+    input, textarea {
+      font-size: 24px;
+      font-family: monospace;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .state { color: #8cf; }
+    #keyinfo {
+      position: sticky;
+      top: 0;
+      background: #111;
+      color: #8f8;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #444;
+    }
+  </style>
 </head>
-<body style="
-  background-color:black;
-  color:white;
-  display:flex;
-  flex-direction:column;
-  height:100%;
-  width:100%;
-  font-size:100px;
-  ">
-  <div>
-    text
-    <input type="text" style="
-      font-size:100px;
-    " value="hello world new order"/>
-  </div>
-  <div>
-    email
-    <input type="email" style="
-      font-size:100px;
-    "/>
-  </div>
-  <div>
-    search
-    <input type="search" style="
-      font-size:100px;
-    "/>
-  </div>
-  <div>
-    tel
-    <input type="tel" style="
-      font-size:100px;
-    "/>
-  </div>
-  <div>
-    url
-    <input type="url" style="
-      font-size:100px;
-    "/>
-  </div>
-  <div>
-    textarea
-    <textarea style="
-      font-size:100px;
-    ">
-    </textarea> 
-  </div>
-  <div>
+<body>
+  <h1>razorshell test target</h1>
+  <div id="keyinfo">last keydown: -</div>
+
+  <label>text
+    <input type="text" value="hello world new order">
+  </label>
+  <label>email
+    <input type="email" value="user@example.com">
+  </label>
+  <label>search
+    <input type="search" value="hello world new order">
+  </label>
+  <label>tel
+    <input type="tel" value="03 1234 5678">
+  </label>
+  <label>url
+    <input type="url" value="https://example.com/hello/world">
+  </label>
+  <label>textarea
+    <textarea rows="4">first line
+second line
+third</textarea>
+  </label>
+
+  <script>
+    document.querySelectorAll("input, textarea").forEach((field) => {
+      const state = document.createElement("div");
+      state.className = "state";
+      field.parentElement.appendChild(state);
+      setInterval(() => {
+        state.textContent =
+          `start=${field.selectionStart} end=${field.selectionEnd} len=${field.value.length}`;
+      }, 100);
+    });
+
+    document.addEventListener("keydown", (e) => {
+      document.getElementById("keyinfo").textContent =
+        `last keydown: key=${e.key} code=${e.code} ctrl=${e.ctrlKey} alt=${e.altKey}` +
+        ` composing=${e.isComposing} prevented=${e.defaultPrevented}` +
+        ` @${e.target.tagName.toLowerCase()}${e.target.type ? "[" + e.target.type + "]" : ""}`;
+    });
+  </script>
 </body>
 </html>
