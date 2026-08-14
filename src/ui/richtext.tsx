@@ -25,7 +25,7 @@ export function RichTextApp() {
           <input
             type='checkbox'
             data-testid='richtext-toggle'
-            className='toggle'
+            className='toggle toggle-primary'
             checked={enabled}
             onChange={(e) => apply(e.target.checked)}
           />
