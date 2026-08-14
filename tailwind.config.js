@@ -1,4 +1,13 @@
 import daisyui from 'daisyui'
+import themes from 'daisyui/src/theming/themes'
+
+const statusColors = {
+  success: '#15803d',
+  'success-content': '#f0fdf4',
+  error: '#b91c1c',
+  'error-content': '#fef2f2',
+}
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -11,7 +20,10 @@ export default {
   plugins: [daisyui, require('@tailwindcss/typography')],
   daisyui: {
     styled: true,
-    themes: true,
+    themes: [
+      { light: { ...themes.light, ...statusColors } },
+      { dark: { ...themes.dark, ...statusColors } },
+    ],
     base: true,
     utils: true,
     logs: true,
