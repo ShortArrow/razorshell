@@ -1,8 +1,19 @@
 import { defaultKeymap, keymaching } from "./keymap";
 import { debug } from "./debug";
 import { TextField } from "./operation";
+import { loadUrlPolicy, subscribeUrlPolicy } from "./urlpolicy";
+import { UrlPolicy, resolveAction } from "./urlrules";
 
 console.log("extension razorshell loaded");
+
+let enabled = true;
+
+function applyUrlPolicy(policy: UrlPolicy) {
+  enabled = resolveAction(location.href, policy) !== "deny";
+}
+
+loadUrlPolicy().then(applyUrlPolicy);
+subscribeUrlPolicy(applyUrlPolicy);
 
 const targetInputTypes = ["text", "search", "url", "tel", "email"];
 
@@ -31,6 +42,7 @@ export function keyEventHandling(event: KeyboardEvent, textinput: TextField) {
 document.addEventListener(
   "keydown",
   (event) => {
+    if (!enabled) return;
     const target = event.target;
     if (!isTextField(target)) return;
     keyEventHandling(event, target);

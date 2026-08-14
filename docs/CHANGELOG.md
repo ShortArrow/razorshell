@@ -3,6 +3,17 @@
 Notable changes to Razorshell. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- URL allow/deny policy: ordered rules evaluated first-match-wins
+  (iptables style) with a configurable default action. Each rule has a
+  pattern, a match type (exact / glob / regex) and an action, all
+  visible as badges in the options page list, reorderable with
+  up/down buttons. Glob `*` and `?` stay within one path segment;
+  `**` crosses `/`. Changes apply to open tabs immediately.
+
 ## [0.0.2] - 2026-08-14
 
 ### Fixed
