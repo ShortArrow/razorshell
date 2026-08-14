@@ -136,34 +136,37 @@ export function KeymapApp() {
                 <td>
                   <ChordView entry={entry} testid={`current-${entry.id}`} overridden={overridden} />
                 </td>
-                <td className='flex items-center gap-2'>
-                  <button
-                    className='btn btn-sm'
-                    data-testid={`rebind-${entry.id}`}
-                    onClick={() => startCapture(entry.id)}
-                  >
-                    {capturing === entry.id ? getMessage('keymap_press_key')() : getMessage('keymap_rebind')()}
-                  </button>
-                  {overridden
-                    ? <button
-                      className='btn btn-sm btn-ghost'
+                <td>
+                  <div className='flex items-center gap-2'>
+                    <button
+                      className='btn btn-sm w-32'
+                      data-testid={`rebind-${entry.id}`}
+                      onClick={() => startCapture(entry.id)}
+                    >
+                      {capturing === entry.id ? getMessage('keymap_press_key')() : getMessage('keymap_rebind')()}
+                    </button>
+                    <button
+                      className={`btn btn-sm btn-ghost w-20 ${overridden ? '' : 'invisible'}`}
                       data-testid={`reset-${entry.id}`}
                       onClick={() => resetOne(entry.id)}
                     >
                       {getMessage('keymap_reset')()}
                     </button>
-                    : null}
-                  {conflict && conflict.id === entry.id
-                    ? <span className='text-error' data-testid={`conflict-${entry.id}`}>
-                      {getMessage('keymap_conflict_with')()}{labelOf(conflict.withId)}
-                    </span>
-                    : null}
+                  </div>
                 </td>
               </tr>
             );
           })}
         </tbody>
       </table>
+      <p
+        className='text-error min-h-6 m-0'
+        data-testid={conflict ? `conflict-${conflict.id}` : 'keymap-no-conflict'}
+      >
+        {conflict
+          ? `${labelOf(conflict.id)} — ${getMessage('keymap_conflict_with')()}${labelOf(conflict.withId)}`
+          : ''}
+      </p>
       <div>
         <button
           className='btn btn-sm'
