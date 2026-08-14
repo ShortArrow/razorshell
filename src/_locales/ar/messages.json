@@ -102,5 +102,17 @@
   "tooltip_url_probe": {
     "message": "يعرض القاعدة التي يطابقها هذا الرابط، ويتم تمييز الصف المطابق",
     "description": "Shows which rule this URL hits; the matching row is highlighted"
+  },
+  "inspect_mode_hint": {
+    "message": "انقر على حقل نص لفحصه (اضغط Esc للإلغاء)",
+    "description": "Click a text field to inspect (Esc to cancel)"
+  },
+  "inspect_conflicts_title": {
+    "message": "الاختصارات التي تعالجها هذه الصفحة بالفعل",
+    "description": "Shortcuts this page already handles"
+  },
+  "inspect_no_conflicts": {
+    "message": "لا توجد اختصارات متعارضة في هذا الحقل",
+    "description": "No conflicting shortcuts in this field"
   }
 }

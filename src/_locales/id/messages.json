@@ -102,5 +102,17 @@
   "tooltip_url_probe": {
     "message": "Menampilkan aturan mana yang cocok dengan URL ini; baris yang cocok akan disorot",
     "description": "Shows which rule this URL hits; the matching row is highlighted"
+  },
+  "inspect_mode_hint": {
+    "message": "Klik kolom teks untuk memeriksanya (Esc untuk membatalkan)",
+    "description": "Click a text field to inspect (Esc to cancel)"
+  },
+  "inspect_conflicts_title": {
+    "message": "Pintasan yang sudah ditangani halaman ini",
+    "description": "Shortcuts this page already handles"
+  },
+  "inspect_no_conflicts": {
+    "message": "Tidak ada pintasan yang berbenturan di kolom ini",
+    "description": "No conflicting shortcuts in this field"
   }
 }

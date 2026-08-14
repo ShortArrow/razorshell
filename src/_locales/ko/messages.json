@@ -102,5 +102,17 @@
   "tooltip_url_probe": {
     "message": "이 URL이 어떤 규칙에 걸리는지 표시하며, 일치하는 행이 강조됩니다",
     "description": "Shows which rule this URL hits; the matching row is highlighted"
+  },
+  "inspect_mode_hint": {
+    "message": "검사할 텍스트 상자를 클릭하세요 (Esc로 취소)",
+    "description": "Click a text field to inspect (Esc to cancel)"
+  },
+  "inspect_conflicts_title": {
+    "message": "이 페이지가 이미 처리하는 단축키",
+    "description": "Shortcuts this page already handles"
+  },
+  "inspect_no_conflicts": {
+    "message": "이 텍스트 상자에 충돌하는 단축키가 없습니다",
+    "description": "No conflicting shortcuts in this field"
   }
 }

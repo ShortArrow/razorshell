@@ -102,5 +102,17 @@
   "tooltip_url_probe": {
     "message": "Zeigt, auf welche Regel diese URL trifft; die passende Zeile wird hervorgehoben",
     "description": "Shows which rule this URL hits; the matching row is highlighted"
+  },
+  "inspect_mode_hint": {
+    "message": "Textfeld anklicken, um es zu prüfen (Esc zum Abbrechen)",
+    "description": "Click a text field to inspect (Esc to cancel)"
+  },
+  "inspect_conflicts_title": {
+    "message": "Tastenkürzel, die diese Seite bereits verarbeitet",
+    "description": "Shortcuts this page already handles"
+  },
+  "inspect_no_conflicts": {
+    "message": "Keine kollidierenden Tastenkürzel in diesem Feld",
+    "description": "No conflicting shortcuts in this field"
   }
 }

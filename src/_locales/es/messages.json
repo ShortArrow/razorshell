@@ -102,5 +102,17 @@
   "tooltip_url_probe": {
     "message": "Muestra qué regla coincide con esta URL; la fila coincidente se resalta",
     "description": "Shows which rule this URL hits; the matching row is highlighted"
+  },
+  "inspect_mode_hint": {
+    "message": "Haz clic en un campo de texto para inspeccionarlo (Esc para cancelar)",
+    "description": "Click a text field to inspect (Esc to cancel)"
+  },
+  "inspect_conflicts_title": {
+    "message": "Atajos que esta página ya gestiona",
+    "description": "Shortcuts this page already handles"
+  },
+  "inspect_no_conflicts": {
+    "message": "No hay atajos en conflicto en este campo",
+    "description": "No conflicting shortcuts in this field"
   }
 }
