@@ -44,11 +44,11 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 - The handled badge follows the selected theme's accent color;
   allow/deny badges keep the theme's semantic success/error colors,
   which carry the permit/block polarity.
-- success/error now differ per theme the way primary always has:
-  deep backgrounds with near-white text in light, brighter
-  backgrounds with dark text in dark. The defaults used one palette
-  for both themes. The packaged CSS also drops from 32 themes to the
-  two the toggle offers.
+- success/error now follow primary's lightness exactly per theme
+  (backgrounds oklch L49 in light and L66 in dark, content L90 and
+  L13), differing only in hue. The defaults used one palette for
+  both themes with black text on each. The packaged CSS also drops
+  from 32 themes to the two the toggle offers.
 - Nine of the eleven locales carried only the extension name; the
   description and the keymap descriptions are now translated in all
   of them, and a test keeps the locale files key-identical.

@@ -2,17 +2,17 @@ import daisyui from 'daisyui'
 import themes from 'daisyui/src/theming/themes'
 
 const lightStatusColors = {
-  success: '#15803d',
-  'success-content': '#f0fdf4',
-  error: '#b91c1c',
-  'error-content': '#fef2f2',
+  success: 'oklch(49.12% 0.16 150)',
+  'success-content': 'oklch(89.82% 0.06 150)',
+  error: 'oklch(49.12% 0.19 27)',
+  'error-content': 'oklch(89.82% 0.04 27)',
 }
 
 const darkStatusColors = {
-  success: '#22c55e',
-  'success-content': '#052e16',
-  error: '#ef4444',
-  'error-content': '#450a0a',
+  success: 'oklch(65.69% 0.18 150)',
+  'success-content': 'oklch(13.14% 0.04 150)',
+  error: 'oklch(65.69% 0.2 27)',
+  'error-content': 'oklch(13.14% 0.03 27)',
 }
 
 /** @type {import('tailwindcss').Config} */
