@@ -106,5 +106,13 @@
   "tooltip_richtext": {
     "message": "在基于 contenteditable 的编辑器中也应用快捷键。Gmail 等网站有自己的快捷键，请使用检查器确认是否冲突",
     "description": "Applies the keybindings inside contenteditable editors. Sites like Gmail have their own shortcuts; use the inspector to check for conflicts"
+  },
+  "tooltip_config_export": {
+    "message": "将全部设置下载为 JSON",
+    "description": "Download all settings as JSON"
+  },
+  "tooltip_config_import": {
+    "message": "粘贴 JSON 设置或选择文件，然后点 Apply 应用",
+    "description": "Paste or choose a JSON settings file, then apply"
   }
 }

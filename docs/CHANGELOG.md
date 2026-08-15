@@ -28,6 +28,11 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   next to Chrome's site-access indicator. The two stay separate
   layers: Chrome decides whether the content script is injected at
   all, the policy decides whether an injected script acts.
+- Settings export and import: a Config section downloads every
+  setting as versioned JSON and applies a pasted or chosen file back,
+  validating it with the failing field named (ADR-0008 records why
+  this replaced the init.lua plan). config.sample.json in the
+  repository shows the format and is kept valid by a test.
 - Rich text editor support, off by default (ADR-0005): a toggle on
   the options page applies the keybindings inside contenteditable
   editors, with Ctrl+a/e/k/u working on the visual line. Editors and

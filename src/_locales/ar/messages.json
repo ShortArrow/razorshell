@@ -106,5 +106,13 @@
   "tooltip_richtext": {
     "message": "يطبّق اختصارات المفاتيح داخل المحرّرات المبنية على contenteditable. مواقع مثل Gmail لديها اختصاراتها الخاصة، لذا تحقّق من التعارضات باستخدام أداة الفحص",
     "description": "Applies the keybindings inside contenteditable editors. Sites like Gmail have their own shortcuts; use the inspector to check for conflicts"
+  },
+  "tooltip_config_export": {
+    "message": "تنزيل جميع الإعدادات بصيغة JSON",
+    "description": "Download all settings as JSON"
+  },
+  "tooltip_config_import": {
+    "message": "الصق إعدادات JSON أو اختر ملفًا، ثم طبّقها بزر Apply",
+    "description": "Paste or choose a JSON settings file, then apply"
   }
 }

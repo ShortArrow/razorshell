@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "urlPolicy": {
+    "defaultAction": "allow",
+    "rules": [
+      {
+        "pattern": "https://mail.google.com/mail/u/0/",
+        "matchType": "exact",
+        "action": "deny"
+      },
+      {
+        "pattern": "https://docs.google.com/**",
+        "matchType": "glob",
+        "action": "deny"
+      },
+      {
+        "pattern": "^https://[^/]*\\.example\\.com/",
+        "matchType": "regex",
+        "action": "allow"
+      }
+    ]
+  },
+  "keymapOverrides": {
+    "move_cursor_to_the_next_word": {
+      "key": "f",
+      "alt": true
+    },
+    "delete_to_the_end_of_the_line": {
+      "key": "k",
+      "ctrl": true
+    }
+  },
+  "language": "auto",
+  "theme": "dark",
+  "enableContentEditable": true
+}

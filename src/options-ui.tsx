@@ -9,6 +9,7 @@ import { FooterApp } from './ui/footer';
 import { LuaApp } from './ui/lua';
 import { KeymapApp } from './ui/keymap';
 import { RichTextApp } from './ui/richtext';
+import { ConfigApp } from './ui/config';
 
 function OptionsUI() {
   const [generation, bump] = useReducer((value: number) => value + 1, 0);
@@ -29,6 +30,7 @@ function OptionsUI() {
           <KeymapApp />
           <LuaApp />
           <LangApp />
+          <ConfigApp />
         </div>
         <div className='grow'></div>
         <FooterApp />

@@ -18,3 +18,5 @@ record names the files it concerns and is frozen when written.
   cannot analyze, and confirms from real input
 - [ADR-0007](0007-options-page-language-policy.md) — the options page
   localizes tooltips only; other strings are English literals
+- [ADR-0008](0008-json-config-io.md) — settings import and export use
+  JSON; the init.lua plan is dormant

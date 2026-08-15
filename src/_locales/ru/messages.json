@@ -106,5 +106,13 @@
   "tooltip_richtext": {
     "message": "Применяет сочетания клавиш в редакторах на основе contenteditable. У сайтов вроде Gmail есть свои сочетания; проверьте конфликты через инспектор",
     "description": "Applies the keybindings inside contenteditable editors. Sites like Gmail have their own shortcuts; use the inspector to check for conflicts"
+  },
+  "tooltip_config_export": {
+    "message": "Скачать все настройки в формате JSON",
+    "description": "Download all settings as JSON"
+  },
+  "tooltip_config_import": {
+    "message": "Вставьте настройки JSON или выберите файл, затем примените кнопкой Apply",
+    "description": "Paste or choose a JSON settings file, then apply"
   }
 }

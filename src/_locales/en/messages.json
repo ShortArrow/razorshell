@@ -106,5 +106,13 @@
   "tooltip_richtext": {
     "message": "Applies the keybindings inside contenteditable editors. Sites like Gmail have their own shortcuts; use the inspector to check for conflicts",
     "description": "Applies the keybindings inside contenteditable editors. Sites like Gmail have their own shortcuts; use the inspector to check for conflicts"
+  },
+  "tooltip_config_export": {
+    "message": "Download all settings as JSON",
+    "description": "Download all settings as JSON"
+  },
+  "tooltip_config_import": {
+    "message": "Paste or choose a JSON settings file, then apply",
+    "description": "Paste or choose a JSON settings file, then apply"
   }
 }

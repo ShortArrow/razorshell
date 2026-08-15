@@ -106,5 +106,13 @@
   "tooltip_richtext": {
     "message": "Aplica os atalhos dentro de editores baseados em contenteditable. Sites como o Gmail têm atalhos próprios; use o inspetor para verificar conflitos",
     "description": "Applies the keybindings inside contenteditable editors. Sites like Gmail have their own shortcuts; use the inspector to check for conflicts"
+  },
+  "tooltip_config_export": {
+    "message": "Baixar todas as configurações em JSON",
+    "description": "Download all settings as JSON"
+  },
+  "tooltip_config_import": {
+    "message": "Cole as configurações JSON ou escolha um arquivo e aplique com Apply",
+    "description": "Paste or choose a JSON settings file, then apply"
   }
 }

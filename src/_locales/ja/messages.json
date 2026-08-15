@@ -106,5 +106,13 @@
   "tooltip_richtext": {
     "message": "contenteditable製エディタでもキーバインドを適用します。Gmail等は独自ショートカットを持つため、競合はインスペクターで確認してください",
     "description": "Applies the keybindings inside contenteditable editors. Sites like Gmail have their own shortcuts; use the inspector to check for conflicts"
+  },
+  "tooltip_config_export": {
+    "message": "全設定をJSONでダウンロードします",
+    "description": "Download all settings as JSON"
+  },
+  "tooltip_config_import": {
+    "message": "JSON設定を貼り付けるかファイルを選んでApplyで適用します",
+    "description": "Paste or choose a JSON settings file, then apply"
   }
 }

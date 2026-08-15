@@ -106,5 +106,13 @@
   "tooltip_richtext": {
     "message": "Wendet die Tastenkürzel auch in contenteditable-Editoren an. Seiten wie Gmail haben eigene Tastenkürzel; prüfe Konflikte mit dem Inspektor",
     "description": "Applies the keybindings inside contenteditable editors. Sites like Gmail have their own shortcuts; use the inspector to check for conflicts"
+  },
+  "tooltip_config_export": {
+    "message": "Alle Einstellungen als JSON herunterladen",
+    "description": "Download all settings as JSON"
+  },
+  "tooltip_config_import": {
+    "message": "JSON-Einstellungen einfügen oder eine Datei wählen, dann mit Apply anwenden",
+    "description": "Paste or choose a JSON settings file, then apply"
   }
 }
