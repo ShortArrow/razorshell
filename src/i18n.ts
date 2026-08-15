@@ -6,7 +6,7 @@
 export type MessageDict = Record<string, { message: string }>;
 
 export const availableLocales: readonly string[] = [
-  "ar", "cn", "de", "en", "es", "fr", "id", "ja", "ko", "pt_BR", "ru",
+  "ar", "de", "en", "es", "fr", "id", "ja", "ko", "pt_BR", "ru", "zh_CN",
 ];
 
 /**

@@ -4,7 +4,7 @@ import { availableLocales, normalizeLocale, lookupMessage } from "../src/i18n";
 describe("availableLocales", () => {
   test("lists the packaged locales", () => {
     expect(availableLocales).toEqual(
-      ["ar", "cn", "de", "en", "es", "fr", "id", "ja", "ko", "pt_BR", "ru"],
+      ["ar", "de", "en", "es", "fr", "id", "ja", "ko", "pt_BR", "ru", "zh_CN"],
     );
   });
 });
