@@ -37,5 +37,38 @@ jobs:
 
       - run: pnpm test:e2e
 
-      # test:visual is omitted: its baselines are win32 screenshots, which a
-      # linux runner cannot reproduce.
+  # The screenshot baselines are win32, so their comparison runs on the
+  # windows runner rather than being skipped outright. Whether the runner's
+  # Server-based font rendering matches locally captured baselines is
+  # empirical; a mismatch here means the baselines and the runner disagree,
+  # not that the UI broke.
+  snapshots:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm exec playwright install chromium
+
+      - run: pnpm build
+
+      - run: pnpm build-storybook
+
+      - run: pnpm test:visual
+
+      - run: pnpm test:storybook
+
+      - uses: actions/upload-artifact@v6
+        if: failure()
+        with:
+          name: snapshot-diffs
+          path: test-results/
+          retention-days: 7
