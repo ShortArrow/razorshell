@@ -30,6 +30,13 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   all, the policy decides whether an injected script acts.
 - The dormant Lua section left over from the abandoned init.lua plan
   is gone from the options page.
+- The axe "needs review" backlog is resolved and guarded: an empty
+  rule table shows a "no rules" row so header association is
+  decidable, the page-level skip-link rule is off for component
+  stories, and a budget assertion fails the suite if any
+  inconclusive result appears beyond the two causes axe cannot
+  compute — daisyUI's gradient select arrow and tooltip pseudo
+  content, both contrast-verified by hand.
 - Six more story scenarios close the review's coverage gaps:
   switching the language, a handled chord in the test area, removing
   a rule, a rejected regex pattern, the inspect-mode hint, and a

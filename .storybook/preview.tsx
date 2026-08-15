@@ -11,7 +11,14 @@ const preview: Preview = {
     // The addon's default is 'todo', which only warns. Stories are the only
     // place these components are exercised with layout, so a violation here
     // has to fail the run to mean anything.
-    a11y: { test: 'error' },
+    a11y: {
+      test: 'error',
+      // `bypass` asks a whole page for a skip link. A story renders one
+      // component with no page around it, so the rule is inapplicable here
+      // rather than failing: it reported "incomplete" on every story whose
+      // component carries no heading.
+      config: { rules: [{ id: 'bypass', enabled: false }] },
+    },
   },
   globalTypes: {
     theme: {

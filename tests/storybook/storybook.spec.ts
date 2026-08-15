@@ -22,8 +22,14 @@
  * entirely, so those stories name the toast element as the capture target. It
  * also removes itself after eight seconds, and the capture happens well inside
  * that window.
+ *
+ * The light pass also spends an axe run on each story's `incomplete` results —
+ * the findings axe could not decide, which the a11y addon shows but never
+ * fails on, so they accumulate unnoticed. Two exemptions are allowed and both
+ * are narrow; see `isAllowedIncomplete`.
  */
 import { test, expect } from "@playwright/test";
+import { createRequire } from "node:module";
 import fs from "node:fs";
 import http from "node:http";
 import path from "node:path";
@@ -71,6 +77,73 @@ function captureSelector(storyId: string): string {
   return injectedStoryIds.has(storyId) ? toastSelector : "#storybook-root";
 }
 
+/**
+ * The minified axe bundle, read once for injection into every story page.
+ *
+ * axe-core arrives as a transitive dependency of the a11y addon, so it is not
+ * hoisted into `node_modules/` and `require.resolve` finds it only when some
+ * other layout puts it there. The pnpm store path is the fallback, matched by
+ * glob so that a version bump does not have to be mirrored here.
+ */
+function readAxeSource(): string {
+  const require = createRequire(import.meta.url);
+  try {
+    return fs.readFileSync(
+      path.join(path.dirname(require.resolve("axe-core")), "axe.min.js"),
+      "utf8",
+    );
+  } catch {
+    const store = path.resolve(staticDir, "../node_modules/.pnpm");
+    const owner = fs
+      .readdirSync(store)
+      .filter((entry) => entry.startsWith("axe-core@"))
+      .sort()
+      .at(-1);
+    if (owner === undefined) throw new Error(`axe-core not found under ${store}`);
+    return fs.readFileSync(
+      path.join(store, owner, "node_modules/axe-core/axe.min.js"),
+      "utf8",
+    );
+  }
+}
+
+/**
+ * Rules switched off for this run, mirroring `.storybook/preview.tsx`.
+ *
+ * The preview's `a11y.config` reaches the addon only; this spec drives axe
+ * directly, so the same reasoning has to be restated here. `bypass` asks a
+ * whole page for a skip link, which a single rendered component cannot have.
+ */
+const disabledRules = ["bypass"];
+
+type IncompleteNode = { rule: string; target: string; html: string; reason: string };
+
+/**
+ * The incomplete findings this suite tolerates.
+ *
+ * Both are the same shape: daisyUI paints something axe cannot see through, so
+ * the contrast comes back undecided rather than failing, over a pair that is
+ * base-100 on base-content and passes when measured by hand.
+ *
+ * - A `<select>`'s arrow is a `linear-gradient` background, so axe reports
+ *   `bgGradient` on every select the options page renders.
+ * - daisyUI's `.tooltip` and `.label` wrappers put content in a `::before`,
+ *   and axe refuses to resolve a background underneath a pseudo-element,
+ *   reporting `pseudoContent`. These surface only once a story gives the
+ *   element visible text, because the contrast check skips elements without
+ *   any — which is why an earlier sweep of these stories did not record them.
+ *
+ * Both are recognised by axe's own `messageKey`, not by the element's tag, so
+ * a genuine contrast failure on the same element still fails. Anything else
+ * undecided is a defect until someone widens this deliberately.
+ */
+function isAllowedIncomplete(node: IncompleteNode): boolean {
+  return (
+    node.rule === "color-contrast" &&
+    (node.reason === "bgGradient" || node.reason === "pseudoContent")
+  );
+}
+
 const contentTypes: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
@@ -86,6 +159,7 @@ const contentTypes: Record<string, string> = {
 
 let server: http.Server;
 let origin: string;
+let axeSource: string;
 
 function resolveRequestPath(url: string): string | null {
   const pathname = decodeURIComponent(new URL(url, "http://localhost").pathname);
@@ -101,6 +175,7 @@ test.beforeAll(async () => {
       `storybook-static/ not found at ${staticDir}. Run \`pnpm build-storybook\` first.`,
     );
   }
+  axeSource = readAxeSource();
   server = http.createServer((request, response) => {
     const filePath = resolveRequestPath(request.url ?? "/");
     if (filePath === null || !fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
@@ -142,6 +217,54 @@ for (const storyId of storyIds) {
       const target = page.locator(captureSelector(storyId));
       await expect(target).toBeVisible();
       await expect(target).toHaveScreenshot(`${storyId}-${theme}.png`);
+
+      // The undecided findings do not depend on the palette — they are about
+      // which properties axe can read, not their values — so one theme's pass
+      // is enough and the run stays at one axe execution per story.
+      if (theme !== "light") return;
+      await page.addScriptTag({ content: axeSource });
+      const incomplete: IncompleteNode[] = await page.evaluate(async (disabled) => {
+        const axe = (window as unknown as {
+          axe: {
+            run: (
+              context: Document,
+              options: { resultTypes: string[]; rules?: Record<string, { enabled: boolean }> },
+            ) => Promise<{
+              incomplete: {
+                id: string;
+                nodes: {
+                  target: string[];
+                  html: string;
+                  any?: { data?: { messageKey?: string } }[];
+                  none?: { data?: { messageKey?: string } }[];
+                  all?: { data?: { messageKey?: string } }[];
+                }[];
+              }[];
+            }>;
+          };
+        }).axe;
+        const results = await axe.run(document, {
+          resultTypes: ["incomplete"],
+          rules: Object.fromEntries(disabled.map((id) => [id, { enabled: false }])),
+        });
+        return results.incomplete.flatMap((entry) =>
+          entry.nodes.map((node) => ({
+            rule: entry.id,
+            target: node.target.join(" "),
+            html: node.html,
+            reason:
+              (node.any?.[0] ?? node.none?.[0] ?? node.all?.[0])?.data?.messageKey ?? "",
+          })),
+        );
+      }, disabledRules);
+
+      const unexpected = incomplete.filter((node) => !isAllowedIncomplete(node));
+      expect(
+        unexpected,
+        `unexpected axe incomplete in ${storyId}: ${unexpected
+          .map((node) => `${node.rule} @ ${node.target} (${node.reason})`)
+          .join("; ")}`,
+      ).toEqual([]);
     });
   }
 }

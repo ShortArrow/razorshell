@@ -156,6 +156,9 @@ export function UrlApp() {
           </tr>
         </thead>
         <tbody>
+          {policy.rules.length === 0
+            ? <tr><td colSpan={5} className='text-center opacity-70'>no rules</td></tr>
+            : null}
           {
             policy.rules.map((rule, index) => {
               const matched = index === probedIndex;
