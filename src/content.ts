@@ -28,13 +28,26 @@ function reportState(): void {
   chrome.runtime.sendMessage({ type: stateMessage, enabled }).catch(() => {});
 }
 
+let urlPolicy: UrlPolicy | null = null;
+
 function applyUrlPolicy(policy: UrlPolicy) {
+  urlPolicy = policy;
   enabled = resolveAction(location.href, policy) !== "deny";
   reportState();
 }
 
-loadUrlPolicy().then(applyUrlPolicy);
+// A same-document navigation keeps this script alive at a new location, so the
+// decision has to be taken again against the policy already in hand.
+function reapplyUrlPolicy(): void {
+  if (urlPolicy === null) return;
+  applyUrlPolicy(urlPolicy);
+}
+
+loadUrlPolicy({ migrate: window === window.top }).then(applyUrlPolicy);
 subscribeUrlPolicy(applyUrlPolicy);
+document.addEventListener("razorshell-navigate", reapplyUrlPolicy);
+window.addEventListener("popstate", reapplyUrlPolicy);
+window.addEventListener("hashchange", reapplyUrlPolicy);
 loadContentEditableSetting().then(applyEditableSetting);
 subscribeContentEditableSetting(applyEditableSetting);
 initKeymap();

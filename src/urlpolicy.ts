@@ -20,11 +20,14 @@ async function migrateFromLegacyUrls(): Promise<UrlPolicy> {
 /**
  * @fn loadUrlPolicy
  * @brief Read the stored policy, migrating the legacy url list when the policy is absent.
+ * @param options - migrate: false leaves the legacy list untouched, so that only one
+ *        caller among concurrent readers such as every frame's content script writes it
  * @return Promise<UrlPolicy>
  */
-export async function loadUrlPolicy(): Promise<UrlPolicy> {
+export async function loadUrlPolicy(options: { migrate?: boolean } = {}): Promise<UrlPolicy> {
   const data = await chrome.storage.sync.get({ [policyKey]: null }) as { urlPolicy: UrlPolicy | null };
   if (data.urlPolicy) return data.urlPolicy;
+  if (options.migrate === false) return defaultUrlPolicy;
   return migrateFromLegacyUrls();
 }
 
