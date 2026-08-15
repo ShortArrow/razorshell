@@ -28,6 +28,9 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   next to Chrome's site-access indicator. The two stay separate
   layers: Chrome decides whether the content script is injected at
   all, the policy decides whether an injected script acts.
+- Storybook covers the options page components: thirteen stories
+  with an in-memory chrome mock, each pinned by a screenshot
+  comparison, and the story build compiles in CI.
 - The end-to-end suite lives in tests/e2e (30 Playwright tests
   covering the content script, options page, live policy and keymap
   propagation, SPA navigation, legacy-key migration and

@@ -32,5 +32,11 @@ export default defineConfig({
       snapshotPathTemplate:
         "{testDir}/{testFileName}-snapshots/{arg}-{platform}{ext}",
     },
+    {
+      name: "storybook",
+      testDir: "tests/storybook",
+      snapshotPathTemplate:
+        "{testDir}/{testFileName}-snapshots/{arg}-{platform}{ext}",
+    },
   ],
 });

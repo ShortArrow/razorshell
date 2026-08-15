@@ -27,6 +27,10 @@ jobs:
 
       - run: pnpm build
 
+      # Builds the stories to prove they compile; test:storybook is omitted for
+      # the same reason as test:visual, its baselines being win32 screenshots.
+      - run: pnpm build-storybook
+
       - run: pnpm exec playwright install --with-deps chromium
 
       - run: pnpm test:e2e
