@@ -237,6 +237,33 @@ test.describe("content script keybindings", () => {
     expect(state).toEqual({ start: 0, end: 0 });
   });
 
+  test("an input inside a closed shadow root is out of reach, so Ctrl+a stays the native select-all", async () => {
+    await page.evaluate(() => {
+      const host = document.createElement("div");
+      const root = host.attachShadow({ mode: "closed" });
+      const inp = document.createElement("input");
+      inp.type = "text";
+      inp.value = "hello world";
+      root.appendChild(inp);
+      document.body.appendChild(host);
+      (window as unknown as { __closedInput: HTMLInputElement }).__closedInput = inp;
+    });
+
+    await page.evaluate(() => {
+      const inp = (window as unknown as { __closedInput: HTMLInputElement }).__closedInput;
+      inp.focus();
+      inp.setSelectionRange(11, 11);
+    });
+
+    await page.keyboard.press("Control+a");
+
+    const state = await page.evaluate(() => {
+      const inp = (window as unknown as { __closedInput: HTMLInputElement }).__closedInput;
+      return { start: inp.selectionStart, end: inp.selectionEnd };
+    });
+    expect(state).toEqual({ start: 0, end: 11 });
+  });
+
   test("input inside an iframe is covered", async () => {
     await page.evaluate((base) => {
       const frame = document.createElement("iframe");

@@ -31,6 +31,13 @@ const preview: Preview = {
       const theme = context.globals.theme as string;
       useEffect(() => {
         document.documentElement.dataset.theme = theme;
+        // ThemeApp paints the same attribute from storage, and it does so from
+        // a resolved promise, which lands after this effect. Reasserting on a
+        // later turn keeps the toolbar global authoritative for every story.
+        const settle = setTimeout(() => {
+          document.documentElement.dataset.theme = theme;
+        }, 0);
+        return () => clearTimeout(settle);
       }, [theme]);
       document.documentElement.dataset.theme = theme;
       return (

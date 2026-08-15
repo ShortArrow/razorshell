@@ -12,6 +12,16 @@
  * `#storybook-root` so that the surrounding page background stays out of the
  * comparison. Stories carrying a `play` function settle asynchronously, so the
  * spec waits for the story's completion signal before capturing.
+ *
+ * Every story is captured under both daisyUI themes, selected through the
+ * `globals=theme:<name>` URL parameter that the preview decorator reads, so a
+ * regression confined to one theme cannot hide behind the other.
+ *
+ * The inspector toast is the exception to the `#storybook-root` rule: it is
+ * injected into `document.body` at a fixed position, outside the story root
+ * entirely, so those stories name the toast element as the capture target. It
+ * also removes itself after eight seconds, and the capture happens well inside
+ * that window.
  */
 import { test, expect } from "@playwright/test";
 import fs from "node:fs";
@@ -39,7 +49,23 @@ const storyIds = [
   "options-urlapp--empty",
   "options-urlapp--with-rules",
   "options-urlapp--probe-match",
+  "inspect-toast--conflicts",
+  "inspect-toast--no-conflicts",
 ];
+
+const themes = ["light", "dark"] as const;
+
+const toastSelector = "#razorshell-inspect-toast";
+
+/** The stories whose subject is injected into `document.body`, not the root. */
+const injectedStoryIds = new Set([
+  "inspect-toast--conflicts",
+  "inspect-toast--no-conflicts",
+]);
+
+function captureSelector(storyId: string): string {
+  return injectedStoryIds.has(storyId) ? toastSelector : "#storybook-root";
+}
 
 const contentTypes: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
@@ -91,19 +117,27 @@ test.afterAll(async () => {
 });
 
 for (const storyId of storyIds) {
-  test(storyId, async ({ page }) => {
-    await page.goto(`${origin}/iframe.html?id=${storyId}&viewMode=story`);
+  for (const theme of themes) {
+    test(`${storyId} (${theme})`, async ({ page }) => {
+      await page.goto(
+        `${origin}/iframe.html?id=${storyId}&viewMode=story&globals=theme:${theme}`,
+      );
 
-    await page.waitForFunction(() => document.body.classList.contains("sb-show-main"));
-    await page.waitForFunction((id) => {
-      const preview = (window as unknown as {
-        __STORYBOOK_PREVIEW__?: { storyRenders?: { id: string; phase?: string }[] };
-      }).__STORYBOOK_PREVIEW__;
-      const render = preview?.storyRenders?.find((candidate) => candidate.id === id);
-      return render?.phase === "finished";
-    }, storyId);
+      await page.waitForFunction(() => document.body.classList.contains("sb-show-main"));
+      await page.waitForFunction((id) => {
+        const preview = (window as unknown as {
+          __STORYBOOK_PREVIEW__?: { storyRenders?: { id: string; phase?: string }[] };
+        }).__STORYBOOK_PREVIEW__;
+        const render = preview?.storyRenders?.find((candidate) => candidate.id === id);
+        return render?.phase === "finished";
+      }, storyId);
+      await expect
+        .poll(() => page.evaluate(() => document.documentElement.dataset.theme))
+        .toBe(theme);
 
-    const root = page.locator("#storybook-root");
-    await expect(root).toHaveScreenshot(`${storyId}.png`);
-  });
+      const target = page.locator(captureSelector(storyId));
+      await expect(target).toBeVisible();
+      await expect(target).toHaveScreenshot(`${storyId}-${theme}.png`);
+    });
+  }
 }
