@@ -30,6 +30,14 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   all, the policy decides whether an injected script acts.
 - The dormant Lua section left over from the abandoned init.lua plan
   is gone from the options page.
+- axe is now fully conclusive with nothing exempted: the select
+  arrow is a real icon instead of the daisyUI background gradient,
+  and tooltip bubbles exist in the DOM only while shown, so every
+  background computes. That exposed dark-theme contrast failures on
+  dimmed helper text that no gate had ever checked — the a11y run
+  only exercised light — which are fixed, and the screenshot suite
+  now asserts zero violations in both themes with only page-level
+  structure rules set aside as inapplicable to lone components.
 - The axe "needs review" backlog is resolved and guarded: an empty
   rule table shows a "no rules" row so header association is
   decidable, the page-level skip-link rule is off for component

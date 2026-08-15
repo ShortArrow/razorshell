@@ -7,6 +7,7 @@ import {
   getUILanguage,
   setLanguage,
 } from "../languages";
+import { Select } from "./select";
 
 const autoLanguage = "auto";
 
@@ -40,22 +41,22 @@ export function LangApp() {
       <div className='flex items-center gap-2'>
         <label htmlFor='language-select'>Display language of this options page</label>
         <div className='tooltip tooltip-top' data-tip={getMessage('tooltip_language_select')()}>
-          <select
+          <Select
             id='language-select'
             data-testid='language-select'
-            className='select select-bordered select-sm'
+            className='select-sm'
             value={setting}
             onChange={(e) => applyLanguage(e.target.value)}
           >
             <option value={autoLanguage}>{autoLanguage}</option>
             {availableLocales.map((locale) => <option key={locale} value={locale}>{locale}</option>)}
-          </select>
+          </Select>
         </div>
         <span className='badge badge-primary whitespace-nowrap' data-testid='effective-language'>
           {effectiveLanguage(setting, uiLanguage)}
         </span>
       </div>
-      <div className='flex items-center gap-2 text-sm opacity-70'>
+      <div className='flex items-center gap-2 text-sm opacity-80'>
         <span>browser UI:</span>
         <span className='badge badge-sm badge-ghost'>{uiLanguage}</span>
         <span>accept:</span>

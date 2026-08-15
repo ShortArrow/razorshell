@@ -1,3 +1,60 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/**
+ * Two daisyUI paint tricks leave axe unable to decide a `color-contrast`
+ * result, so its findings land in `incomplete` rather than in `passes` or
+ * `violations` — reported by the a11y addon, failing nothing. Both are removed
+ * here so the storybook budget can require `incomplete` to be empty.
+ */
+
+/*
+ * daisyUI draws a select's arrow with two `linear-gradient` backgrounds, and
+ * axe reports `bgGradient` on any element painted that way. `src/ui/select.tsx`
+ * draws the arrow as a real icon instead; this rule takes the gradient away.
+ * The declaration is in `utilities`, which the cascade places after daisyUI's
+ * `components`, so it wins without `!important`.
+ */
+@layer utilities {
+  .select-arrowless {
+    background-image: none;
+  }
+}
+
+/*
+ * daisyUI's `.tooltip` keeps its bubble (`::before`) and tail (`::after`) in
+ * the tree at all times and animates `opacity`, so an always-present pseudo
+ * element sits over the wrapper. axe refuses to resolve a background beneath
+ * one and reports `pseudoContent` for the wrapper's text — the toggle label in
+ * `RichTextApp`, for instance.
+ *
+ * Taking them out of the box tree while hidden and restoring them on each of
+ * daisyUI's three show triggers keeps the visible tooltip identical and leaves
+ * nothing for axe to trip over when it is not shown. The `opacity` transition
+ * still runs on the way in; only the fade-out is lost, because a `display`
+ * change is not interpolated.
+ */
+.tooltip:before,
+.tooltip:after {
+  display: none;
+}
+
+.tooltip.tooltip-open:before,
+.tooltip.tooltip-open:after,
+.tooltip:hover:before,
+.tooltip:hover:after,
+.tooltip:has(:focus-visible):before,
+.tooltip:has(:focus-visible):after {
+  display: block;
+}
+
+/*
+ * daisyUI hides the bubble for a tooltip carrying no `data-tip`; that rule
+ * changes `visibility` only, so the `display` restore above would put an empty
+ * bubble back on screen.
+ */
+.tooltip:not([data-tip]):hover:before,
+.tooltip:not([data-tip]):hover:after {
+  display: none;
+}

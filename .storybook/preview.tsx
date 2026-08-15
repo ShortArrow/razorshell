@@ -13,11 +13,17 @@ const preview: Preview = {
     // has to fail the run to mean anything.
     a11y: {
       test: 'error',
-      // `bypass` asks a whole page for a skip link. A story renders one
-      // component with no page around it, so the rule is inapplicable here
-      // rather than failing: it reported "incomplete" on every story whose
-      // component carries no heading.
-      config: { rules: [{ id: 'bypass', enabled: false }] },
+      // These four are page-structure rules (skip link, main landmark, an
+      // h1, content inside landmarks). A story renders one component with
+      // no page around it, so they are inapplicable rather than failing.
+      config: {
+        rules: [
+          { id: 'bypass', enabled: false },
+          { id: 'landmark-one-main', enabled: false },
+          { id: 'page-has-heading-one', enabled: false },
+          { id: 'region', enabled: false },
+        ],
+      },
     },
   },
   globalTypes: {

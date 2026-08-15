@@ -3,6 +3,7 @@ import { ChevronDownIcon, ChevronUpIcon, XMarkIcon } from '@heroicons/react/24/o
 import { getMessage } from '../languages';
 import { loadUrlPolicy, saveUrlPolicy } from '../urlpolicy';
 import { MatchType, RuleAction, UrlPolicy, UrlRule, defaultUrlPolicy, findMatchingRuleIndex } from '../urlrules';
+import { Select } from './select';
 
 const matchTypes: MatchType[] = ['exact', 'glob', 'regex'];
 const ruleActions: RuleAction[] = ['allow', 'deny'];
@@ -71,14 +72,14 @@ export function UrlApp() {
       <div className='flex items-center gap-2'>
         <label htmlFor='default-action'>Default policy for URLs matching no rule</label>
         <div className='tooltip tooltip-top' data-tip={getMessage('tooltip_default_policy')()}>
-          <select
+          <Select
             id='default-action'
-            className='select select-bordered select-sm'
+            className='select-sm'
             value={policy.defaultAction}
             onChange={(e) => applyPolicy({ ...policy, defaultAction: e.target.value as RuleAction })}
           >
             {ruleActions.map((value) => <option key={value} value={value}>{value}</option>)}
-          </select>
+          </Select>
         </div>
       </div>
       <div className='join w-full'>
@@ -96,8 +97,8 @@ export function UrlApp() {
           />
         </label>
         <div className='tooltip tooltip-top' data-tip={getMessage('tooltip_match_type')()}>
-          <select
-            className='select select-bordered join-item'
+          <Select
+            className='join-item'
             aria-label={getMessage('tooltip_match_type')()}
             value={matchType}
             onChange={(e) => {
@@ -106,17 +107,17 @@ export function UrlApp() {
             }}
           >
             {matchTypes.map((value) => <option key={value} value={value}>{value}</option>)}
-          </select>
+          </Select>
         </div>
         <div className='tooltip tooltip-top' data-tip={getMessage('tooltip_rule_action')()}>
-          <select
-            className='select select-bordered join-item'
+          <Select
+            className='join-item'
             aria-label={getMessage('tooltip_rule_action')()}
             value={action}
             onChange={(e) => setAction(e.target.value as RuleAction)}
           >
             {ruleActions.map((value) => <option key={value} value={value}>{value}</option>)}
-          </select>
+          </Select>
         </div>
         <button className='btn btn-primary join-item' onClick={addRule}>add rule</button>
       </div>
@@ -157,7 +158,7 @@ export function UrlApp() {
         </thead>
         <tbody>
           {policy.rules.length === 0
-            ? <tr><td colSpan={5} className='text-center opacity-70'>no rules</td></tr>
+            ? <tr><td colSpan={5} className='text-center opacity-80'>no rules</td></tr>
             : null}
           {
             policy.rules.map((rule, index) => {

@@ -23,10 +23,21 @@
  * also removes itself after eight seconds, and the capture happens well inside
  * that window.
  *
- * The light pass also spends an axe run on each story's `incomplete` results —
- * the findings axe could not decide, which the a11y addon shows but never
- * fails on, so they accumulate unnoticed. Two exemptions are allowed and both
- * are narrow; see `isAllowedIncomplete`.
+ * Both passes spend an axe run on the story's `violations`, because the ones
+ * that matter here are `color-contrast`, and contrast is exactly the finding a
+ * single theme cannot speak for: the two daisyUI palettes put different
+ * foregrounds on different backgrounds, and a dimmed row that clears 4.5:1
+ * against white can sit at 4.2:1 against the dark base. The budget is zero.
+ *
+ * The light pass additionally reads that run's `incomplete` results — the
+ * findings axe could not decide, which the a11y addon shows but never fails
+ * on, so they accumulate unnoticed. The budget is zero: an undecided result
+ * means axe could not read the page, and the two daisyUI paint tricks that
+ * used to make that unavoidable (a gradient select arrow, an always-present
+ * tooltip pseudo element) are removed in `src/css/options.css`. Unlike
+ * contrast, an undecided result is about which properties axe can read rather
+ * than their values, so one theme's pass covers both and the run stays at one
+ * axe execution per story per theme.
  */
 import { test, expect } from "@playwright/test";
 import { createRequire } from "node:module";
@@ -111,38 +122,22 @@ function readAxeSource(): string {
  * Rules switched off for this run, mirroring `.storybook/preview.tsx`.
  *
  * The preview's `a11y.config` reaches the addon only; this spec drives axe
- * directly, so the same reasoning has to be restated here. `bypass` asks a
- * whole page for a skip link, which a single rendered component cannot have.
+ * directly, so the same reasoning has to be restated here.
+ *
+ * All four judge a document as a whole page, and a story is not one: it is a
+ * single component mounted into a bare `iframe.html` with no surrounding
+ * document for it to be a part of. `bypass` asks for a skip link past the
+ * navigation; `landmark-one-main` asks for a `<main>`; `region` asks that
+ * every node sit inside some landmark; `page-has-heading-one` asks for an
+ * `<h1>`, where these components deliberately start at `<h2>` because the
+ * options page that hosts them owns the `<h1>`. Satisfying any of them inside
+ * a story would mean shipping page furniture in a component, so they are
+ * inapplicable here rather than failing — the real options page is where they
+ * are worth asking, and `tests/e2e` is what renders it.
  */
-const disabledRules = ["bypass"];
+const disabledRules = ["bypass", "landmark-one-main", "page-has-heading-one", "region"];
 
-type IncompleteNode = { rule: string; target: string; html: string; reason: string };
-
-/**
- * The incomplete findings this suite tolerates.
- *
- * Both are the same shape: daisyUI paints something axe cannot see through, so
- * the contrast comes back undecided rather than failing, over a pair that is
- * base-100 on base-content and passes when measured by hand.
- *
- * - A `<select>`'s arrow is a `linear-gradient` background, so axe reports
- *   `bgGradient` on every select the options page renders.
- * - daisyUI's `.tooltip` and `.label` wrappers put content in a `::before`,
- *   and axe refuses to resolve a background underneath a pseudo-element,
- *   reporting `pseudoContent`. These surface only once a story gives the
- *   element visible text, because the contrast check skips elements without
- *   any — which is why an earlier sweep of these stories did not record them.
- *
- * Both are recognised by axe's own `messageKey`, not by the element's tag, so
- * a genuine contrast failure on the same element still fails. Anything else
- * undecided is a defect until someone widens this deliberately.
- */
-function isAllowedIncomplete(node: IncompleteNode): boolean {
-  return (
-    node.rule === "color-contrast" &&
-    (node.reason === "bgGradient" || node.reason === "pseudoContent")
-  );
-}
+type AxeNode = { rule: string; target: string; html: string; reason: string };
 
 const contentTypes: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
@@ -218,52 +213,75 @@ for (const storyId of storyIds) {
       await expect(target).toBeVisible();
       await expect(target).toHaveScreenshot(`${storyId}-${theme}.png`);
 
-      // The undecided findings do not depend on the palette — they are about
-      // which properties axe can read, not their values — so one theme's pass
-      // is enough and the run stays at one axe execution per story.
-      if (theme !== "light") return;
+      // A story's `play` function leaves focus on whatever it last drove, and
+      // Testing Library's synthetic events make Chromium treat that focus as
+      // keyboard-originated, so `:focus-visible` matches and daisyUI shows the
+      // tooltip wrapping the control. A shown tooltip is correct behaviour —
+      // a real mouse click leaves it hidden — but axe compares the bubble's
+      // raw area against the wrapper's without noticing that it is positioned
+      // clear of it, and reports `pseudoContent` for a bubble that overlaps
+      // nothing. The budget is about the resting page, which is also what the
+      // screenshot above already captured, so focus is dropped first.
+      await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
       await page.addScriptTag({ content: axeSource });
-      const incomplete: IncompleteNode[] = await page.evaluate(async (disabled) => {
-        const axe = (window as unknown as {
-          axe: {
-            run: (
-              context: Document,
-              options: { resultTypes: string[]; rules?: Record<string, { enabled: boolean }> },
-            ) => Promise<{
-              incomplete: {
-                id: string;
-                nodes: {
-                  target: string[];
-                  html: string;
-                  any?: { data?: { messageKey?: string } }[];
-                  none?: { data?: { messageKey?: string } }[];
-                  all?: { data?: { messageKey?: string } }[];
-                }[];
-              }[];
-            }>;
+      const findings: { violations: AxeNode[]; incomplete: AxeNode[] } = await page.evaluate(
+        async (disabled) => {
+          type ResultNode = {
+            target: string[];
+            html: string;
+            any?: { data?: { messageKey?: string; contrastRatio?: number } }[];
+            none?: { data?: { messageKey?: string; contrastRatio?: number } }[];
+            all?: { data?: { messageKey?: string; contrastRatio?: number } }[];
           };
-        }).axe;
-        const results = await axe.run(document, {
-          resultTypes: ["incomplete"],
-          rules: Object.fromEntries(disabled.map((id) => [id, { enabled: false }])),
-        });
-        return results.incomplete.flatMap((entry) =>
-          entry.nodes.map((node) => ({
-            rule: entry.id,
-            target: node.target.join(" "),
-            html: node.html,
-            reason:
-              (node.any?.[0] ?? node.none?.[0] ?? node.all?.[0])?.data?.messageKey ?? "",
-          })),
-        );
-      }, disabledRules);
+          type ResultEntry = { id: string; nodes: ResultNode[] };
+          const axe = (window as unknown as {
+            axe: {
+              run: (
+                context: Document,
+                options: { resultTypes: string[]; rules?: Record<string, { enabled: boolean }> },
+              ) => Promise<{ violations: ResultEntry[]; incomplete: ResultEntry[] }>;
+            };
+          }).axe;
+          const results = await axe.run(document, {
+            resultTypes: ["violations", "incomplete"],
+            rules: Object.fromEntries(disabled.map((id) => [id, { enabled: false }])),
+          });
+          const shape = (entries: ResultEntry[]) =>
+            entries.flatMap((entry) =>
+              entry.nodes.map((node) => {
+                const data = (node.any?.[0] ?? node.none?.[0] ?? node.all?.[0])?.data;
+                return {
+                  rule: entry.id,
+                  target: node.target.join(" "),
+                  html: node.html,
+                  // Contrast failures carry a ratio rather than a message key,
+                  // and the measured value is the whole diagnosis.
+                  reason:
+                    data?.messageKey ??
+                    (data?.contrastRatio === undefined ? "" : `${data.contrastRatio}:1`),
+                };
+              }),
+            );
+          return { violations: shape(results.violations), incomplete: shape(results.incomplete) };
+        },
+        disabledRules,
+      );
 
-      const unexpected = incomplete.filter((node) => !isAllowedIncomplete(node));
+      const describe = (nodes: AxeNode[]) =>
+        nodes.map((node) => `${node.rule} @ ${node.target} (${node.reason})`).join("; ");
+
       expect(
-        unexpected,
-        `unexpected axe incomplete in ${storyId}: ${unexpected
-          .map((node) => `${node.rule} @ ${node.target} (${node.reason})`)
-          .join("; ")}`,
+        findings.violations,
+        `unexpected axe violations in ${storyId} (${theme}): ${describe(findings.violations)}`,
+      ).toEqual([]);
+
+      // Undecided findings are about which properties axe can read rather than
+      // their values, so the light pass speaks for both themes.
+      if (theme !== "light") return;
+
+      expect(
+        findings.incomplete,
+        `unexpected axe incomplete in ${storyId}: ${describe(findings.incomplete)}`,
       ).toEqual([]);
     });
   }
