@@ -1,10 +1,9 @@
 /**
  * Visual regression tests for the options page keymap table.
  *
- * The extension is loaded unpacked from the repository `dist/` directory, so
- * its ID is derived deterministically from that absolute path. The constant
- * below is the ID for `V:\razorshell\dist`; it changes if the repository is
- * checked out elsewhere.
+ * The extension is loaded unpacked from the repository `dist/` directory. Its
+ * ID depends on that absolute path, so it is resolved at runtime from the
+ * service worker the fresh-profile install spawns, never hardcoded.
  *
  * Chromium must be the full build (`channel: "chromium"`) because the default
  * headless shell cannot load extensions.
@@ -22,14 +21,18 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const EXTENSION_ID = "aampaghhhfgjcdofgkafhlbbjaflkokn";
-
 const distPath = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../../dist",
 );
-const optionsUrl = `chrome-extension://${EXTENSION_ID}/options.html`;
 const firstRebindTestId = "rebind-move_cursor_to_the_beginning";
+
+async function optionsUrl(activeContext: BrowserContext): Promise<string> {
+  const worker =
+    activeContext.serviceWorkers()[0] ??
+    (await activeContext.waitForEvent("serviceworker", { timeout: 15000 }));
+  return `chrome-extension://${new URL(worker.url()).host}/options.html`;
+}
 
 const staticDotsMask =
   "url(\"data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='4' cy='12' r='3'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Ccircle cx='20' cy='12' r='3'/%3E%3C/svg%3E\")";
@@ -61,7 +64,7 @@ test.afterEach(async () => {
 
 test("keymap table (idle)", async () => {
   const page = await context.newPage();
-  await page.goto(optionsUrl);
+  await page.goto(await optionsUrl(context));
 
   const keymapTable = page
     .locator("table")
@@ -73,7 +76,7 @@ test("keymap table (idle)", async () => {
 
 test("keymap row capturing", async () => {
   const page = await context.newPage();
-  await page.goto(optionsUrl);
+  await page.goto(await optionsUrl(context));
   await page.addStyleTag({ content: FREEZE_LOADING_DOTS_CSS });
 
   const keymapTable = page
