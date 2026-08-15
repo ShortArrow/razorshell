@@ -69,6 +69,18 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ### Fixed
 
+- Same-document navigations (pushState, replaceState, popstate,
+  hashchange) re-evaluate the URL policy, so a single-page app moving
+  onto a denied path disables the keybindings without a reload.
+- The legacy "urls" storage key migrates only from the top frame;
+  every subframe used to run the migration concurrently.
+- The Chinese locale directory is zh_CN, the code Chrome actually
+  resolves; it was shipped as "cn", which no browser UI language
+  maps to.
+- The README keymap table now lists only the implemented bindings —
+  it promised over twenty shortcuts while eight exist — and a test
+  keeps the table equal to the code; the rest moved to a planned
+  section.
 - `email` inputs were dead keys since 0.0.1: the selection API does
   not apply to that type, so every operation threw after
   preventDefault had already suppressed the native action. `email`
