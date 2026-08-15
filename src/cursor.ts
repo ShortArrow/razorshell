@@ -32,14 +32,12 @@ export const cursor = {
     return newline === -1 ? text.length : newline;
   },
   getEndOfWord(text: string, cursor: number): number {
-    const sliced = text.slice(cursor);
-    if (sliced === "") return text.length;
-    const words = sliced.split(" ");
-    const firstWordLength = words[0].length;
-    const newCursor = cursor + firstWordLength;
-    if (newCursor === cursor) {
-      return cursor + words[1].length + 1;
+    while (cursor < text.length && separators.includes(text[cursor])) {
+      cursor++; // ignore separators
     }
-    return newCursor;
+    while (cursor < text.length && !separators.includes(text[cursor])) {
+      cursor++; // to the end of the word
+    }
+    return cursor;
   },
 };

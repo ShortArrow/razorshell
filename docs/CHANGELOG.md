@@ -78,6 +78,12 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ### Fixed
 
+- Alt+f no longer jumps across newlines and tabs: end-of-word motion
+  treated only spaces as separators. Fourteen hardening tests pin the
+  behaviors a mutation review found unconstrained, among them glob
+  `?` staying inside a segment, multi-modifier handler analysis, the
+  page keeping chords razorshell has no editable counterpart for, and
+  the rich text opt-in defaulting off.
 - Same-document navigations (pushState, replaceState, popstate,
   hashchange) re-evaluate the URL policy, so a single-page app moving
   onto a denied path disables the keybindings without a reload.
