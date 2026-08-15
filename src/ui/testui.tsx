@@ -24,11 +24,11 @@ function statusOf(event: React.KeyboardEvent<TextField>): LastStatus {
 function StatusPanel({ status }: { status: LastStatus | null }) {
   if (status === null) {
     return <div data-testid="last-status" className="flex items-center gap-2">
-      <span className="text-sm opacity-60">last status: -</span>
+      <span className="text-sm opacity-80">last status: -</span>
     </div>;
   }
   return <div data-testid="last-status" className="flex flex-wrap items-center gap-2">
-    <span className="text-sm opacity-60">last status:</span>
+    <span className="text-sm opacity-80">last status:</span>
     <span className="flex items-center gap-1">
       {status.chord.map((label, index) => <kbd key={index} className="kbd kbd-sm text-base-content">{label}</kbd>)}
     </span>
@@ -66,6 +66,7 @@ export function TestApp() {
             <input
               type="text"
               data-testid="test-input"
+              aria-label={`${getMessage("tooltip_test_area")()} (single line)`}
               className="grow"
               defaultValue={inputText}
               onKeyDown={(e) => handleKeyDown(e, setInputSelection)}
@@ -74,9 +75,10 @@ export function TestApp() {
               onInput={(e) => setInputSelection(selectionSummary(e.currentTarget))}
             />
           </label>
-          <p data-testid="test-input-selection" className="text-xs opacity-60 m-0">{inputSelection}</p>
+          <p data-testid="test-input-selection" className="text-xs opacity-80 m-0">{inputSelection}</p>
           <textarea
             data-testid="test-textarea"
+            aria-label={`${getMessage("tooltip_test_area")()} (multiple lines)`}
             className="textarea textarea-bordered w-full"
             rows={3}
             defaultValue={textareaText}
@@ -85,7 +87,7 @@ export function TestApp() {
             onSelect={(e) => setTextareaSelection(selectionSummary(e.currentTarget))}
             onInput={(e) => setTextareaSelection(selectionSummary(e.currentTarget))}
           />
-          <p data-testid="test-textarea-selection" className="text-xs opacity-60 m-0">{textareaSelection}</p>
+          <p data-testid="test-textarea-selection" className="text-xs opacity-80 m-0">{textareaSelection}</p>
           <div className="divider m-0"></div>
           <StatusPanel status={status} />
         </div>

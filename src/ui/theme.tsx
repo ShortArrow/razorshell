@@ -34,6 +34,7 @@ export function ThemeApp() {
     <label className="swap swap-rotate">
       <input type="checkbox"
         data-testid="theme-toggle"
+        aria-label="Toggle light and dark theme"
         checked={theme === "light"}
         onChange={(e) => toggle(e.target.checked)}
       />

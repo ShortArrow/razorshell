@@ -131,7 +131,7 @@ export function KeymapApp() {
             <th>action</th>
             <th>default</th>
             <th>current</th>
-            <th></th>
+            <th><span className='sr-only'>rebind</span></th>
           </tr>
         </thead>
         <tbody>

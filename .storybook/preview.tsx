@@ -8,6 +8,10 @@ installChromeMock();
 const preview: Preview = {
   parameters: {
     controls: { matchers: { color: /(background|color)$/i, date: /Date$/i } },
+    // The addon's default is 'todo', which only warns. Stories are the only
+    // place these components are exercised with layout, so a violation here
+    // has to fail the run to mean anything.
+    a11y: { test: 'error' },
   },
   globalTypes: {
     theme: {

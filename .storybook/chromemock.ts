@@ -76,6 +76,17 @@ export function resetStorage(seed: Record<string, unknown> = {}): void {
 }
 
 /**
+ * @fn storedValue
+ * @brief Read one key straight out of the mock store, for play functions that
+ *        assert a component persisted what it rendered.
+ * @param key - The storage key to read
+ * @return The stored value, or undefined when the key was never written
+ */
+export function storedValue<T = unknown>(key: string): T | undefined {
+  return store[key] as T | undefined;
+}
+
+/**
  * @fn installChromeMock
  * @brief Publish the mock on globalThis.chrome, idempotently.
  * @return void

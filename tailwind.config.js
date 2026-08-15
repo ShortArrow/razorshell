@@ -3,7 +3,7 @@ import themes from 'daisyui/src/theming/themes'
 
 const lightStatusColors = {
   success: 'oklch(49.12% 0.16 150)',
-  'success-content': 'oklch(89.82% 0.06 150)',
+  'success-content': 'oklch(96% 0.03 150)',
   error: 'oklch(49.12% 0.19 27)',
   'error-content': 'oklch(89.82% 0.04 27)',
   '--tooltip-color': 'oklch(94% 0.005 260)',

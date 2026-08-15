@@ -28,6 +28,14 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   next to Chrome's site-access indicator. The two stay separate
   layers: Chrome decides whether the content script is injected at
   all, the policy decides whether an injected script acts.
+- Stories run as tests: the Storybook vitest addon executes every
+  story in a real Chromium alongside the unit suite, play functions
+  drive interactions (adding a rule, rebinding by keyboard, the rich
+  text toggle persisting), and axe accessibility checks fail the run
+  on violations. The audit fixed missing accessible names on selects
+  and icon buttons, empty table headers, low-contrast helper text,
+  and a success badge pairing that sat at 4.24:1 against the 4.5:1
+  requirement.
 - Storybook covers the options page components: thirteen stories
   with an in-memory chrome mock, each pinned by a screenshot
   comparison, and the story build compiles in CI.

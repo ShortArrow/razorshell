@@ -98,6 +98,7 @@ export function UrlApp() {
         <div className='tooltip tooltip-top' data-tip={getMessage('tooltip_match_type')()}>
           <select
             className='select select-bordered join-item'
+            aria-label={getMessage('tooltip_match_type')()}
             value={matchType}
             onChange={(e) => {
               setMatchType(e.target.value as MatchType);
@@ -110,6 +111,7 @@ export function UrlApp() {
         <div className='tooltip tooltip-top' data-tip={getMessage('tooltip_rule_action')()}>
           <select
             className='select select-bordered join-item'
+            aria-label={getMessage('tooltip_rule_action')()}
             value={action}
             onChange={(e) => setAction(e.target.value as RuleAction)}
           >
@@ -124,6 +126,7 @@ export function UrlApp() {
           <input
             type='url'
             data-testid='url-probe-input'
+            aria-label={getMessage('tooltip_url_probe')()}
             className='input input-bordered input-sm w-full'
             placeholder='URL to check'
             value={probe}
@@ -149,7 +152,7 @@ export function UrlApp() {
             <th>action</th>
             <th>match</th>
             <th>pattern</th>
-            <th></th>
+            <th><span className='sr-only'>rule actions</span></th>
           </tr>
         </thead>
         <tbody>
@@ -164,18 +167,21 @@ export function UrlApp() {
                 <td className='flex items-center gap-2'>
                   <button
                     className='btn btn-outline btn-xs'
+                    aria-label={`move rule ${index + 1} up`}
                     disabled={index === 0}
                     onClick={() => applyPolicy({ ...policy, rules: swapped(policy.rules, index, index - 1) })}>
                     <ChevronUpIcon className='w-4 h-4' />
                   </button>
                   <button
                     className='btn btn-outline btn-xs'
+                    aria-label={`move rule ${index + 1} down`}
                     disabled={index === policy.rules.length - 1}
                     onClick={() => applyPolicy({ ...policy, rules: swapped(policy.rules, index, index + 1) })}>
                     <ChevronDownIcon className='w-4 h-4' />
                   </button>
                   <button
                     className='btn btn-outline btn-xs btn-error'
+                    aria-label={`delete rule ${index + 1}`}
                     onClick={() => applyPolicy({ ...policy, rules: policy.rules.filter((_, i) => i !== index) })}>
                     <XMarkIcon className='w-4 h-4' />
                   </button>

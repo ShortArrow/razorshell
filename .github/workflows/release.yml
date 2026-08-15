@@ -23,13 +23,15 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # Ahead of vitest: the storybook project runs its stories in a real
+      # chromium, so the browser has to exist before the suite starts.
+      - run: pnpm exec playwright install --with-deps chromium
+
       - run: pnpm exec vitest run
 
       - run: pnpm lint
 
       - run: pnpm build
-
-      - run: pnpm exec playwright install --with-deps chromium
 
       - run: pnpm test:e2e
 
