@@ -1,13 +1,16 @@
 /**
- * Visual regression suite configuration.
+ * Playwright suites.
  *
- * Screenshots are compared with animations frozen so that daisyUI's
- * loading-dots in the keymap capture mode does not make baselines flaky.
+ * `e2e` drives the unpacked extension in a persistent context; its blocks run
+ * as one serial scenario over a shared browser, so it needs a timeout well
+ * above the default. `visual` compares screenshots with animations frozen so
+ * that daisyUI's loading-dots in the keymap capture mode does not make
+ * baselines flaky. A single worker keeps the two suites from competing for
+ * the browser and keeps the extension's storage writes ordered.
  */
 import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
-  testDir: "tests/playwright",
   workers: 1,
   outputDir: "test-results",
   expect: {
@@ -15,4 +18,19 @@ export default defineConfig({
       animations: "disabled",
     },
   },
+  projects: [
+    {
+      name: "e2e",
+      testDir: "tests/e2e",
+      timeout: 120_000,
+    },
+    {
+      name: "visual",
+      testDir: "tests/playwright",
+      // Naming the project would otherwise insert it into the snapshot path;
+      // this template keeps the committed `<name>-<platform>.png` baselines.
+      snapshotPathTemplate:
+        "{testDir}/{testFileName}-snapshots/{arg}-{platform}{ext}",
+    },
+  ],
 });

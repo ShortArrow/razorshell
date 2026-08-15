@@ -28,6 +28,12 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   next to Chrome's site-access indicator. The two stay separate
   layers: Chrome decides whether the content script is injected at
   all, the policy decides whether an injected script acts.
+- The end-to-end suite lives in tests/e2e (30 Playwright tests
+  covering the content script, options page, live policy and keymap
+  propagation, SPA navigation, legacy-key migration and
+  restart persistence) and runs in CI on every push and before every
+  release; releases previously shipped with only unit tests, lint
+  and a build.
 - Settings export and import: a Config section downloads every
   setting as versioned JSON and applies a pasted or chosen file back,
   validating it with the failing field named (ADR-0008 records why

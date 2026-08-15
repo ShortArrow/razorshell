@@ -9,7 +9,8 @@
     "build": "tsc && vite build && vite build --config vite.config.content.ts && vite build --config vite.config.pagehook.ts",
     "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
     "test": "vitest",
-    "test:visual": "playwright test",
+    "test:visual": "playwright test --project=visual",
+    "test:e2e": "playwright test --project=e2e",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -13,6 +13,7 @@ const vitestConfig = defineConfig({
       "**/dist/**",
       "**/cypress/**",
       "tests/playwright/**",
+      "tests/e2e/**",
     ],
     environment: "jsdom",
   },

@@ -1,15 +1,13 @@
-name: Release
+name: CI
 
 on:
   push:
-    tags:
-      - 'v*'
-
-permissions:
-  contents: write
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  release:
+  check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -33,13 +31,5 @@ jobs:
 
       - run: pnpm test:e2e
 
-      - name: Package dist
-        run: |
-          cd dist
-          zip -r "../razorshell-${GITHUB_REF_NAME}.zip" .
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: razorshell-*.zip
-          generate_release_notes: true
+      # test:visual is omitted: its baselines are win32 screenshots, which a
+      # linux runner cannot reproduce.
