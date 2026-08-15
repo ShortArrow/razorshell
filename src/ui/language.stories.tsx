@@ -32,5 +32,6 @@ export const SwitchLanguage: Story = {
     // the options page once it has reached storage.
     await waitFor(() => expect(storedValue<string>('language')).toBe('ja'));
     await expect(canvas.getByTestId('effective-language')).toHaveTextContent('ja');
+    (document.activeElement as HTMLElement | null)?.blur();
   },
 };

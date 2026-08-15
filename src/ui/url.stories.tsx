@@ -39,6 +39,7 @@ export const ProbeMatch: Story = {
     const probe = await canvas.findByTestId('url-probe-input');
     await userEvent.type(probe, 'https://app.internal.test/admin/panel');
     await expect(canvas.getByTestId('url-probe-result')).toHaveTextContent('deny');
+    (document.activeElement as HTMLElement | null)?.blur();
   },
 };
 

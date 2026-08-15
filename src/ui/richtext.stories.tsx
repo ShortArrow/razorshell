@@ -33,5 +33,6 @@ export const TogglePersists: Story = {
     // The component writes through to storage without waiting for it, so the
     // opt-in has to be observed settling rather than read once.
     await waitFor(() => expect(storedValue<boolean>('enableContentEditable')).toBe(true));
+    (document.activeElement as HTMLElement | null)?.blur();
   },
 };
