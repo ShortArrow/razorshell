@@ -59,3 +59,32 @@ export const NoConflicts: Story = {
     lines: [],
   },
 };
+
+/**
+ * The look of a host page while inspect mode is armed: the hint toast up, the
+ * crosshair cursor on, and a field waiting to be picked. Choosing the field is
+ * the content script's job and stays with the e2e suite; only the appearance
+ * is pinned here.
+ */
+export const InspectMode: Story = {
+  args: {
+    title: 'Click a text field to inspect (Esc to cancel)',
+    lines: [],
+  },
+  decorators: [
+    (Story) => (
+      <div style={{ cursor: 'crosshair' }} className='flex flex-col gap-3'>
+        <Story />
+        <label className='input input-bordered flex items-center'>
+          <input
+            type='text'
+            className='grow'
+            aria-label='sample field'
+            defaultValue='hello world'
+            readOnly
+          />
+        </label>
+      </div>
+    ),
+  ],
+};

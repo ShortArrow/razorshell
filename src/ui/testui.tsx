@@ -35,7 +35,7 @@ function StatusPanel({ status }: { status: LastStatus | null }) {
     <span className={status.handled ? "badge badge-primary" : "badge badge-ghost"}>
       {status.handled ? "handled" : "pass-through"}
     </span>
-    <code className="text-xs opacity-60">{status.code}</code>
+    <code className="text-xs opacity-80">{status.code}</code>
   </div>;
 }
 

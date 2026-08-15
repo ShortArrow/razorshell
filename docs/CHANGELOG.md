@@ -28,6 +28,13 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   next to Chrome's site-access indicator. The two stay separate
   layers: Chrome decides whether the content script is injected at
   all, the policy decides whether an injected script acts.
+- The dormant Lua section left over from the abandoned init.lua plan
+  is gone from the options page.
+- Six more story scenarios close the review's coverage gaps:
+  switching the language, a handled chord in the test area, removing
+  a rule, a rejected regex pattern, the inspect-mode hint, and a
+  two-modifier override — the last of these exposed and fixed one
+  more low-contrast text.
 - Stories run as tests: the Storybook vitest addon executes every
   story in a real Chromium alongside the unit suite, play functions
   drive interactions (adding a rule, rebinding by keyboard, the rich

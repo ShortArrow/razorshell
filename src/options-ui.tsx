@@ -6,7 +6,6 @@ import { TitleApp } from './ui/title';
 import { TestApp } from './ui/testui';
 import { ThemeApp } from './ui/theme';
 import { FooterApp } from './ui/footer';
-import { LuaApp } from './ui/lua';
 import { KeymapApp } from './ui/keymap';
 import { RichTextApp } from './ui/richtext';
 import { ConfigApp } from './ui/config';
@@ -28,7 +27,6 @@ function OptionsUI() {
           <UrlApp />
           <RichTextApp />
           <KeymapApp />
-          <LuaApp />
           <LangApp />
           <ConfigApp />
         </div>

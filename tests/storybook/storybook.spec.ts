@@ -40,6 +40,7 @@ const storyIds = [
   "options-configapp--import-error",
   "options-keymapapp--default",
   "options-keymapapp--with-override",
+  "options-keymapapp--two-modifier-override",
   "options-langapp--auto",
   "options-langapp--overridden",
   "options-richtextapp--off",
@@ -49,8 +50,10 @@ const storyIds = [
   "options-urlapp--empty",
   "options-urlapp--with-rules",
   "options-urlapp--probe-match",
+  "options-urlapp--invalid-pattern",
   "inspect-toast--conflicts",
   "inspect-toast--no-conflicts",
+  "inspect-toast--inspect-mode",
 ];
 
 const themes = ["light", "dark"] as const;
@@ -61,6 +64,7 @@ const toastSelector = "#razorshell-inspect-toast";
 const injectedStoryIds = new Set([
   "inspect-toast--conflicts",
   "inspect-toast--no-conflicts",
+  "inspect-toast--inspect-mode",
 ]);
 
 function captureSelector(storyId: string): string {

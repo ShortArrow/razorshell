@@ -62,3 +62,39 @@ export const AddRule: Story = {
       .toEqual([{ pattern, matchType: 'glob', action: 'deny' }]));
   },
 };
+
+export const RemoveRule: Story = {
+  decorators: [seededStory({
+    urlPolicy: {
+      defaultAction: 'allow',
+      rules: [{ pattern: 'https://example.com/secret', matchType: 'exact', action: 'deny' }],
+    } satisfies UrlPolicy,
+  })],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const pattern = 'https://example.com/secret';
+
+    await expect(await canvas.findByText(pattern)).toBeInTheDocument();
+    await userEvent.click(canvas.getByRole('button', { name: 'delete rule 1' }));
+
+    await waitFor(() => expect(canvas.queryByText(pattern)).not.toBeInTheDocument());
+    await waitFor(() => expect(storedValue<UrlPolicy>('urlPolicy')?.rules).toEqual([]));
+  },
+};
+
+export const InvalidPattern: Story = {
+  decorators: [seededStory({})],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.selectOptions(
+      await canvas.findByLabelText(getMessage('tooltip_match_type')()), 'regex');
+    await userEvent.type(canvas.getByPlaceholderText('pattern'), '(');
+    await userEvent.click(canvas.getByRole('button', { name: 'add rule' }));
+
+    await expect(await canvas.findByText('invalid regular expression')).toBeInTheDocument();
+    // A rejected pattern must not reach either the table or storage, so the
+    // policy stays untouched rather than gaining a rule that cannot compile.
+    await expect(storedValue<UrlPolicy>('urlPolicy')).toBeUndefined();
+  },
+};

@@ -47,3 +47,21 @@ export const RebindByKeyboard: Story = {
     await expect(current).toHaveTextContent('m');
   },
 };
+
+const twoModifierOverride: Record<string, Chord> = {
+  move_cursor_to_the_beginning: { key: 'm', ctrl: true, alt: true, shift: false },
+};
+
+export const TwoModifierOverride: Story = {
+  loaders: [() => loadOverrides(twoModifierOverride)],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // Two modifiers is the case where a renderer that keeps only the last one
+    // still looks right for every single-modifier row.
+    const current = await canvas.findByTestId('current-move_cursor_to_the_beginning');
+    await expect(current).toHaveTextContent('Ctrl');
+    await expect(current).toHaveTextContent('Alt');
+    await expect(current).toHaveTextContent('m');
+  },
+};
