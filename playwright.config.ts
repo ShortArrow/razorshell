@@ -16,6 +16,11 @@ export default defineConfig({
   expect: {
     toHaveScreenshot: {
       animations: "disabled",
+      // The windows CI runner renders fonts a dozen-odd pixels differently
+      // from the machine that captured the baselines (measured 14-16px).
+      // Real regressions move far more: the select-arrow swap alone was
+      // ~72px per select and color changes reach thousands.
+      maxDiffPixels: 40,
     },
   },
   projects: [
