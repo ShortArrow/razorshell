@@ -38,6 +38,7 @@ function writableEntries(settings: SettingsFile): Record<string, unknown> {
 
 export function ConfigApp() {
   const [text, setText] = useState<string>('');
+  const [fileName, setFileName] = useState<string>('');
   const [result, setResult] = useState<Result>({ kind: 'none' });
 
   const exportSettings = async () => {
@@ -47,6 +48,7 @@ export function ConfigApp() {
   const chooseFile = async (file: File | undefined) => {
     if (!file) return;
     setText(await file.text());
+    setFileName(file.name);
     setResult({ kind: 'none' });
   };
 
@@ -70,15 +72,18 @@ export function ConfigApp() {
       <h2 className='h2'>Config</h2>
       <div className='flex items-center gap-2'>
         <div className='tooltip tooltip-top' data-tip={getMessage('tooltip_config_export')()}>
-          <button className='btn btn-primary' data-testid='config-export' onClick={exportSettings}>Export</button>
+          <button className='btn btn-primary btn-sm' data-testid='config-export' onClick={exportSettings}>Export</button>
         </div>
+        <label className='btn btn-outline btn-sm' htmlFor='config-file-input'>Choose file…</label>
         <input
           type='file'
+          id='config-file-input'
           accept='.json,application/json'
           data-testid='config-file'
-          className='file-input file-input-bordered file-input-sm grow'
+          className='hidden'
           onChange={(e) => chooseFile(e.target.files?.[0])}
         />
+        <span className='text-sm opacity-70'>{fileName}</span>
       </div>
       <div className='tooltip tooltip-top' data-tip={getMessage('tooltip_config_import')()}>
         <textarea
@@ -94,7 +99,7 @@ export function ConfigApp() {
         />
       </div>
       <div className='flex items-center gap-2'>
-        <button className='btn btn-primary' data-testid='config-apply' onClick={apply}>Apply</button>
+        <button className='btn btn-primary btn-sm' data-testid='config-apply' onClick={apply}>Apply</button>
         <div className='min-h-6' data-testid='config-result'>
           {result.kind === 'applied' ? <span className='badge badge-primary'>applied</span> : null}
           {result.kind === 'error' ? <span className='text-error'>{result.message}</span> : null}
