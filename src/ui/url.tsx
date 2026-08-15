@@ -34,6 +34,7 @@ export function UrlApp() {
   const [action, setAction] = useState<RuleAction>('deny');
   const [patternError, setPatternError] = useState<boolean>(false);
   const [probe, setProbe] = useState<string>('');
+  const [saveError, setSaveError] = useState<string>('');
 
   const probedIndex = probe === '' ? null : findMatchingRuleIndex(probe, policy);
   const probedRule = probedIndex === null ? null : policy.rules[probedIndex];
@@ -47,7 +48,11 @@ export function UrlApp() {
 
   const applyPolicy = (next: UrlPolicy) => {
     setPolicy(next);
-    saveUrlPolicy(next);
+    saveUrlPolicy(next)
+      .then(() => setSaveError(''))
+      .catch((failure: unknown) => {
+        setSaveError(failure instanceof Error ? failure.message : String(failure));
+      });
   };
 
   const addRule = () => {
@@ -180,6 +185,9 @@ export function UrlApp() {
           }
         </tbody>
       </table>
+      <div className='min-h-6' data-testid='url-save-error'>
+        {saveError === '' ? null : <span className='text-error'>{saveError}</span>}
+      </div>
     </div>
   </>;
 }

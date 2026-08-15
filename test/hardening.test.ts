@@ -3,7 +3,7 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import { matchesRule, migrateLegacyUrls } from "../src/urlrules";
 import { analyzeHandlerSource } from "../src/handleranalysis";
 import { cursor } from "../src/cursor";
-import { dispatchEditableKey } from "../src/keyhandling";
+import { dispatchEditableKey, dispatchKey } from "../src/keyhandling";
 import { findConflict, mergeKeymap } from "../src/keymapmerge";
 import { selectionSummary } from "../src/keychord";
 import { loadContentEditableSetting } from "../src/contenteditablesetting";
@@ -88,6 +88,35 @@ describe("dispatchEditableKey", () => {
     dispatchEditableKey(ctrlKeydown("a"), root, keymap);
     expect(first).toHaveBeenCalledTimes(1);
     expect(second).not.toHaveBeenCalled();
+  });
+});
+
+describe("keydown during IME composition is left alone", () => {
+  function composingCtrlKeydown(key: string): KeyboardEvent {
+    const event = new KeyboardEvent("keydown", { key, ctrlKey: true, cancelable: true });
+    Object.defineProperty(event, "isComposing", { value: true });
+    return event;
+  }
+
+  test("dispatchKey does not act while composing", () => {
+    const op = vi.fn();
+    const keymap: Keymap[] = [
+      { id: "one", label: "one", operation: op, ctrl: true, key: "a" },
+    ];
+    const input = document.createElement("input");
+    const event = composingCtrlKeydown("a");
+    dispatchKey(event, input, keymap);
+    expect(op).not.toHaveBeenCalled();
+    expect(event.defaultPrevented).toBe(false);
+  });
+
+  test("dispatchEditableKey does not act while composing", () => {
+    const editable = vi.fn();
+    const keymap: Keymap[] = [
+      { id: "one", label: "one", operation: noop, editableOperation: editable, ctrl: true, key: "a" },
+    ];
+    dispatchEditableKey(composingCtrlKeydown("a"), document.createElement("div"), keymap);
+    expect(editable).not.toHaveBeenCalled();
   });
 });
 

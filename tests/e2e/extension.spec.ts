@@ -706,6 +706,46 @@ test.describe("settings import and export", () => {
     await optionsPage.evaluate(() => chrome.storage.sync.set({ language: "ja" }));
     await optionsPage.waitForTimeout(500);
   });
+
+  test("a policy past the sync quota reports the failure and is not stored", async () => {
+    const oversized = await optionsPage.evaluate(() =>
+      JSON.stringify({
+        version: 1,
+        urlPolicy: {
+          defaultAction: "allow",
+          rules: Array.from({ length: 400 }, (_, i) => ({
+            pattern: `https://example.com/rule-${i}/**`,
+            matchType: "glob",
+            action: "deny",
+          })),
+        },
+      }),
+    );
+    await optionsPage.locator('[data-testid="config-text"]').fill(oversized);
+    await optionsPage.locator('[data-testid="config-apply"]').click();
+    await optionsPage.waitForTimeout(700);
+
+    const reported = await optionsPage.locator('[data-testid="config-result"]').innerText();
+    expect(reported.toLowerCase()).toContain("quota");
+
+    const stored = await optionsPage.evaluate(async () => {
+      const data = (await chrome.storage.sync.get("urlPolicy")) as {
+        urlPolicy?: { rules?: unknown[] };
+      };
+      return data.urlPolicy?.rules?.length ?? 0;
+    });
+    expect(stored).not.toBe(400);
+
+    await optionsPage.evaluate(() =>
+      chrome.storage.sync.set({
+        urlPolicy: {
+          defaultAction: "allow",
+          rules: [{ pattern: "https://example.com/**", matchType: "glob", action: "deny" }],
+        },
+      }),
+    );
+    await optionsPage.waitForTimeout(500);
+  });
 });
 
 test.describe("persistence across a browser restart", () => {

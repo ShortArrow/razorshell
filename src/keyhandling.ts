@@ -35,9 +35,11 @@ export function isEditableTarget(target: EventTarget | null): target is HTMLElem
 /**
  * Runs the first keymap entry matching the event against the given text field,
  * cancelling the default action. A chord bound twice fires only its first entry,
- * and an unmatched event is left untouched.
+ * and an unmatched event is left untouched. A keydown raised while an IME
+ * composition is in flight belongs to the IME, so it is left to the page.
  */
 export function dispatchKey(event: KeyboardEvent, textinput: TextField, keymap: Keymap[]): void {
+  if (event.isComposing) return;
   const matched = keymap.find((entry) => keymaching(event, entry));
   if (!matched) return;
   console.debug("key matched");
@@ -56,9 +58,11 @@ export function keyEventHandling(event: KeyboardEvent, textinput: TextField) {
 /**
  * Runs the first matching keymap entry against a contenteditable root. An entry
  * carrying no editable counterpart leaves the event to the page, so a chord the
- * host editor owns keeps working.
+ * host editor owns keeps working. A keydown raised while an IME composition is
+ * in flight belongs to the IME, so it is left to the page.
  */
 export function dispatchEditableKey(event: KeyboardEvent, root: HTMLElement, keymap: Keymap[]): void {
+  if (event.isComposing) return;
   const matched = keymap.find((entry) => keymaching(event, entry));
   if (!matched || !matched.editableOperation) return;
   event.preventDefault(); // cancel default action

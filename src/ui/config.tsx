@@ -56,7 +56,12 @@ export function ConfigApp() {
       setResult({ kind: 'error', message: parsed.error });
       return;
     }
-    await chrome.storage.sync.set(writableEntries(parsed.settings));
+    try {
+      await chrome.storage.sync.set(writableEntries(parsed.settings));
+    } catch (failure) {
+      setResult({ kind: 'error', message: failure instanceof Error ? failure.message : String(failure) });
+      return;
+    }
     setResult({ kind: 'applied' });
   };
 
