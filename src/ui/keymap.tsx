@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ArrowPathIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import { keyChord } from "../keychord";
 import { defaultKeymap } from "../keymap";
@@ -58,6 +58,25 @@ export function KeymapApp() {
   const [overrides, setOverrides] = useState<Record<string, Chord>>(() => getKeymapOverrides());
   const [capturing, setCapturing] = useState<string | null>(null);
   const [conflict, setConflict] = useState<{ id: string; withId: string } | null>(null);
+  const [saveError, setSaveError] = useState<string>('');
+
+  /**
+   * @fn applyMutation
+   * @brief Await a store mutation, showing the refusal and resyncing the rows when it fails.
+   * @param Promise<void> mutate - The pending write, rejecting when storage refused it
+   * @return void
+   */
+  const applyMutation = useCallback((mutate: Promise<void>) => {
+    mutate
+      .then(() => setSaveError(''))
+      .catch((failure: unknown) => {
+        setSaveError(failure instanceof Error ? failure.message : String(failure));
+        // The rows showed the mutation optimistically. Storage refused it, so
+        // reading the store back is what makes display and storage agree again.
+        setKeymap(getActiveKeymap());
+        setOverrides(getKeymapOverrides());
+      });
+  }, []);
 
   useEffect(() => {
     const refresh = () => {
@@ -87,11 +106,11 @@ export function KeymapApp() {
         setConflict({ id: capturing, withId: collision });
         return;
       }
-      saveKeymapOverride(capturing, chord);
+      applyMutation(saveKeymapOverride(capturing, chord));
     };
     document.addEventListener("keydown", onKeydown, { capture: true });
     return () => document.removeEventListener("keydown", onKeydown, { capture: true });
-  }, [capturing]);
+  }, [capturing, applyMutation]);
 
   const startCapture = (id: string) => {
     setConflict(null);
@@ -100,12 +119,12 @@ export function KeymapApp() {
 
   const resetOne = (id: string) => {
     setConflict(null);
-    clearKeymapOverride(id);
+    applyMutation(clearKeymapOverride(id));
   };
 
   const resetAll = () => {
     setConflict(null);
-    clearAllKeymapOverrides();
+    applyMutation(clearAllKeymapOverrides());
   };
 
   const overriddenCount = Object.keys(overrides).length;
@@ -178,6 +197,9 @@ export function KeymapApp() {
           })}
         </tbody>
       </table>
+      <div className='min-h-6' data-testid='keymap-save-error'>
+        {saveError === '' ? null : <span className='text-error'>{saveError}</span>}
+      </div>
       <p
         className='text-error min-h-6 m-0'
         data-testid={conflict ? `conflict-${conflict.id}` : 'keymap-no-conflict'}

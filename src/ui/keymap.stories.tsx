@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import { resetStorage, storedValue } from '../../.storybook/chromemock';
+import { failNextSet, resetStorage, storedValue } from '../../.storybook/chromemock';
 import { initKeymap } from '../keymapstore';
 import { KeymapApp } from './keymap';
 import type { Chord } from '../keymapmerge';
@@ -133,6 +133,56 @@ export const ConflictThenRecover: Story = {
     await expect(canvas.getByTestId('keymap-no-conflict')).toBeEmptyDOMElement();
     await waitFor(() => expect(storedValue<Record<string, Chord>>('keymapOverrides')).toEqual({
       move_cursor_to_the_end: { key: 'm', ctrl: true, alt: false, shift: false },
+    }));
+    (document.activeElement as HTMLElement | null)?.blur();
+  },
+};
+
+export const SaveFailure: Story = {
+  loaders: [() => loadOverrides({})],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    failNextSet('sync write refused');
+    await userEvent.click(await canvas.findByTestId('rebind-move_cursor_to_the_end'));
+    await userEvent.keyboard('{Control>}m{/Control}');
+
+    await waitFor(() => expect(canvas.getByTestId('keymap-save-error'))
+      .toHaveTextContent('sync write refused'));
+    // The row is what the user reads the binding off. Storage refused the
+    // rebind, so a row still showing Ctrl+m would name a chord no keystroke
+    // will ever trigger.
+    const current = canvas.getByTestId('current-move_cursor_to_the_end');
+    await expect(current).toHaveTextContent('Ctrl');
+    await expect(current).toHaveTextContent('e');
+    await expect(storedValue<Record<string, Chord>>('keymapOverrides')).toBeUndefined();
+    (document.activeElement as HTMLElement | null)?.blur();
+  },
+};
+
+const twoOverrides: Record<string, Chord> = {
+  move_cursor_to_the_beginning: { key: 'm', ctrl: true, alt: false, shift: false },
+  move_cursor_to_the_end: { key: 'p', ctrl: true, alt: false, shift: false },
+};
+
+export const ResetRow: Story = {
+  loaders: [() => loadOverrides(twoOverrides)],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.click(await canvas.findByTestId('reset-move_cursor_to_the_beginning'));
+
+    const reset = canvas.getByTestId('current-move_cursor_to_the_beginning');
+    await waitFor(() => expect(reset).toHaveTextContent('a'));
+    await expect(reset).toHaveTextContent('Ctrl');
+    // A per-row reset that clears the whole layer looks identical on the row
+    // that was clicked, so the second override is the only thing that tells
+    // the two apart.
+    const kept = canvas.getByTestId('current-move_cursor_to_the_end');
+    await expect(kept).toHaveTextContent('Ctrl');
+    await expect(kept).toHaveTextContent('p');
+    await waitFor(() => expect(storedValue<Record<string, Chord>>('keymapOverrides')).toEqual({
+      move_cursor_to_the_end: { key: 'p', ctrl: true, alt: false, shift: false },
     }));
     (document.activeElement as HTMLElement | null)?.blur();
   },

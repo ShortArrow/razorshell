@@ -4,6 +4,7 @@ import { SettingsFile, parseSettings, serializeSettings } from '../settingsio';
 
 const storedKeys = ['urlPolicy', 'keymapOverrides', 'language', 'theme', 'enableContentEditable'];
 const downloadName = 'razorshell-config.json';
+const maxFileSize = 1024 * 1024;
 
 type Result = { kind: 'none' } | { kind: 'applied' } | { kind: 'error'; message: string };
 
@@ -42,12 +43,35 @@ export function ConfigApp() {
   const [result, setResult] = useState<Result>({ kind: 'none' });
 
   const exportSettings = async () => {
-    download(serializeSettings(await readSettings()));
+    const serialized = serializeSettings(await readSettings());
+    // Storage may hold values an older version or an external writer left
+    // behind that our own import would refuse. Downloading such a file hands
+    // the user a config that cannot be applied, so it is checked first.
+    const parsed = parseSettings(serialized);
+    if (!parsed.ok) {
+      setResult({ kind: 'error', message: `cannot export: ${parsed.error}` });
+      return;
+    }
+    download(serialized);
   };
 
   const chooseFile = async (file: File | undefined) => {
     if (!file) return;
-    setText(await file.text());
+    if (file.size > maxFileSize) {
+      setResult({ kind: 'error', message: 'file too large (max 1 MiB)' });
+      return;
+    }
+    let content: string;
+    try {
+      content = await file.text();
+    } catch (failure) {
+      setResult({
+        kind: 'error',
+        message: `could not read file: ${failure instanceof Error ? failure.message : String(failure)}`,
+      });
+      return;
+    }
+    setText(content);
     setFileName(file.name);
     setResult({ kind: 'none' });
   };
@@ -94,6 +118,7 @@ export function ConfigApp() {
           value={text}
           onChange={(e) => {
             setText(e.target.value);
+            setFileName('');
             setResult({ kind: 'none' });
           }}
         />

@@ -20,6 +20,7 @@ export function LangApp() {
   const [uiLanguage, setUiLanguage] = useState<string>('');
   const [acceptLanguages, setAcceptLanguages] = useState<string[]>([]);
   const [setting, setSetting] = useState<string>(autoLanguage);
+  const [saveError, setSaveError] = useState<string>('');
 
   useEffect(() => {
     const fetchLanguages = async () => {
@@ -32,7 +33,14 @@ export function LangApp() {
 
   const applyLanguage = (value: string) => {
     setSetting(value);
-    setLanguage(value);
+    setLanguage(value)
+      .then(() => setSaveError(''))
+      .catch(async (failure: unknown) => {
+        setSaveError(failure instanceof Error ? failure.message : String(failure));
+        // The select and badge showed `value` optimistically. Storage refused
+        // it, so reading the setting back is what makes the two agree again.
+        setSetting(await getLanguageSetting());
+      });
   };
 
   return (
@@ -63,6 +71,9 @@ export function LangApp() {
         {acceptLanguages.map((lang, index) => (
           <span className='badge badge-sm badge-ghost' key={index}>{lang}</span>
         ))}
+      </div>
+      <div className='min-h-6' data-testid='language-save-error'>
+        {saveError === '' ? null : <span className='text-error'>{saveError}</span>}
       </div>
     </div>
   );

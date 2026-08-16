@@ -96,7 +96,8 @@ export function onLanguageChange(listener: () => void): void {
  */
 export async function initI18n(): Promise<void> {
   await loadDicts(normalizeLocale(await getLanguageSetting()));
-  chrome.storage.onChanged.addListener((changes) => {
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== "sync") return;
     const change = changes[languageKey];
     if (!change) return;
     const locale = normalizeLocale(change.newValue as string | undefined);

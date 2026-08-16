@@ -34,7 +34,8 @@ export async function saveContentEditableSetting(value: boolean): Promise<void> 
  * @return void
  */
 export function subscribeContentEditableSetting(callback: (value: boolean) => void): void {
-  chrome.storage.onChanged.addListener((changes) => {
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== "sync") return;
     const change = changes[settingKey];
     if (!change) return;
     callback(change.newValue === true);

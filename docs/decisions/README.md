@@ -20,3 +20,6 @@ record names the files it concerns and is frozen when written.
   localizes tooltips only; other strings are English literals
 - [ADR-0008](0008-json-config-io.md) — settings import and export use
   JSON; the init.lua plan is dormant
+- [ADR-0009](0009-pessimistic-storage-writes.md) — state and the view
+  update only after the write succeeds; a refusal shows inline and
+  the view resyncs from storage

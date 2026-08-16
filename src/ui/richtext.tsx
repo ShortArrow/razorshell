@@ -4,6 +4,7 @@ import { getMessage } from '../languages';
 
 export function RichTextApp() {
   const [enabled, setEnabled] = useState<boolean>(false);
+  const [saveError, setSaveError] = useState<string>('');
 
   useEffect(() => {
     const fetchSetting = async () => {
@@ -14,7 +15,14 @@ export function RichTextApp() {
 
   const apply = (value: boolean) => {
     setEnabled(value);
-    saveContentEditableSetting(value);
+    saveContentEditableSetting(value)
+      .then(() => setSaveError(''))
+      .catch(async (failure: unknown) => {
+        setSaveError(failure instanceof Error ? failure.message : String(failure));
+        // The checkbox showed `value` optimistically. Storage refused it, so
+        // reading the setting back is what makes the two agree again.
+        setEnabled(await loadContentEditableSetting());
+      });
   };
 
   return <>
@@ -31,6 +39,9 @@ export function RichTextApp() {
           />
           <span className='label-text'>Enable in rich text editors</span>
         </label>
+      </div>
+      <div className='min-h-6' data-testid='richtext-save-error'>
+        {saveError === '' ? null : <span className='text-error'>{saveError}</span>}
       </div>
     </div>
   </>;

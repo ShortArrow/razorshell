@@ -17,6 +17,8 @@ export const Default: Story = {
   decorators: [seededStory({})],
 };
 
+const importedKeys = ['urlPolicy', 'keymapOverrides', 'language', 'theme', 'enableContentEditable'];
+
 export const ImportError: Story = {
   decorators: [seededStory({})],
   play: async ({ canvasElement }) => {
@@ -24,7 +26,60 @@ export const ImportError: Story = {
     const textarea = await canvas.findByTestId('config-text');
     await userEvent.type(textarea, '{{ not json');
     await userEvent.click(canvas.getByTestId('config-apply'));
-    await expect(canvas.getByTestId('config-result')).not.toBeEmptyDOMElement();
+
+    // A result box that is merely non-empty is equally satisfied by the
+    // applied badge, so the rejection has to be named as the parser names it.
+    await expect(canvas.getByTestId('config-result')).toHaveTextContent('not valid JSON');
+    await expect(canvas.queryByText('applied')).not.toBeInTheDocument();
+    // Text that never parsed cannot have contributed a single setting.
+    for (const key of importedKeys) {
+      await expect(storedValue(key)).toBeUndefined();
+    }
+    (document.activeElement as HTMLElement | null)?.blur();
+  },
+};
+
+export const ImportRecovery: Story = {
+  decorators: [seededStory({})],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const textarea = await canvas.findByTestId('config-text');
+
+    await userEvent.type(textarea, '{{ not json');
+    await userEvent.click(canvas.getByTestId('config-apply'));
+    await expect(canvas.getByTestId('config-result')).toHaveTextContent('not valid JSON');
+
+    await userEvent.clear(textarea);
+    await userEvent.type(textarea, '{{"version":1,"language":"ja"}');
+    await userEvent.click(canvas.getByTestId('config-apply'));
+
+    // A rejection that outlives the correction reads as though the fixed
+    // document was refused too, and hides the import that did happen.
+    await expect(await canvas.findByText('applied')).toBeInTheDocument();
+    await expect(canvas.getByTestId('config-result')).not.toHaveTextContent('not valid JSON');
+    await waitFor(() => expect(storedValue<string>('language')).toBe('ja'));
+    (document.activeElement as HTMLElement | null)?.blur();
+  },
+};
+
+export const ImportAtomicity: Story = {
+  decorators: [seededStory({})],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.type(
+      await canvas.findByTestId('config-text'), '{{"version":1,"language":"ja","theme":"dark"}');
+    failNextSet('quota exceeded');
+    await userEvent.click(canvas.getByTestId('config-apply'));
+
+    await expect(await canvas.findByText('quota exceeded')).toBeInTheDocument();
+    // One arming rejects one write. Both keys landing undefined is what says
+    // the import was one write rather than a loop that got partway through
+    // and left the settings half replaced.
+    await expect(storedValue<string>('language')).toBeUndefined();
+    await expect(storedValue<string>('theme')).toBeUndefined();
+    await expect(canvas.queryByText('applied')).not.toBeInTheDocument();
+    (document.activeElement as HTMLElement | null)?.blur();
   },
 };
 

@@ -4,6 +4,7 @@
  */
 
 import { availableLocales, normalizeLocale } from "./i18n";
+import { defaultKeymap } from "./keymap";
 import { Chord } from "./keymapmerge";
 import { MatchType, RuleAction, UrlPolicy, UrlRule } from "./urlrules";
 
@@ -36,6 +37,7 @@ const ruleActions: RuleAction[] = ["allow", "deny"];
 const themes = ["light", "dark"];
 const modifiers = ["ctrl", "alt", "shift"];
 const autoLanguage = "auto";
+const keymapIds = defaultKeymap.map((entry) => entry.id);
 
 function reject(message: string): never {
   throw new SettingsError(message);
@@ -92,7 +94,9 @@ function parseUrlPolicy(value: unknown): UrlPolicy {
 
 function parseChord(value: unknown, id: string): Chord {
   const source = asRecord(value, `keymapOverrides.${id}`);
-  const chord: Chord = { key: asString(source.key, `keymapOverrides.${id}.key`) };
+  const key = asString(source.key, `keymapOverrides.${id}.key`);
+  if (key === "") reject(`keymapOverrides.${id}.key must not be empty`);
+  const chord: Chord = { key };
   for (const modifier of modifiers) {
     if (source[modifier] === undefined) continue;
     chord[modifier as "ctrl" | "alt" | "shift"] = asBoolean(
@@ -107,6 +111,7 @@ function parseKeymapOverrides(value: unknown): Record<string, Chord> {
   const source = asRecord(value, "keymapOverrides");
   const overrides: Record<string, Chord> = {};
   for (const [id, chord] of Object.entries(source)) {
+    if (!keymapIds.includes(id)) reject(`unknown keymap id ${id}`);
     overrides[id] = parseChord(chord, id);
   }
   return overrides;

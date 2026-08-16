@@ -2,32 +2,49 @@
  * @file chromemock.ts
  * @brief In-memory stand-in for the subset of the chrome extension API the
  *        options UI touches, so that stories render outside an extension host.
- * @details `chrome.storage.sync` is the only stateful part; the i18n and
- *          runtime surfaces are pure functions over the packaged english
- *          dictionary. Installed onto globalThis before any story module is
- *          imported, because `src/languages.ts` and `src/keymapstore.ts` read
- *          chrome at module init.
+ * @details `chrome.storage` is the only stateful part; the i18n and runtime
+ *          surfaces are pure functions over the packaged english dictionary.
+ *          Installed onto globalThis before any story module is imported,
+ *          because `src/languages.ts` and `src/keymapstore.ts` read chrome at
+ *          module init.
+ *
+ *          The storage areas follow real chrome.storage where the difference is
+ *          observable from a story:
+ *          - values cross the boundary by structured clone, so a caller that
+ *            mutates what it wrote or what it read cannot reach the store;
+ *          - `get` of a string or string[] omits keys that hold no value, as
+ *            chrome does, rather than reporting them as undefined. Only the
+ *            object form fills defaults in;
+ *          - `sync` and `local` are separate stores, and a change notification
+ *            carries the areaName of the area that was written.
+ *
+ *          Two behaviours are deliberately not modelled. A `set` that writes a
+ *          key its current value still notifies listeners — real chrome's
+ *          behaviour here is unverified, so the mock keeps what the stories were
+ *          written against rather than guessing. And the armed-failure queue is
+ *          the sync area's alone: `local` writes always succeed, which keeps the
+ *          arming unambiguous for the options UI, which only writes to sync.
  */
 
 import englishMessages from '../src/_locales/en/messages.json';
 
 type StorageArea = typeof chrome.storage.sync;
 type ChangeListener = Parameters<typeof chrome.storage.onChanged.addListener>[0];
+type AreaName = 'sync' | 'local';
+type StorageQuery = string | string[] | Record<string, unknown> | null | undefined;
 
 const defaultUiLanguage = 'en';
 const defaultAcceptLanguages = ['en-US', 'en'];
 
-let store: Record<string, unknown> = {};
+let syncStore: Record<string, unknown> = {};
+let localStore: Record<string, unknown> = {};
 let uiLanguage = defaultUiLanguage;
 let acceptLanguages = defaultAcceptLanguages;
-let pendingSetFailure: string | null = null;
+const armedSetFailures: string[] = [];
 const changeListeners: ChangeListener[] = [];
 
-function keysOf(query: string | string[] | Record<string, unknown> | null | undefined): string[] {
-  if (query === null || query === undefined) return Object.keys(store);
-  if (typeof query === 'string') return [query];
-  if (Array.isArray(query)) return query;
-  return Object.keys(query);
+function clone<T>(value: T): T {
+  return structuredClone(value);
 }
 
 function defaultsOf(query: unknown): Record<string, unknown> {
@@ -35,67 +52,99 @@ function defaultsOf(query: unknown): Record<string, unknown> {
   return query as Record<string, unknown>;
 }
 
-function notify(changes: Record<string, chrome.storage.StorageChange>): void {
-  for (const listener of changeListeners) listener(changes, 'sync');
+function notify(area: AreaName, changes: Record<string, chrome.storage.StorageChange>): void {
+  for (const listener of changeListeners) listener(changes, area);
 }
 
-async function get(query?: string | string[] | Record<string, unknown> | null): Promise<Record<string, unknown>> {
-  const defaults = defaultsOf(query);
+function readFrom(store: Record<string, unknown>, query: StorageQuery): Record<string, unknown> {
+  if (query === null || query === undefined) return clone(store);
   const result: Record<string, unknown> = {};
-  for (const key of keysOf(query)) {
-    result[key] = key in store ? store[key] : defaults[key];
+  if (typeof query === 'string' || Array.isArray(query)) {
+    for (const key of typeof query === 'string' ? [query] : query) {
+      if (key in store) result[key] = clone(store[key]);
+    }
+    return result;
+  }
+  const defaults = defaultsOf(query);
+  for (const key of Object.keys(defaults)) {
+    result[key] = key in store ? clone(store[key]) : clone(defaults[key]);
   }
   return result;
 }
 
-async function set(items: Record<string, unknown>): Promise<void> {
-  if (pendingSetFailure !== null) {
-    const message = pendingSetFailure;
-    pendingSetFailure = null;
-    throw new Error(message);
-  }
+function writeTo(
+  store: Record<string, unknown>,
+  area: AreaName,
+  items: Record<string, unknown>,
+): void {
   const changes: Record<string, chrome.storage.StorageChange> = {};
   for (const [key, value] of Object.entries(items)) {
-    changes[key] = { oldValue: store[key], newValue: value };
-    store[key] = value;
+    const stored = clone(value);
+    changes[key] = { oldValue: clone(store[key]), newValue: clone(stored) };
+    store[key] = stored;
   }
-  notify(changes);
+  notify(area, changes);
 }
 
-async function remove(keys: string | string[]): Promise<void> {
-  const list = typeof keys === 'string' ? [keys] : keys;
+function deleteFrom(
+  store: Record<string, unknown>,
+  area: AreaName,
+  keys: string | string[],
+): void {
   const changes: Record<string, chrome.storage.StorageChange> = {};
-  for (const key of list) {
+  for (const key of typeof keys === 'string' ? [keys] : keys) {
     if (!(key in store)) continue;
-    changes[key] = { oldValue: store[key], newValue: undefined };
+    changes[key] = { oldValue: clone(store[key]), newValue: undefined };
     delete store[key];
   }
-  notify(changes);
+  notify(area, changes);
 }
+
+const syncArea = {
+  get: async (query?: StorageQuery) => readFrom(syncStore, query),
+  set: async (items: Record<string, unknown>) => {
+    const armed = armedSetFailures.shift();
+    if (armed !== undefined) throw new Error(armed);
+    writeTo(syncStore, 'sync', items);
+  },
+  remove: async (keys: string | string[]) => deleteFrom(syncStore, 'sync', keys),
+} as unknown as StorageArea;
+
+const localArea = {
+  get: async (query?: StorageQuery) => readFrom(localStore, query),
+  set: async (items: Record<string, unknown>) => writeTo(localStore, 'local', items),
+  remove: async (keys: string | string[]) => deleteFrom(localStore, 'local', keys),
+} as unknown as StorageArea;
 
 /**
  * @fn resetStorage
- * @brief Replace the whole in-memory store, without notifying listeners.
- * @details Also disarms any pending write failure, so that a story which armed
- *          one and never spent it cannot fail the next story's first write.
- * @param seed - The storage contents the story starts from
+ * @brief Replace both in-memory stores, without notifying listeners.
+ * @details Also disarms every pending write failure, so that a story which armed
+ *          one and never spent it cannot fail the next story's first write. The
+ *          seed goes to sync, which is where the options UI keeps everything;
+ *          local starts empty.
+ * @param seed - The sync storage contents the story starts from
  * @return void
  */
 export function resetStorage(seed: Record<string, unknown> = {}): void {
-  store = { ...seed };
-  pendingSetFailure = null;
+  syncStore = clone(seed);
+  localStore = {};
+  armedSetFailures.length = 0;
 }
 
 /**
  * @fn failNextSet
- * @brief Arm the next storage write to reject, once.
+ * @brief Arm one further sync write to reject.
  * @details The mock is otherwise infallible, so a component's save-failure path
- *          has no way to run. The arming is spent by the write it rejects.
+ *          has no way to run. Each call adds one arming to a queue, and each
+ *          rejected write spends the one at its head, so arming twice makes the
+ *          next two writes fail in turn — which is what a double-fault recovery
+ *          story needs. `local` writes are never armed.
  * @param string message - The Error message the rejected write carries
  * @return void
  */
 export function failNextSet(message: string): void {
-  pendingSetFailure = message;
+  armedSetFailures.push(message);
 }
 
 /**
@@ -122,13 +171,15 @@ export function resetBrowserLanguages(): void {
 
 /**
  * @fn storedValue
- * @brief Read one key straight out of the mock store, for play functions that
- *        assert a component persisted what it rendered.
+ * @brief Read one key straight out of the mock's sync store, for play functions
+ *        that assert a component persisted what it rendered.
+ * @details The value is cloned, so an assertion cannot be satisfied by a
+ *          reference the component still holds and later mutates.
  * @param key - The storage key to read
  * @return The stored value, or undefined when the key was never written
  */
 export function storedValue<T = unknown>(key: string): T | undefined {
-  return store[key] as T | undefined;
+  return key in syncStore ? clone(syncStore[key]) as T : undefined;
 }
 
 /**
@@ -137,11 +188,10 @@ export function storedValue<T = unknown>(key: string): T | undefined {
  * @return void
  */
 export function installChromeMock(): void {
-  const storageArea = { get, set, remove } as unknown as StorageArea;
   const mock = {
     storage: {
-      sync: storageArea,
-      local: storageArea,
+      sync: syncArea,
+      local: localArea,
       onChanged: {
         addListener: (listener: ChangeListener) => { changeListeners.push(listener); },
         removeListener: (listener: ChangeListener) => {

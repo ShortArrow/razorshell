@@ -166,6 +166,48 @@ export const ReorderRule: Story = {
   },
 };
 
+export const DefaultActionChange: Story = {
+  decorators: [seededStory({})],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.selectOptions(
+      await canvas.findByLabelText('Default policy for URLs matching no rule'), 'deny');
+
+    await waitFor(() => expect(storedValue<UrlPolicy>('urlPolicy')?.defaultAction).toBe('deny'));
+    // With no rules at all the default is the whole policy, so the probe is
+    // where the change becomes visible as a decision rather than as a select.
+    await userEvent.type(canvas.getByTestId('url-probe-input'), 'https://anything.example/');
+    await expect(canvas.getByTestId('url-probe-result')).toHaveTextContent('default: deny');
+    (document.activeElement as HTMLElement | null)?.blur();
+  },
+};
+
+export const MoveRuleUp: Story = {
+  decorators: [seededStory({
+    urlPolicy: {
+      defaultAction: 'allow',
+      rules: [
+        { pattern: 'https://a.example/**', matchType: 'glob', action: 'deny' },
+        { pattern: 'https://b.example/**', matchType: 'glob', action: 'allow' },
+      ],
+    } satisfies UrlPolicy,
+  })],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // Up and down are separate handlers that can disagree about which index
+    // moves, and pressing only one of them cannot tell.
+    await userEvent.click(await canvas.findByRole('button', { name: 'move rule 2 up' }));
+
+    await waitFor(() => expect(storedValue<UrlPolicy>('urlPolicy')?.rules?.map((rule) => rule.pattern))
+      .toEqual(['https://b.example/**', 'https://a.example/**']));
+    const firstRow = canvas.getAllByRole('row')[1];
+    await expect(within(firstRow).getByText('https://b.example/**')).toBeInTheDocument();
+    (document.activeElement as HTMLElement | null)?.blur();
+  },
+};
+
 export const ProbeDefault: Story = {
   decorators: [seededStory({
     urlPolicy: {

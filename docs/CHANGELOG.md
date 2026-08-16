@@ -51,6 +51,14 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   a browser reporting no languages, while the end-to-end suite
   checks that a denied SPA route flips the toolbar badge and that
   the extension recovers after each rejected input.
+- The GUI-to-storage contract is exercised against the real
+  extension: URL rules are added, reordered and deleted through the
+  options page with the stored policy and the content script checked
+  after each step, reset-all is proven to unbind the chord in an
+  open tab, a failing import is shown to apply none of its keys in
+  real Chrome, and every export re-parses through the importer. The
+  chrome mock behind the stories now clones values, keeps local and
+  sync apart and omits unstored keys, like the real API.
 - Six more story scenarios close the review's coverage gaps:
   switching the language, a handled chord in the test area, removing
   a rule, a rejected regex pattern, the inspect-mode hint, and a
@@ -114,6 +122,30 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ### Fixed
 
+- Save failures no longer pass unnoticed. The keymap, theme, rich
+  text and language controls each showed the new value and dropped
+  whatever storage said; now the write is awaited, a refusal is
+  shown beside the control, and the view rolls back to what storage
+  kept (ADR-0009). The keymap store likewise updates its cached
+  overrides only once the write lands, so a refused rebind no longer
+  drives open tabs from memory the next reload discards.
+- A refused URL rule edit resyncs without migrating: the reload it
+  ran could itself write the legacy `urls` migration, which fails
+  for the same reason the save did and replaced the message the user
+  needed to read.
+- Export validates before it downloads. Storage can hold values an
+  older version or an external writer left, and a file our own
+  import refuses is worse than no file; the offending field is now
+  named instead.
+- Import rejects overrides naming a keymap id that does not exist,
+  and a chord whose key is the empty string — the first silently did
+  nothing, the second bound a chord no key press can produce.
+- Only `sync` writes are accepted. The four storage listeners read
+  any area, so a `local` or `managed` write under the same key
+  changed the policy, keymap, language or rich text opt-in.
+- A config file staged and then edited by hand no longer keeps the
+  file name beside text it no longer describes; a file over 1 MiB is
+  refused before it is read, and an unreadable one says so.
 - A URL rule edit that storage refuses no longer leaves the table
   showing the unsaved change: the list reloads from what storage
   kept and the failure is shown next to it. An empty pattern is

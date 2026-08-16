@@ -59,7 +59,8 @@ export function onKeymapChange(listener: () => void): void {
  */
 export async function initKeymap(): Promise<void> {
   await loadOverrides();
-  chrome.storage.onChanged.addListener((changes) => {
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== "sync") return;
     const change = changes[overridesKey];
     if (!change) return;
     guiOverrides = (change.newValue as KeymapOverrides | undefined) ?? {};
@@ -68,8 +69,8 @@ export async function initKeymap(): Promise<void> {
 }
 
 async function writeOverrides(overrides: KeymapOverrides): Promise<void> {
-  guiOverrides = overrides;
   await chrome.storage.sync.set({ [overridesKey]: overrides });
+  guiOverrides = overrides;
   notifyListeners();
 }
 

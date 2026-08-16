@@ -54,11 +54,15 @@ const staticDir = path.resolve(
 
 /**
  * One id per visually distinct end state. Stories whose end state repeats a
- * captured one are left out — `ReorderRule` ends as the same rule table as
- * `WithRules`, config's `SaveFailure` renders the same error line as
- * `ImportError`, and `ConflictThenRecover` ends as an override row like
- * `WithOverride` — because a second screenshot of the same rendering doubles
- * the baseline maintenance without widening what a regression can hit.
+ * captured one are left out — `ReorderRule` and `MoveRuleUp` end as the same
+ * rule table as `WithRules`, config's `SaveFailure`, `ImportRecovery` and
+ * `ImportAtomicity` render the same result line as `ImportError` or
+ * `AppliedBadge`, `ConflictThenRecover` and `ResetRow` end as override rows
+ * like `WithOverride`, and `DefaultActionChange` ends as `ProbeDefault` with
+ * the other action — because a second screenshot of the same rendering
+ * doubles the baseline maintenance without widening what a regression can
+ * hit. The keymap `SaveFailure` stands in for the inline save-error line all
+ * four settings sections share.
  */
 const storyIds = [
   "options-configapp--default",
@@ -68,6 +72,7 @@ const storyIds = [
   "options-keymapapp--default",
   "options-keymapapp--with-override",
   "options-keymapapp--two-modifier-override",
+  "options-keymapapp--save-failure",
   "options-langapp--auto",
   "options-langapp--overridden",
   "options-langapp--no-browser-languages",

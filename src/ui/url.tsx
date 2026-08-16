@@ -63,8 +63,14 @@ export function UrlApp() {
         setSaveError(failure instanceof Error ? failure.message : String(failure));
         // The table showed `next` optimistically. Storage refused it, so the
         // rendered policy is now a claim about state that does not exist;
-        // reading storage back is what makes the two agree again.
-        setPolicy(await loadUrlPolicy());
+        // reading storage back is what makes the two agree again. The read
+        // must not migrate: migration writes, and whatever refused the save
+        // refuses that write too, which would replace the shown failure.
+        try {
+          setPolicy(await loadUrlPolicy({ migrate: false }));
+        } catch {
+          // The resync failed as well; the save failure stays on screen.
+        }
       });
   };
 

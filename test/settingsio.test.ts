@@ -84,6 +84,24 @@ describe("parseSettings rejects", () => {
       "ctrl",
     );
   });
+  test("an override id absent from the default keymap, naming it", () => {
+    expectError(
+      '{"version":1,"keymapOverrides":{"move_cursor_to_the_begining":{"key":"m","ctrl":true}}}',
+      "move_cursor_to_the_begining",
+    );
+  });
+  test("an override whose key is the empty string", () => {
+    expectError(
+      '{"version":1,"keymapOverrides":{"move_cursor_to_the_beginning":{"key":""}}}',
+      "key",
+    );
+  });
+  test("a defaultAction outside allow and deny", () => {
+    expectError(
+      '{"version":1,"urlPolicy":{"defaultAction":"ask","rules":[]}}',
+      "defaultAction",
+    );
+  });
   test("a language outside auto and the packaged locales", () => {
     expectError('{"version":1,"language":"xx"}', "language");
   });

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ReactElement } from 'react';
-import { expect, waitFor, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { failNextSet, storedValue } from '../../.storybook/chromemock';
 import { seededStory } from '../../.storybook/seed';
 import { ThemeApp } from './theme';
 
@@ -78,5 +79,33 @@ export const SystemDefault: Story = {
     // Nothing stored, so the browser's preference decides, and this browser
     // prefers dark — the toggle has to follow it rather than assuming light.
     await waitFor(() => expect(canvas.getByTestId('theme-toggle')).not.toBeChecked());
+  },
+};
+
+export const SaveFailure: Story = {
+  decorators: [paintedThemes, seededStory({})],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const toggle = await canvas.findByTestId('theme-toggle') as HTMLInputElement;
+
+    // ThemeApp's own theme is what the toggle is checked against, and with
+    // nothing stored it comes from the browser preference. The document
+    // attribute cannot stand in for it here: the preview decorator repaints
+    // the toolbar global over ThemeApp's paint so that one story cannot
+    // recolour the next, and that repaint can be the one left standing.
+    await waitFor(() => expect(painted.length).toBeGreaterThan(0));
+    const before = toggle.checked ? 'light' : 'dark';
+    failNextSet('sync write refused');
+    await userEvent.click(toggle);
+
+    await waitFor(() => expect(canvas.getByTestId('theme-save-error'))
+      .toHaveTextContent('sync write refused'));
+    // The page was repainted before storage had accepted the theme. Storage
+    // refused, so both the toggle and the paint have to come back rather than
+    // showing a theme the next load of the options page will not reproduce.
+    await waitFor(() => expect(toggle.checked).toBe(before === 'light'));
+    await expect(painted[painted.length - 1]).toBe(before);
+    await expect(storedValue<string>('theme')).toBeUndefined();
+    (document.activeElement as HTMLElement | null)?.blur();
   },
 };

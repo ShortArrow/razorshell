@@ -48,7 +48,8 @@ export async function saveUrlPolicy(policy: UrlPolicy): Promise<void> {
  * @return void
  */
 export function subscribeUrlPolicy(callback: (policy: UrlPolicy) => void): void {
-  chrome.storage.onChanged.addListener((changes) => {
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== "sync") return;
     const change = changes[policyKey];
     if (!change) return;
     callback((change.newValue as UrlPolicy | undefined) ?? defaultUrlPolicy);

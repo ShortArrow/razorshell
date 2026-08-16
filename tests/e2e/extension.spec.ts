@@ -18,6 +18,7 @@
  * never really served.
  */
 import { test, expect, chromium, type BrowserContext, type Page } from "@playwright/test";
+import { parseSettings } from "../../src/settingsio";
 import http from "node:http";
 import type { AddressInfo } from "node:net";
 import fs from "node:fs";
@@ -163,6 +164,37 @@ async function startInspecting(): Promise<void> {
     await chrome.tabs.sendMessage(tabs[0].id!, { type: "razorshell-inspect" });
   }, origin);
   await page.waitForTimeout(400);
+}
+
+/**
+ * The override layer as `chrome.storage.sync` actually holds it. The rendered
+ * rows are a claim about this value, so assertions that must not be satisfied
+ * by a stale render read it here instead of reading the table.
+ */
+function storedOverrides(): Promise<Record<string, unknown>> {
+  return optionsPage.evaluate(async () => {
+    const data = (await chrome.storage.sync.get("keymapOverrides")) as {
+      keymapOverrides?: Record<string, unknown>;
+    };
+    return data.keymapOverrides ?? {};
+  });
+}
+
+/** The url policy as stored, with the same intent as `storedOverrides`. */
+function storedPolicy(): Promise<{
+  defaultAction?: string;
+  rules?: { pattern: string; matchType: string; action: string }[];
+}> {
+  return optionsPage.evaluate(async () => {
+    const data = (await chrome.storage.sync.get("urlPolicy")) as {
+      urlPolicy?: { defaultAction?: string; rules?: never[] };
+    };
+    return data.urlPolicy ?? {};
+  });
+}
+
+function storedRules(): Promise<{ pattern: string; matchType: string; action: string }[]> {
+  return storedPolicy().then((policy) => policy.rules ?? []);
 }
 
 function badgeText(): Promise<string> {
@@ -511,6 +543,10 @@ test.describe("keymap rebinding", () => {
       optionsPage.locator('[data-testid="conflict-move_cursor_to_the_end"]'),
     ).toContainText("move cursor to the beginning");
     expect(await currentChord("move_cursor_to_the_end")).toBe("Ctrl+e");
+
+    // The row reverting is what the GUI shows; storage is what the content
+    // script reads. A rejected capture must never have reached it.
+    expect(await storedOverrides()).not.toHaveProperty("move_cursor_to_the_end");
   });
 
   test("rebinding the rejected row to a free chord clears the conflict", async () => {
@@ -527,12 +563,48 @@ test.describe("keymap rebinding", () => {
       optionsPage.locator('[data-testid="conflict-move_cursor_to_the_end"]'),
     ).toHaveCount(0);
     await expect(optionsPage.locator('[data-testid="keymap-no-conflict"]')).toHaveCount(1);
+
+    // Chromium reports Digit9 under Shift as key "9", not "(" — verified by
+    // reading KeyboardEvent.key for this exact press.
+    await expect.poll(() => storedOverrides()).toMatchObject({
+      move_cursor_to_the_end: { key: "9", ctrl: true, alt: false, shift: true },
+    });
+    expect((await storedOverrides()).move_cursor_to_the_end).toEqual({
+      key: "9",
+      ctrl: true,
+      alt: false,
+      shift: true,
+    });
   });
 
+  /**
+   * Reset all is the one mutation whose failure the GUI cannot betray: the rows
+   * re-render from the defaults either way. Only storage and the content script
+   * distinguish a real reset from a silent no-op, so both are read here.
+   *
+   * Unmodified Ctrl+m carries no native caret action in Chromium (verified),
+   * so an unmoved caret is evidence the binding is gone rather than evidence of
+   * a fallback.
+   */
   test("reset all restores the defaults", async () => {
     await optionsPage.locator('[data-testid="keymap-reset-all"]').click();
     await optionsPage.waitForTimeout(500);
     expect(await currentChord("move_cursor_to_the_beginning")).toBe("Ctrl+a");
+
+    await expect.poll(() => storedOverrides()).toEqual({});
+
+    await seedTextInput("hello world", 11);
+    await page.keyboard.press("Control+m");
+    expect(await caretState(page.locator('input[type="text"]').first())).toEqual({
+      start: 11,
+      end: 11,
+    });
+
+    await page.keyboard.press("Control+a");
+    expect(await caretState(page.locator('input[type="text"]').first())).toEqual({
+      start: 0,
+      end: 0,
+    });
   });
 });
 
@@ -650,6 +722,92 @@ test.describe("url policy", () => {
   });
 });
 
+/**
+ * The url policy describe above drives storage directly. This one drives the
+ * same policy through the rendered controls, so the wiring between the form,
+ * `chrome.storage.sync` and the content script is what is under test rather
+ * than the rule evaluation, which the previous describe already covers.
+ *
+ * It inherits `{defaultAction:'allow', rules:[]}` from that describe's last
+ * test and leaves exactly that state behind, so the blocks after it are
+ * unaffected.
+ */
+test.describe("url rules edited through the gui", () => {
+  // Both selects are labelled only by their tooltip message, so the accessible
+  // name is the handle the real DOM offers. Matching a stable fragment of it
+  // keeps the locator readable and survives rewording around it.
+  const patternInput = () => optionsPage.getByPlaceholder("pattern");
+  const matchTypeSelect = () => optionsPage.getByLabel(/exact: whole URL/);
+  const actionSelect = () => optionsPage.getByLabel(/allow enables the keybindings/);
+  const denyRule = () => ({ pattern: `${origin}/**`, matchType: "glob", action: "deny" });
+  const allowRule = () => ({ pattern: `${origin}/other`, matchType: "exact", action: "allow" });
+
+  test.beforeAll(async () => {
+    await optionsPage.reload();
+    await optionsPage.waitForTimeout(800);
+  });
+
+  test("a rule added through the form reaches storage and the content script", async () => {
+    await patternInput().fill(`${origin}/**`);
+    await matchTypeSelect().selectOption("glob");
+    await actionSelect().selectOption("deny");
+    await optionsPage.getByRole("button", { name: "add rule" }).click();
+
+    await expect.poll(() => storedRules()).toEqual([denyRule()]);
+
+    await page.waitForTimeout(500);
+    await seedTextInput("hello world", 11);
+    await page.keyboard.press("Control+a");
+    expect(await fieldState(page.locator('input[type="text"]').first())).toEqual({
+      value: "hello world",
+      start: 0,
+      end: 11,
+    });
+    expect(await badgeText()).toBe("✕");
+  });
+
+  test("the reorder buttons rewrite the stored order", async () => {
+    await patternInput().fill(`${origin}/other`);
+    await matchTypeSelect().selectOption("exact");
+    await actionSelect().selectOption("allow");
+    await optionsPage.getByRole("button", { name: "add rule" }).click();
+
+    await expect.poll(() => storedRules()).toEqual([denyRule(), allowRule()]);
+
+    await optionsPage.getByRole("button", { name: "move rule 2 up" }).click();
+    await expect.poll(() => storedRules()).toEqual([allowRule(), denyRule()]);
+
+    await optionsPage.getByRole("button", { name: "move rule 1 down" }).click();
+    await expect.poll(() => storedRules()).toEqual([denyRule(), allowRule()]);
+  });
+
+  test("the default action select writes through", async () => {
+    await optionsPage.locator("#default-action").selectOption("deny");
+    await expect.poll(() => storedPolicy().then((p) => p.defaultAction)).toBe("deny");
+
+    await optionsPage.locator("#default-action").selectOption("allow");
+    await expect.poll(() => storedPolicy().then((p) => p.defaultAction)).toBe("allow");
+  });
+
+  test("deleting every rule hands the page back to the keybindings", async () => {
+    await optionsPage.getByRole("button", { name: "delete rule 2" }).click();
+    await expect.poll(() => storedRules()).toEqual([denyRule()]);
+
+    await optionsPage.getByRole("button", { name: "delete rule 1" }).click();
+    await expect.poll(() => storedRules()).toEqual([]);
+
+    await page.waitForTimeout(500);
+    await seedTextInput("hello world", 11);
+    await page.keyboard.press("Control+a");
+    expect(await fieldState(page.locator('input[type="text"]').first())).toEqual({
+      value: "hello world",
+      start: 0,
+      end: 0,
+    });
+    expect(await badgeText()).toBe("");
+  });
+});
+
 test.describe("event trust and the inspector", () => {
   test("synthetic key events are ignored", async () => {
     await addPageKeydownListener("cancelCtrlK");
@@ -760,6 +918,40 @@ test.describe("rich text editors", () => {
       return { offset: sel.focusOffset, collapsed: sel.isCollapsed };
     });
 
+  /**
+   * The tests below seed `enableContentEditable` straight into storage, which
+   * leaves the checkbox itself unproven. Clicking it is the only way to show
+   * that the rendered control reaches storage and that the content script acts
+   * on what the click wrote.
+   *
+   * It ends with the toggle off, which is the state the next test expects.
+   */
+  test("the toggle click reaches storage and the content script", async () => {
+    const stored = () =>
+      optionsPage.evaluate(async () => {
+        const data = (await chrome.storage.sync.get("enableContentEditable")) as {
+          enableContentEditable?: boolean;
+        };
+        return data.enableContentEditable;
+      });
+
+    await optionsPage.locator('[data-testid="richtext-toggle"]').click();
+    await expect.poll(stored).toBe(true);
+    await expect(optionsPage.locator('[data-testid="richtext-toggle"]')).toBeChecked();
+
+    await page.waitForTimeout(500);
+    await expect(page.locator("#ce-status")).toContainText("enabled in options");
+    await page.locator('[contenteditable="true"]').click();
+    await setCaret(3);
+    await page.keyboard.press("Control+a");
+    expect(await selectionState()).toEqual({ offset: 0, collapsed: true });
+
+    await optionsPage.locator('[data-testid="richtext-toggle"]').click();
+    await expect.poll(stored).toBe(false);
+    await expect(optionsPage.locator('[data-testid="richtext-toggle"]')).not.toBeChecked();
+    await page.waitForTimeout(500);
+  });
+
   test("the editor stays native while the setting is off", async () => {
     expect(await optionsPage.locator('[data-testid="richtext-toggle"]').count()).toBe(1);
 
@@ -823,7 +1015,12 @@ test.describe("settings import and export", () => {
     const downloadPromise = optionsPage.waitForEvent("download");
     await optionsPage.getByRole("button", { name: "Export" }).click();
     const download = await downloadPromise;
-    const exported = JSON.parse(fs.readFileSync((await download.path())!, "utf8"));
+    const exportedText = fs.readFileSync((await download.path())!, "utf8");
+    const exported = JSON.parse(exportedText);
+
+    // What was written must be importable again: the export is only a backup
+    // if the parser the import path uses accepts it verbatim.
+    expect(parseSettings(exportedText).ok).toBe(true);
 
     expect({
       version: exported.version,
@@ -861,6 +1058,37 @@ test.describe("settings import and export", () => {
     await optionsPage.waitForTimeout(500);
   });
 
+  /**
+   * A parse failure must leave storage untouched and must not wedge the form:
+   * the next well-formed document has to apply normally.
+   *
+   * The recovery payload is constrained to be a no-op, because this test sits
+   * between blocks that assert exact settings. `enableContentEditable` is
+   * already `true` here (the export test seeded it and nothing since has
+   * written it), so re-applying `true` changes nothing while still exercising
+   * the whole parse-and-store path. Any value differing from current state
+   * would drift into the restart assertions below.
+   */
+  test("malformed json is rejected and the page recovers", async () => {
+    const before = await optionsPage.evaluate(() => chrome.storage.sync.get(null));
+
+    await optionsPage.locator('[data-testid="config-text"]').fill("{nope");
+    await optionsPage.locator('[data-testid="config-apply"]').click();
+    await optionsPage.waitForTimeout(300);
+    await expect(optionsPage.locator('[data-testid="config-result"]')).toContainText("JSON");
+
+    expect(await optionsPage.evaluate(() => chrome.storage.sync.get(null))).toEqual(before);
+
+    await optionsPage
+      .locator('[data-testid="config-text"]')
+      .fill('{"version":1,"enableContentEditable":true}');
+    await optionsPage.locator('[data-testid="config-apply"]').click();
+    await optionsPage.waitForTimeout(500);
+    await expect(optionsPage.locator('[data-testid="config-result"]')).toContainText("applied");
+
+    expect(await optionsPage.evaluate(() => chrome.storage.sync.get(null))).toEqual(before);
+  });
+
   test("a policy past the sync quota reports the failure and is not stored", async () => {
     const oversized = await optionsPage.evaluate(() =>
       JSON.stringify({
@@ -896,6 +1124,60 @@ test.describe("settings import and export", () => {
           defaultAction: "allow",
           rules: [{ pattern: "https://example.com/**", matchType: "glob", action: "deny" }],
         },
+      }),
+    );
+    await optionsPage.waitForTimeout(500);
+  });
+
+  /**
+   * An import is one `chrome.storage.sync.set`, so a document whose policy
+   * exceeds the quota must not leave its other keys behind. The language is the
+   * witness: `fr` travels in the same document as the oversized policy, and the
+   * stored language must still be the `ja` this block seeded.
+   *
+   * The state left behind is the one the restart describe asserts — language
+   * `ja` and the single example.com rule — so the policy is re-seeded after the
+   * refusal exactly as the quota test does.
+   */
+  test("a failing import applies none of its keys", async () => {
+    expect(await optionsPage.evaluate(() => chrome.storage.sync.get("language"))).toEqual({
+      language: "ja",
+    });
+    const policyBefore = await storedPolicy();
+
+    const oversized = await optionsPage.evaluate(() =>
+      JSON.stringify({
+        version: 1,
+        language: "fr",
+        urlPolicy: {
+          defaultAction: "allow",
+          rules: Array.from({ length: 400 }, (_, i) => ({
+            pattern: `https://example.com/rule-${i}/**`,
+            matchType: "glob",
+            action: "deny",
+          })),
+        },
+      }),
+    );
+    await optionsPage.locator('[data-testid="config-text"]').fill(oversized);
+    await optionsPage.locator('[data-testid="config-apply"]').click();
+    await optionsPage.waitForTimeout(700);
+
+    const reported = await optionsPage.locator('[data-testid="config-result"]').innerText();
+    expect(reported.toLowerCase()).toContain("quota");
+
+    expect(await optionsPage.evaluate(() => chrome.storage.sync.get("language"))).toEqual({
+      language: "ja",
+    });
+    expect(await storedPolicy()).toEqual(policyBefore);
+
+    await optionsPage.evaluate(() =>
+      chrome.storage.sync.set({
+        urlPolicy: {
+          defaultAction: "allow",
+          rules: [{ pattern: "https://example.com/**", matchType: "glob", action: "deny" }],
+        },
+        language: "ja",
       }),
     );
     await optionsPage.waitForTimeout(500);
