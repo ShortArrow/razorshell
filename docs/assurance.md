@@ -70,6 +70,7 @@ file the importer refuses; a rendering readable in one theme only.
 | C1.10 | The options page renders both themes with zero axe violations and zero undecided results |
 | C1.11 | Fields the extension cannot reach — closed shadow roots, `email` inputs — keep their native behavior instead of dying half-handled |
 | C1.12 | The language override resolves every packaged locale's tooltips, and a failed dictionary fetch falls back to the browser's own messages |
+| C1.13 | A binding runs exactly once per keypress — settings churn, options-page remounts, same-document navigations and an abandoned rebind capture leave no duplicate or stale key handler behind |
 
 ## Traceability
 
@@ -130,3 +131,5 @@ planned section is the current answer, not a test.
 | R2 | The `auto` language under a non-English browser UI; every suite runs an English Chromium, so `auto` always resolves to English in tests |
 | R3 | Concurrent edits from two devices merging through account sync |
 | R4 | Test sensitivity outside the deliberate-violation checks the measurement records list: a test that cannot fail would count as evidence here without being any |
+| R5 | An orphaned content script after an extension update or reload: Chrome leaves the old script's DOM listeners in place, so a binding can run twice until the page reloads — reproducing an update in the harness is not automated |
+| R6 | The 102,400-byte total sync quota; only the 8 KB per-item limit is exercised |

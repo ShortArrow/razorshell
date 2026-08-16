@@ -126,6 +126,14 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   typecheck, lint and the vitest suites into one command, and
   CLAUDE.md records the commands, test structure and conventions an
   agent session needs.
+- Double execution has its canary: every earlier key assertion used
+  idempotent operations, so a duplicated keydown handler would have
+  passed the whole suite. Alt+f — one word per press — now runs once
+  after heavy settings churn, after options-page remounts, after SPA
+  navigations and after an abandoned rebind capture, and must land
+  exactly one word in. The badge and policy are also proven per tab
+  with two tabs open, and repeated inspector clicks keep a single
+  toast.
 - Three assurance residuals became tests, and one became a product
   fix: real Chrome was measured to fire no storage change event for
   a redundant write (the story mock now mirrors that), all eleven

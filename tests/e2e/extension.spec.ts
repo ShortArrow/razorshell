@@ -205,6 +205,57 @@ function badgeText(): Promise<string> {
   }, origin);
 }
 
+/**
+ * The badge as it stands on one named tab. `badgeText` takes whichever tab the
+ * query returns first, which is enough while a single content tab is open but
+ * cannot tell two apart — a per-tab claim has to name the tab it is about.
+ */
+function badgeTextOfTab(tabId: number): Promise<string> {
+  return optionsPage.evaluate((id) => chrome.action.getBadgeText({ tabId: id }), tabId);
+}
+
+/**
+ * The extension's own view of a page, which is the id the badge is keyed by.
+ * Playwright's `Page` carries no tab id, so the url it was opened at is the
+ * handle that crosses into `chrome.tabs`.
+ */
+function tabIdForUrl(url: string): Promise<number> {
+  return optionsPage.evaluate(async (target) => {
+    const tabs = await chrome.tabs.query({ url: target });
+    if (tabs.length !== 1) throw new Error(`expected 1 tab at ${target}, found ${tabs.length}`);
+    return tabs[0].id!;
+  }, url);
+}
+
+/**
+ * One word forward from caret 0 in "hello world", measured rather than assumed:
+ * a single Alt+f lands on 5, two land on 11. That gap is the whole point of the
+ * @C1.13 tests — an idempotent chord like Ctrl+a cannot tell one run from two,
+ * while a doubled handler overshoots 5 and lands on 11. Verified by flipping
+ * the expectation to 11: the assertion fails with `received 5`, so it is the
+ * single run it claims to measure and not a number that passes either way.
+ */
+const oneWordForward = 5;
+
+/** Seeds "hello world" at caret 0 in the content page and presses Alt+f once. */
+async function pressAltFOnceOnContentPage(): Promise<{ start: number | null; end: number | null }> {
+  await seedTextInput("hello world", 0);
+  await page.keyboard.press("Alt+f");
+  return caretState(page.locator('input[type="text"]').first());
+}
+
+/** The same single Alt+f, in the options page's own test field. */
+async function pressAltFOnceOnOptionsInput(): Promise<{ start: number | null; end: number | null }> {
+  const optInput = optionsPage.locator('[data-testid="test-input"]');
+  await optInput.evaluate((el: HTMLInputElement) => {
+    el.value = "hello world";
+    el.focus();
+    el.setSelectionRange(0, 0);
+  });
+  await optionsPage.keyboard.press("Alt+f");
+  return caretState(optInput);
+}
+
 test.describe.configure({ mode: "serial" });
 
 test.beforeAll(async () => {
@@ -647,6 +698,47 @@ test.describe("keymap rebinding @C1.5", () => {
       end: 0,
     });
   });
+
+  /**
+   * Capture mode installs a document-level keydown listener that swallows the
+   * next key and binds it. Its removal rides on the effect cleanup, so an
+   * unmount that skipped the cleanup would leave a listener that steals the
+   * user's next keystroke into a binding they never asked for.
+   *
+   * The language change is what remounts: the options root is keyed on a
+   * generation the language subscription bumps, so switching away and back
+   * unmounts the whole subtree while the capture is still armed.
+   *
+   * A plain letter is the probe, because a leaked listener calls
+   * `preventDefault` on anything non-modifier: the character reaching the field
+   * is what proves nothing intercepted it, and storage is what proves nothing
+   * was bound behind the render.
+   */
+  test("an abandoned rebind capture leaves no key handler behind", async () => {
+    const rebind = optionsPage.locator('[data-testid="rebind-move_cursor_to_the_end"]');
+    await rebind.click();
+    await expect(rebind.locator(".loading")).toHaveCount(1);
+
+    await optionsPage.locator('[data-testid="language-select"]').selectOption("ja");
+    await optionsPage.waitForTimeout(700);
+    await optionsPage.locator('[data-testid="language-select"]').selectOption("auto");
+    await optionsPage.waitForTimeout(700);
+
+    const optInput = optionsPage.locator('[data-testid="test-input"]');
+    await optInput.evaluate((el: HTMLInputElement) => {
+      el.value = "";
+      el.focus();
+      el.setSelectionRange(0, 0);
+    });
+    await optionsPage.keyboard.press("m");
+    await optionsPage.waitForTimeout(400);
+
+    expect(await optInput.evaluate((el: HTMLInputElement) => el.value)).toBe("m");
+    expect(await storedOverrides()).not.toHaveProperty("move_cursor_to_the_end");
+    await expect(
+      optionsPage.locator('[data-testid="rebind-move_cursor_to_the_end"]').locator(".loading"),
+    ).toHaveCount(0);
+  });
 });
 
 test.describe("url policy @C1.3", () => {
@@ -849,6 +941,183 @@ test.describe("url rules edited through the gui @C1.3", () => {
   });
 });
 
+/**
+ * A binding must run exactly once per keypress.
+ *
+ * Every other block asserts with idempotent chords — Ctrl+a lands on 0 and
+ * Ctrl+k deletes to the end whether the handler ran once or twice — so a
+ * duplicated keydown listener, which is the regression these tests exist to
+ * catch, would pass the whole suite. Alt+f is the discriminator: it advances
+ * one word per run, so a doubled handler overshoots by exactly one word.
+ *
+ * The landing positions are measured, not chosen: from caret 0 in "hello
+ * world", one Alt+f lands on 5 and two land on 11 (verified against real
+ * Chromium with the built extension).
+ *
+ * The block inherits `{defaultAction:'allow', rules:[]}`, no overrides,
+ * language `auto` and `enableContentEditable` false from the describes above,
+ * and restores exactly that, so what follows is unaffected.
+ */
+test.describe("a binding runs once @C1.13", () => {
+  /**
+   * Every settings path a user can reach, driven through the surface a user
+   * would drive it through: the GUI for the rebind, the reset and the language,
+   * storage for what has no control of its own here. Each of these re-runs the
+   * content script's subscribers, and any of them re-registering the document
+   * listener instead of replacing it would double the binding.
+   */
+  async function churnTheSettings(): Promise<void> {
+    await optionsPage.locator('[data-testid="rebind-move_cursor_to_the_beginning"]').click();
+    await optionsPage.keyboard.press("Control+m");
+    await expect
+      .poll(() => storedOverrides())
+      .toHaveProperty("move_cursor_to_the_beginning");
+
+    await optionsPage.locator('[data-testid="keymap-reset-all"]').click();
+    await expect.poll(() => storedOverrides()).toEqual({});
+
+    await setPolicy({
+      defaultAction: "allow",
+      rules: [{ pattern: `${origin}/**`, matchType: "glob", action: "deny" }],
+    });
+    await setPolicy({ defaultAction: "allow", rules: [] });
+
+    await optionsPage.evaluate(() => chrome.storage.sync.set({ enableContentEditable: true }));
+    await page.waitForTimeout(400);
+    await optionsPage.evaluate(() => chrome.storage.sync.set({ enableContentEditable: false }));
+    await page.waitForTimeout(400);
+
+    await optionsPage.locator('[data-testid="language-select"]').selectOption("ja");
+    await optionsPage.waitForTimeout(700);
+    await optionsPage.locator('[data-testid="language-select"]').selectOption("auto");
+    await optionsPage.waitForTimeout(700);
+  }
+
+  test.afterAll(async () => {
+    await optionsPage.evaluate(() =>
+      chrome.storage.sync.set({ keymapOverrides: {}, enableContentEditable: false, language: "auto" }),
+    );
+    await setPolicy({ defaultAction: "allow", rules: [] });
+    await optionsPage.reload();
+    await optionsPage.waitForTimeout(800);
+  });
+
+  test("a binding runs once after settings churn @C1.13", async () => {
+    await churnTheSettings();
+
+    expect(await pressAltFOnceOnContentPage()).toEqual({
+      start: oneWordForward,
+      end: oneWordForward,
+    });
+
+    expect(await pressAltFOnceOnOptionsInput()).toEqual({
+      start: oneWordForward,
+      end: oneWordForward,
+    });
+  });
+
+  /**
+   * `reapplyUrlPolicy` runs on every same-document navigation. It re-decides
+   * `enabled` against the policy already held, and must not be a second place
+   * the keydown listener gets attached from.
+   */
+  test("a binding runs once after same-document navigations @C1.13", async () => {
+    for (const route of ["/spa-one", "/spa-two", "/spa-three"]) {
+      await page.evaluate((path) => history.pushState({}, "", path), route);
+      await page.waitForTimeout(300);
+      await page.evaluate(() => history.back());
+      await page.waitForTimeout(300);
+    }
+
+    expect(await pressAltFOnceOnContentPage()).toEqual({
+      start: oneWordForward,
+      end: oneWordForward,
+    });
+  });
+});
+
+/**
+ * The policy is decided per document, and the badge is set per tab. With one
+ * tab open the two are indistinguishable from a single global switch — this
+ * block opens a second tab that the same policy denies while the first is
+ * allowed, so a global decision or a global badge would show up as both tabs
+ * agreeing.
+ */
+test.describe("the badge and policy are decided per tab @C1.3", () => {
+  let deniedPage: Page;
+  let allowedTabId: number;
+  let deniedTabId: number;
+
+  test.beforeAll(async () => {
+    await setPolicy({
+      defaultAction: "allow",
+      rules: [{ pattern: `${origin}/denied`, matchType: "exact", action: "deny" }],
+    });
+
+    deniedPage = await context.newPage();
+    await deniedPage.goto(`${origin}/denied`);
+    await deniedPage.waitForTimeout(1200);
+
+    allowedTabId = await tabIdForUrl(`${origin}/`);
+    deniedTabId = await tabIdForUrl(`${origin}/denied`);
+  });
+
+  test.afterAll(async () => {
+    await deniedPage.close();
+    await setPolicy({ defaultAction: "allow", rules: [] });
+  });
+
+  test("the badge names the denied tab only", async () => {
+    await expect.poll(() => badgeTextOfTab(deniedTabId)).toBe("✕");
+    expect(await badgeTextOfTab(allowedTabId)).toBe("");
+  });
+
+  test("the same chord is disabled in one tab and live in the other", async () => {
+    await deniedPage.locator('input[type="text"]').first().evaluate((el: HTMLInputElement) => {
+      el.value = "hello world";
+      el.focus();
+      el.setSelectionRange(11, 11);
+    });
+    await deniedPage.keyboard.press("Control+a");
+    expect(await caretState(deniedPage.locator('input[type="text"]').first())).toEqual({
+      start: 0,
+      end: 11,
+    });
+
+    await seedTextInput("hello world", 11);
+    await page.keyboard.press("Control+a");
+    expect(await caretState(page.locator('input[type="text"]').first())).toEqual({
+      start: 0,
+      end: 0,
+    });
+  });
+
+  test("lifting the rule re-enables both tabs without a reload", async () => {
+    await setPolicy({ defaultAction: "allow", rules: [] });
+
+    await deniedPage.locator('input[type="text"]').first().evaluate((el: HTMLInputElement) => {
+      el.value = "hello world";
+      el.focus();
+      el.setSelectionRange(11, 11);
+    });
+    await deniedPage.keyboard.press("Control+a");
+    expect(await caretState(deniedPage.locator('input[type="text"]').first())).toEqual({
+      start: 0,
+      end: 0,
+    });
+
+    await seedTextInput("hello world", 11);
+    await page.keyboard.press("Control+a");
+    expect(await caretState(page.locator('input[type="text"]').first())).toEqual({
+      start: 0,
+      end: 0,
+    });
+
+    await expect.poll(() => badgeTextOfTab(deniedTabId)).toBe("");
+    expect(await badgeTextOfTab(allowedTabId)).toBe("");
+  });
+});
+
 test.describe("event trust and the inspector", () => {
   test("synthetic key events are ignored @C1.2", async () => {
     await addPageKeydownListener("cancelCtrlK");
@@ -937,6 +1206,31 @@ test.describe("event trust and the inspector", () => {
     expect(toast).not.toContain("Ctrl+k");
     expect(toast).not.toContain("Alt+b");
     expect(toast).toContain("could not be analyzed");
+  });
+
+  /**
+   * `showToast` is documented as replacing the toast already shown, and it is
+   * addressed by a fixed id — two elements carrying it would make
+   * `getElementById` a coin toss, so every assertion above that reads the toast
+   * would be reading whichever one the DOM happened to return first.
+   *
+   * Each inspect click draws two toasts in sequence — the arming hint, then the
+   * report — so three armed clicks pass through the replacement path six times.
+   * The wait between them stays well inside the eight-second dismissal, so a
+   * count of one is replacement rather than expiry.
+   */
+  test("repeated inspect clicks keep a single toast", async () => {
+    const toastCount = () =>
+      page.evaluate(
+        () => document.querySelectorAll('[id="razorshell-inspect-toast"]').length,
+      );
+
+    for (let attempt = 0; attempt < 3; attempt++) {
+      await startInspecting();
+      await page.locator('input[type="password"]').click();
+      await page.waitForTimeout(700);
+      expect(await toastCount(), `after inspect click ${attempt + 1}`).toBe(1);
+    }
   });
 });
 
