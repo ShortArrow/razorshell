@@ -8,6 +8,8 @@ This is a browser extension that adds bash shell-like keyboard shortcuts to text
 
 ![Each chord moving the caret and deleting lines in the options test area](./image/demo.gif)
 
+[▶ Full demo video (webm, 20s): test area, URL policy probe, rebinding](./image/demo.webm)
+
 ## Features
 
 <!-- markdownlint-disable md013 -->

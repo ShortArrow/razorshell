@@ -329,16 +329,17 @@ async function renderGif(browser) {
   console.log(`wrote image/demo.gif (${Math.round(fs.statSync(gifPath).size / 1024)} KB, ${frames.length} frames, ${width}x${height})`);
 }
 
-/** The YouTube-ready recording: the options page driven for ~25 seconds. */
+/** The repository demo recording, sized and paced for a README link. */
 async function renderWebm() {
   const distPath = path.join(root, "dist");
   const userDataDir = path.join(root, "test-results", "promo-video-data");
   fs.rmSync(userDataDir, { recursive: true, force: true });
+  const size = { width: 960, height: 600 };
   const context = await chromium.launchPersistentContext(userDataDir, {
     channel: "chromium",
     headless: true,
-    viewport: { width: 1280, height: 800 },
-    recordVideo: { dir: path.join(outDir, "rec"), size: { width: 1280, height: 800 } },
+    viewport: size,
+    recordVideo: { dir: path.join(outDir, "rec"), size },
     args: [`--disable-extensions-except=${distPath}`, `--load-extension=${distPath}`],
   });
   const boot = await context.newPage();
@@ -363,35 +364,33 @@ async function renderWebm() {
     await page.waitForTimeout(900);
   };
 
-  await scrollTo("Keymap");
-  await page.waitForTimeout(2000);
   await scrollTo("Test Area");
   await page.locator('[data-testid="test-input"]').click();
   await page.keyboard.press("End");
   for (const chord of ["Control+a", "Control+e", "Alt+b", "Alt+b", "Control+k", "Control+u"]) {
-    await page.waitForTimeout(900);
+    await page.waitForTimeout(750);
     await page.keyboard.press(chord);
   }
-  await page.waitForTimeout(1200);
+  await page.waitForTimeout(900);
   await scrollTo("URL policy");
   await page.locator('[data-testid="url-probe-input"]').pressSequentially(
-    "https://docs.google.com/document/d/1", { delay: 35 });
-  await page.waitForTimeout(1500);
+    "https://docs.google.com/document/d/1", { delay: 30 });
+  await page.waitForTimeout(1100);
   await scrollTo("Keymap");
   await page.locator('[data-testid="rebind-move_cursor_to_the_beginning"]').click();
-  await page.waitForTimeout(900);
+  await page.waitForTimeout(700);
   await page.keyboard.press("Control+m");
-  await page.waitForTimeout(1600);
+  await page.waitForTimeout(1200);
   await page.locator('[data-testid="keymap-reset-all"]').click();
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
 
   const video = page.video();
   await context.close();
   const recorded = await video.path();
-  const finalPath = path.join(outDir, "demo-1280x800.webm");
+  const finalPath = path.join(root, "image", "demo.webm");
   fs.copyFileSync(recorded, finalPath);
   fs.rmSync(path.join(outDir, "rec"), { recursive: true, force: true });
-  console.log(`wrote demo-1280x800.webm (${Math.round(fs.statSync(finalPath).size / 1024)} KB)`);
+  console.log(`wrote image/demo.webm (${Math.round(fs.statSync(finalPath).size / 1024)} KB)`);
 }
 
 async function main() {

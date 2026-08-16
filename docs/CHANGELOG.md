@@ -129,8 +129,9 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 - Store assets generate from the repository: `node promo/generate.mjs`
   renders the two promo tiles from the mascot, five 1280x800 JPEG
   screenshots from the real extension with a branded caption band,
-  the README demo GIF (gifenc, no ffmpeg), and a 1280x800 webm ready
-  for a YouTube upload. The README opens with the GIF.
+  the README demo GIF (gifenc, no ffmpeg), and a 960x600 webm demo
+  kept in the repository. The README opens with the GIF and links
+  the video.
 - Double execution has its canary: every earlier key assertion used
   idempotent operations, so a duplicated keydown handler would have
   passed the whole suite. Alt+f — one word per press — now runs once
