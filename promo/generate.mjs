@@ -24,26 +24,39 @@ const mascot = `data:image/svg+xml;base64,${Buffer.from(mascotSvg).toString("bas
 
 const jpeg = { type: "jpeg", quality: 95 };
 
+/** The one palette every asset draws from. */
+const brand = {
+  bg: ["#191026", "#2b1a4e", "#3a1f66"],
+  tagline: "#cdbfff",
+  chipBg: "#241640",
+  chipBorder: "#7a5cff",
+  chipText: "#e8e1ff",
+  sans: '"Segoe UI", system-ui, sans-serif',
+  mono: "Consolas, monospace",
+};
+const chords = ["Ctrl+A", "Ctrl+E", "Ctrl+K", "Ctrl+U", "Alt+F", "Alt+B"];
+const taglineText = "Bash keybindings in every text box on the web.";
+
 const baseStyle = `
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    font-family: "Segoe UI", system-ui, sans-serif;
-    background: linear-gradient(135deg, #191026 0%, #2b1a4e 55%, #3a1f66 100%);
+    font-family: ${brand.sans};
+    background: linear-gradient(135deg, ${brand.bg[0]} 0%, ${brand.bg[1]} 55%, ${brand.bg[2]} 100%);
     color: #ffffff;
     overflow: hidden;
     width: 100vw; height: 100vh;
     display: flex; flex-direction: column;
   }
   .title { font-weight: 700; letter-spacing: 0.01em; }
-  .tagline { color: #cdbfff; font-weight: 400; }
+  .tagline { color: ${brand.tagline}; font-weight: 400; }
   .chips { display: flex; gap: 14px; }
   .chip {
-    font-family: Consolas, monospace;
-    background: #241640;
-    border: 1px solid #7a5cff;
+    font-family: ${brand.mono};
+    background: ${brand.chipBg};
+    border: 1px solid ${brand.chipBorder};
     border-bottom-width: 3px;
     border-radius: 8px;
-    color: #e8e1ff;
+    color: ${brand.chipText};
     text-align: center;
   }
   .mascot { display: block; }
@@ -59,12 +72,8 @@ function marqueeHtml() {
     .mascot { width: 1180px; margin: 38px auto 0; }
   </style></head><body>
     <div class="title">Razorshell</div>
-    <div class="tagline">Bash keybindings in every text box on the web.</div>
-    <div class="chips">
-      <span class="chip">Ctrl+A</span><span class="chip">Ctrl+E</span>
-      <span class="chip">Ctrl+K</span><span class="chip">Ctrl+U</span>
-      <span class="chip">Alt+F</span><span class="chip">Alt+B</span>
-    </div>
+    <div class="tagline">${taglineText}</div>
+    <div class="chips">${chords.map((c) => `<span class="chip">${c}</span>`).join("")}</div>
     <img class="mascot" src="${mascot}">
   </body></html>`;
 }
@@ -457,6 +466,83 @@ async function renderWebm() {
   console.log(`wrote image/demo.webm (${Math.round(fs.statSync(finalPath).size / 1024)} KB)`);
 }
 
+/**
+ * The PNGs shipped in the extension and the README banner PNG, derived from
+ * their committed SVG sources so no image depends on a manual export.
+ */
+async function renderIcons(browser) {
+  const targets = [
+    ...([16, 32, 48, 128].map((size) => ({
+      svg: path.join(root, "src", "images", "icon.svg"),
+      out: path.join(root, "src", "images", `${size}.png`),
+      width: size,
+      height: size,
+    }))),
+    {
+      svg: path.join(root, "image", "razorshell.svg"),
+      out: path.join(root, "image", "razorshell.png"),
+      width: 800,
+      height: 128,
+    },
+  ];
+  for (const target of targets) {
+    const uri = `data:image/svg+xml;base64,${fs.readFileSync(target.svg).toString("base64")}`;
+    const page = await browser.newPage({
+      viewport: { width: target.width, height: target.height },
+    });
+    await page.setContent(
+      `<body style="margin:0"><img src="${uri}" style="display:block;width:${target.width}px;height:${target.height}px"></body>`,
+      { waitUntil: "networkidle" },
+    );
+    await page.screenshot({ path: target.out, omitBackground: true });
+    await page.close();
+    console.log(`wrote ${path.relative(root, target.out)}`);
+  }
+}
+
+/**
+ * image/promotion.svg, written from the same palette and typography as the
+ * tiles so the store art cannot drift from them. The mascot travels inside
+ * as a data URI, keeping the file self-contained.
+ */
+function writePromotionSvg() {
+  const width = 1280;
+  const height = 800;
+  const pad = 80;
+  const chipWidth = 132;
+  const chipHeight = 54;
+  const chipY = 330;
+  const chipRow = chords.map((label, index) => {
+    const x = pad + index * (chipWidth + 16);
+    return `
+  <rect x="${x}" y="${chipY}" width="${chipWidth}" height="${chipHeight}" rx="10"
+        fill="${brand.chipBg}" stroke="${brand.chipBorder}" stroke-width="1.5"/>
+  <rect x="${x}" y="${chipY + chipHeight - 3}" width="${chipWidth}" height="3" rx="1.5"
+        fill="${brand.chipBorder}"/>
+  <text x="${x + chipWidth / 2}" y="${chipY + 36}" text-anchor="middle"
+        font-family='${brand.mono}' font-size="26" fill="${brand.chipText}">${label}</text>`;
+  }).join("");
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="${brand.bg[0]}"/>
+      <stop offset="0.55" stop-color="${brand.bg[1]}"/>
+      <stop offset="1" stop-color="${brand.bg[2]}"/>
+    </linearGradient>
+  </defs>
+  <rect width="${width}" height="${height}" fill="url(#bg)"/>
+  <text x="${pad}" y="200" font-family='${brand.sans}' font-size="112" font-weight="700"
+        fill="#ffffff">Razorshell</text>
+  <text x="${pad}" y="272" font-family='${brand.sans}' font-size="42"
+        fill="${brand.tagline}">${taglineText}</text>${chipRow}
+  <image x="${(width - 1140) / 2}" y="500" width="1140" height="182" href="${mascot}"/>
+</svg>
+`;
+  const out = path.join(root, "image", "promotion.svg");
+  fs.writeFileSync(out, svg);
+  console.log(`wrote ${path.relative(root, out)}`);
+}
+
 async function main() {
   fs.mkdirSync(outDir, { recursive: true });
   const mode = process.argv[2] ?? "all";
@@ -465,6 +551,8 @@ async function main() {
     if (mode === "tiles" || mode === "all") await renderTiles(browser);
     if (mode === "shots" || mode === "all") await renderShots(browser);
     if (mode === "gif" || mode === "all") await renderGif(browser);
+    if (mode === "icons" || mode === "all") await renderIcons(browser);
+    if (mode === "promotion" || mode === "all") writePromotionSvg();
     if (mode === "video" || mode === "all") await renderWebm();
   } finally {
     await browser.close();
