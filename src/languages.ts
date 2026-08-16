@@ -5,7 +5,8 @@ const autoLanguage = "auto";
 
 let activeDict: MessageDict | undefined;
 let englishDict: MessageDict | undefined;
-const listeners: (() => void)[] = [];
+const listeners = new Set<() => void>();
+let chromeListenerAttached = false;
 
 /**
  * @reference https://developer.chrome.com/docs/extensions/reference/i18n/
@@ -56,7 +57,7 @@ async function loadDicts(locale: string | null): Promise<void> {
 }
 
 function notifyListeners(): void {
-  for (const listener of listeners) listener();
+  for (const listener of [...listeners]) listener();
 }
 
 /**
@@ -83,10 +84,14 @@ export async function setLanguage(value: string): Promise<void> {
  * @fn onLanguageChange
  * @brief Register a callback invoked whenever the active dictionary is replaced.
  * @param listener - Receives no arguments
- * @return void
+ * @return () => void - Releases this listener. The chrome listener installed by
+ *         initI18n stays for the page lifetime and fans out to this list.
  */
-export function onLanguageChange(listener: () => void): void {
-  listeners.push(listener);
+export function onLanguageChange(listener: () => void): () => void {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
 }
 
 /**
@@ -96,6 +101,11 @@ export function onLanguageChange(listener: () => void): void {
  */
 export async function initI18n(): Promise<void> {
   await loadDicts(normalizeLocale(await getLanguageSetting()));
+  if (chromeListenerAttached) {
+    notifyListeners();
+    return;
+  }
+  chromeListenerAttached = true;
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== "sync") return;
     const change = changes[languageKey];

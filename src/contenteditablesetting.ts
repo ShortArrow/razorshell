@@ -27,17 +27,35 @@ export async function saveContentEditableSetting(value: boolean): Promise<void> 
   await chrome.storage.sync.set({ [settingKey]: value });
 }
 
-/**
- * @fn subscribeContentEditableSetting
- * @brief Invoke the callback whenever the stored opt-in changes.
- * @param callback - Receives the new value
- * @return void
- */
-export function subscribeContentEditableSetting(callback: (value: boolean) => void): void {
+type SettingListener = (value: boolean) => void;
+
+const listeners = new Set<SettingListener>();
+let chromeListenerAttached = false;
+
+function attachChromeListener(): void {
+  if (chromeListenerAttached) return;
+  chromeListenerAttached = true;
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== "sync") return;
     const change = changes[settingKey];
     if (!change) return;
-    callback(change.newValue === true);
+    const value = change.newValue === true;
+    for (const listener of [...listeners]) listener(value);
   });
+}
+
+/**
+ * @fn subscribeContentEditableSetting
+ * @brief Invoke the callback whenever the stored opt-in changes.
+ * @param callback - Receives the new value
+ * @return () => void - Releases this callback. The module holds one chrome
+ *         listener for the page lifetime and fans out to its own list, so
+ *         repeated subscribe/unsubscribe cycles add nothing to chrome.
+ */
+export function subscribeContentEditableSetting(callback: SettingListener): () => void {
+  attachChromeListener();
+  listeners.add(callback);
+  return () => {
+    listeners.delete(callback);
+  };
 }

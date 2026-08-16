@@ -5,6 +5,7 @@ import {
   getLanguageSetting,
   getMessage,
   getUILanguage,
+  onLanguageChange,
   setLanguage,
 } from "../languages";
 import { Select } from "./select";
@@ -29,6 +30,9 @@ export function LangApp() {
       setSetting(await getLanguageSetting());
     };
     void fetchLanguages();
+    return onLanguageChange(() => {
+      void getLanguageSetting().then(setSetting);
+    });
   }, []);
 
   const applyLanguage = (value: string) => {

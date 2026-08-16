@@ -19,6 +19,7 @@
  */
 import { test, expect, chromium, type BrowserContext, type Page } from "@playwright/test";
 import { parseSettings } from "../../src/settingsio";
+import { availableLocales } from "../../src/i18n";
 import http from "node:http";
 import type { AddressInfo } from "node:net";
 import fs from "node:fs";
@@ -347,7 +348,7 @@ test.describe("content script keybindings", () => {
     await page.evaluate(() => document.getElementById("rs-dynamic-input")?.remove());
   });
 
-  test("an input inside a closed shadow root is out of reach, so Ctrl+a stays the native select-all", async () => {
+  test("an input inside a closed shadow root is out of reach, so Ctrl+a stays the native select-all @C1.11", async () => {
     await page.evaluate(() => {
       const host = document.createElement("div");
       const root = host.attachShadow({ mode: "closed" });
@@ -406,7 +407,7 @@ test.describe("content script keybindings", () => {
     expect(await caretState(pwd)).toEqual({ start: 0, end: 0 });
   });
 
-  test("email input keeps native select-all", async () => {
+  test("email input keeps native select-all @C1.11", async () => {
     await page.evaluate(() => {
       const el = document.createElement("input");
       el.type = "email";
@@ -497,6 +498,46 @@ test.describe("options page", () => {
     await optionsPage.locator('[data-testid="language-select"]').selectOption("auto");
     await optionsPage.waitForTimeout(700);
     expect(await tooltipHas("Move cursor to the beginning")).toBe(true);
+  });
+
+  /**
+   * The test above proves the override mechanism on one locale. This one proves
+   * the packaging: every locale in `availableLocales` must have a dictionary
+   * that actually reaches the DOM. A locale whose directory is missing from the
+   * build, or whose json fails to parse, falls back to english and renders a
+   * plausible page — so the assertion compares against the locale's own
+   * `messages.json` read from disk rather than against a hardcoded string.
+   *
+   * `tooltip_match_type` is the probe key: it sits on the add-rule form, which
+   * renders whatever the url policy currently holds, so this test does not
+   * depend on the rules the surrounding blocks leave behind. It restores "auto"
+   * at the end, which is the state the following describes expect.
+   */
+  test("every packaged locale reaches the tooltips @C1.12", async () => {
+    const localesDir = path.resolve(here, "../../src/_locales");
+    const messageFor = (locale: string) => {
+      const raw = fs.readFileSync(path.join(localesDir, locale, "messages.json"), "utf8");
+      return (JSON.parse(raw) as Record<string, { message: string }>).tooltip_match_type.message;
+    };
+    const tooltips = () =>
+      optionsPage.evaluate(() =>
+        Array.from(document.querySelectorAll<HTMLElement>("[data-tip]")).map(
+          (el) => el.dataset.tip ?? "",
+        ),
+      );
+
+    for (const locale of availableLocales) {
+      await optionsPage.locator('[data-testid="language-select"]').selectOption(locale);
+      await optionsPage.waitForTimeout(700);
+      expect(await tooltips(), `locale ${locale}`).toContain(messageFor(locale));
+      await expect(optionsPage.locator('[data-testid="effective-language"]')).toContainText(
+        locale,
+      );
+    }
+
+    await optionsPage.locator('[data-testid="language-select"]').selectOption("auto");
+    await optionsPage.waitForTimeout(700);
+    expect(await tooltips()).toContain(messageFor("en"));
   });
 });
 
@@ -1181,6 +1222,65 @@ test.describe("settings import and export", () => {
       }),
     );
     await optionsPage.waitForTimeout(500);
+  });
+});
+
+/**
+ * What `chrome.storage.onChanged` does about a write that changes nothing.
+ *
+ * This is a characterization test, not a specification: the expected value is
+ * whatever real Chrome does, measured rather than chosen. Everything downstream
+ * that reacts to storage — the content script's policy re-evaluation, the
+ * options page re-render, the language dictionary reload in `initI18n` — is
+ * driven by this event, so whether a redundant `set` wakes them is a platform
+ * fact the code rests on, and the mock has to match it or the unit suite tests
+ * a browser that does not exist.
+ *
+ * Measured on Chromium via `channel: "chromium"`: writing the key once fires
+ * once, and writing a deep-equal value again fires NOT AT ALL. Chrome compares
+ * the serialized old and new values and suppresses the notification when they
+ * are equal, so the count stays at 1 across all three writes. A fresh object
+ * that is merely deep-equal is suppressed the same way — identity does not
+ * enter into it, only the serialized value.
+ *
+ * The consequence for the code under test: a write is not a reliable way to
+ * provoke a listener. Anything that must re-run on demand needs a real value
+ * change or a direct call, never a redundant `set` used as a nudge.
+ *
+ * Should this ever go red, Chrome's behaviour changed — reopen R1 and update
+ * the mock in step rather than adjusting the number to make it pass.
+ */
+test.describe("storage.onChanged characterization", () => {
+  test("a redundant write fires no event", async () => {
+    const counts = await optionsPage.evaluate(async () => {
+      const probeKey = "__razorshell_probe";
+      let fired = 0;
+      const listener = (changes: Record<string, unknown>, area: string) => {
+        if (area === "sync" && probeKey in changes) fired += 1;
+      };
+      chrome.storage.onChanged.addListener(listener);
+      const settle = () => new Promise((resolve) => setTimeout(resolve, 400));
+
+      await chrome.storage.sync.set({ [probeKey]: { tag: "x" } });
+      await settle();
+      const afterFirst = fired;
+
+      await chrome.storage.sync.set({ [probeKey]: { tag: "x" } });
+      await settle();
+      const afterIdentical = fired;
+
+      await chrome.storage.sync.set({ [probeKey]: { tag: "x" } });
+      await settle();
+      const afterDeepEqual = fired;
+
+      chrome.storage.onChanged.removeListener(listener);
+      await chrome.storage.sync.remove(probeKey);
+      return { afterFirst, afterIdentical, afterDeepEqual };
+    });
+
+    console.log(`R1 storage.onChanged counts: ${JSON.stringify(counts)}`);
+
+    expect(counts).toEqual({ afterFirst: 1, afterIdentical: 1, afterDeepEqual: 1 });
   });
 });
 

@@ -41,17 +41,35 @@ export async function saveUrlPolicy(policy: UrlPolicy): Promise<void> {
   await chrome.storage.sync.set({ [policyKey]: policy });
 }
 
-/**
- * @fn subscribeUrlPolicy
- * @brief Invoke the callback whenever the stored policy changes.
- * @param callback - Receives the new policy
- * @return void
- */
-export function subscribeUrlPolicy(callback: (policy: UrlPolicy) => void): void {
+type PolicyListener = (policy: UrlPolicy) => void;
+
+const listeners = new Set<PolicyListener>();
+let chromeListenerAttached = false;
+
+function attachChromeListener(): void {
+  if (chromeListenerAttached) return;
+  chromeListenerAttached = true;
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== "sync") return;
     const change = changes[policyKey];
     if (!change) return;
-    callback((change.newValue as UrlPolicy | undefined) ?? defaultUrlPolicy);
+    const policy = (change.newValue as UrlPolicy | undefined) ?? defaultUrlPolicy;
+    for (const listener of [...listeners]) listener(policy);
   });
+}
+
+/**
+ * @fn subscribeUrlPolicy
+ * @brief Invoke the callback whenever the stored policy changes.
+ * @param callback - Receives the new policy
+ * @return () => void - Releases this callback. The module holds one chrome
+ *         listener for the page lifetime and fans out to its own list, so
+ *         repeated subscribe/unsubscribe cycles add nothing to chrome.
+ */
+export function subscribeUrlPolicy(callback: PolicyListener): () => void {
+  attachChromeListener();
+  listeners.add(callback);
+  return () => {
+    listeners.delete(callback);
+  };
 }

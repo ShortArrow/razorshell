@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ChevronDownIcon, ChevronUpIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { getMessage } from '../languages';
-import { loadUrlPolicy, saveUrlPolicy } from '../urlpolicy';
+import { loadUrlPolicy, saveUrlPolicy, subscribeUrlPolicy } from '../urlpolicy';
 import { MatchType, RuleAction, UrlPolicy, UrlRule, defaultUrlPolicy, findMatchingRuleIndex } from '../urlrules';
 import { Select } from './select';
 
@@ -53,6 +53,7 @@ export function UrlApp() {
       setPolicy(await loadUrlPolicy());
     };
     void fetchPolicy();
+    return subscribeUrlPolicy(setPolicy);
   }, []);
 
   const applyPolicy = (next: UrlPolicy) => {

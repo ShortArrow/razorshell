@@ -13,9 +13,7 @@ import { ConfigApp } from './ui/config';
 function OptionsUI() {
   const [generation, bump] = useReducer((value: number) => value + 1, 0);
 
-  useEffect(() => {
-    onLanguageChange(bump);
-  }, []);
+  useEffect(() => onLanguageChange(bump), []);
 
   return (
     <>

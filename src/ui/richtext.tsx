@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react';
-import { loadContentEditableSetting, saveContentEditableSetting } from '../contenteditablesetting';
+import {
+  loadContentEditableSetting,
+  saveContentEditableSetting,
+  subscribeContentEditableSetting,
+} from '../contenteditablesetting';
 import { getMessage } from '../languages';
 
 export function RichTextApp() {
@@ -11,6 +15,7 @@ export function RichTextApp() {
       setEnabled(await loadContentEditableSetting());
     };
     void fetchSetting();
+    return subscribeContentEditableSetting(setEnabled);
   }, []);
 
   const apply = (value: boolean) => {

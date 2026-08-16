@@ -31,19 +31,20 @@ the commit under assessment.
 | A4 | Writes stay inside the sync quotas: 8 KB per item, 100 KB total, and Chrome's write-rate limits |
 | A5 | No other code writes this extension's `sync` keys |
 | A6 | Editable fields are `input` of type text, search, url, tel or password, `textarea`, and — behind the opt-in — `contenteditable`, including open shadow roots and same-process iframes |
-| A7 | For the `auto` language setting, the browser UI language is one the packaged locales cover (see R3) |
+| A7 | For the `auto` language setting, the browser UI language is one the packaged locales cover (see R2) |
 
 ## Boundary
 
 Nothing is claimed about: the Google-account sync transport (the
 suites exercise `storage.sync` as persistence inside one profile;
-cross-device merge is never run), closed shadow roots, `email` and
-`number` inputs (the platform exposes no selection API there),
-branded Chrome Stable/Beta 137 and later (no unpacked loading),
-browser or OS crashes, interference from other extensions, and the
-Storybook dev preview during manual story-to-story navigation (the
-preview reloads itself when a play function outlives a navigation;
-assurance rests on the vitest and CI runs, not on the panel).
+cross-device merge is never run), branded Chrome Stable/Beta 137 and
+later (no unpacked loading), browser or OS crashes, interference
+from other extensions, and the Storybook dev preview during manual
+story-to-story navigation (the preview reloads itself when a play
+function outlives a navigation; assurance rests on the vitest and CI
+runs, not on the panel). Fields the extension cannot reach — closed
+shadow roots, `email` and `number` inputs — are not out of scope but
+a claim of their own: C1.11 says they keep their native behavior.
 
 ## Hazards the suites are built against
 
@@ -67,6 +68,8 @@ file the importer refuses; a rendering readable in one theme only.
 | C1.8 | Every export re-parses through the importer |
 | C1.9 | A refused write is shown beside the control and the view rolls back to what storage kept, in every settings section |
 | C1.10 | The options page renders both themes with zero axe violations and zero undecided results |
+| C1.11 | Fields the extension cannot reach — closed shadow roots, `email` inputs — keep their native behavior instead of dying half-handled |
+| C1.12 | The language override resolves every packaged locale's tooltips, and a failed dictionary fetch falls back to the browser's own messages |
 
 ## Traceability
 
@@ -96,7 +99,18 @@ Frozen observations; each holds only for its date.
 - 2026-08-16, mutation check: replacing per-row reset with reset-all
   turned the ResetRow story red; rewriting the import into per-key
   writes turned C1.6's e2e test red in real Chrome. Both reverted.
-  No other test has had a sensitivity check (R7).
+- 2026-08-16, further deliberate-violation checks, all reverted after
+  going red: the traceability gate in both directions (a removed tag,
+  a fabricated tag), the locale sweep against the wrong locale's
+  strings, the dictionary fallback blanked, one store's unsubscribe
+  made a no-op, a bare storage `set` against the floating-promises
+  rule, and a story dropped from the screenshot lists. Tests outside
+  these records keep R4 open.
+- 2026-08-16, real Chrome fires no `storage.onChanged` for a write
+  whose value serializes to what the key already holds — measured
+  counts 1/1/1 across an initial write, an identical rewrite and a
+  deep-equal fresh object, reproduced twice. A redundant write cannot
+  be used to wake listeners. The chrome mock mirrors this.
 - 2026-08-16, Ctrl+Shift+9 under Playwright's `press` reports
   `KeyboardEvent.key === "9"`, not `"("` — the stored-chord
   assertions depend on this.
@@ -112,10 +126,7 @@ planned section is the current answer, not a test.
 
 | # | Not assured |
 |---|---|
-| R1 | Whether real `storage.onChanged` fires on a set whose value is unchanged; the mock always notifies, and code relying on either behavior would pass the stories |
-| R2 | Chrome's write-rate limits (`MAX_WRITE_OPERATIONS_*`); the only refused real write the suites produce is one oversized item through the import path |
-| R3 | The `auto` language under a non-English browser UI; every suite runs an English Chromium, so `auto` always resolves to English in tests |
-| R4 | Locale dictionary loading beyond `ja`: the fetch-failure fallback and the other packaged locales are unexercised, and the dictionary layer is unreachable from stories |
-| R5 | Storage change listeners are registered and never removed; growth across options-page remounts is invisible to every suite |
-| R6 | Concurrent edits from two devices merging through account sync |
-| R7 | Test sensitivity outside the two mutation-checked invariants: a test that cannot fail would count as evidence here without being any |
+| R1 | Chrome's write-rate limits (`MAX_WRITE_OPERATIONS_*`); the only refused real write the suites produce is one oversized item through the import path |
+| R2 | The `auto` language under a non-English browser UI; every suite runs an English Chromium, so `auto` always resolves to English in tests |
+| R3 | Concurrent edits from two devices merging through account sync |
+| R4 | Test sensitivity outside the deliberate-violation checks the measurement records list: a test that cannot fail would count as evidence here without being any |

@@ -18,12 +18,14 @@
  *          - `sync` and `local` are separate stores, and a change notification
  *            carries the areaName of the area that was written.
  *
- *          Two behaviours are deliberately not modelled. A `set` that writes a
- *          key its current value still notifies listeners — real chrome's
- *          behaviour here is unverified, so the mock keeps what the stories were
- *          written against rather than guessing. And the armed-failure queue is
- *          the sync area's alone: `local` writes always succeed, which keeps the
- *          arming unambiguous for the options UI, which only writes to sync.
+ *          - a `set` that rewrites a key with a value serializing to what it
+ *            already holds notifies no listener, matching real chrome as
+ *            measured by the e2e characterization test: only the serialized
+ *            value decides, never object identity.
+ *
+ *          One deliberate narrowing: the armed-failure queue is the sync
+ *          area's alone. `local` writes always succeed, which keeps the arming
+ *          unambiguous for the options UI, which only writes to sync.
  */
 
 import englishMessages from '../src/_locales/en/messages.json';
@@ -79,11 +81,12 @@ function writeTo(
 ): void {
   const changes: Record<string, chrome.storage.StorageChange> = {};
   for (const [key, value] of Object.entries(items)) {
+    if (key in store && JSON.stringify(store[key]) === JSON.stringify(value)) continue;
     const stored = clone(value);
     changes[key] = { oldValue: clone(store[key]), newValue: clone(stored) };
     store[key] = stored;
   }
-  notify(area, changes);
+  if (Object.keys(changes).length > 0) notify(area, changes);
 }
 
 function deleteFrom(

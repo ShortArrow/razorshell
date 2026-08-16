@@ -46,6 +46,8 @@ function reapplyUrlPolicy(): void {
 // The console is this script's only surface: an init that fails silently
 // leaves the keybindings inert with nothing to diagnose from.
 loadUrlPolicy({ migrate: window === window.top }).then(applyUrlPolicy).catch(console.error);
+// This script lives as long as the page, so both subscriptions are held until
+// the frame goes away and the returned release functions are deliberately dropped.
 subscribeUrlPolicy(applyUrlPolicy);
 document.addEventListener("razorshell-navigate", reapplyUrlPolicy);
 window.addEventListener("popstate", reapplyUrlPolicy);

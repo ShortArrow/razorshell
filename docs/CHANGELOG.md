@@ -126,6 +126,17 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   typecheck, lint and the vitest suites into one command, and
   CLAUDE.md records the commands, test structure and conventions an
   agent session needs.
+- Three assurance residuals became tests, and one became a product
+  fix: real Chrome was measured to fire no storage change event for
+  a redundant write (the story mock now mirrors that), all eleven
+  locales are driven through the language select against their
+  packaged strings with the dictionary-fetch fallback pinned in
+  unit tests, and the storage subscriptions — which could never be
+  released and grew with every options-page remount — now return an
+  unsubscribe that the components call on unmount, held by contract
+  tests. Wiring those subscriptions also made the url, rich text and
+  language sections follow storage changes they previously ignored
+  until a reload.
 - Two more silent gaps have gates: every story in the Storybook
   build must be screenshot-captured or listed as excluded with the
   rendering it repeats, and every `getMessage` key in src/ must

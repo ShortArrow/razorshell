@@ -13,7 +13,8 @@ const overridesKey = "keymapOverrides";
 export type KeymapOverrides = Record<string, Chord>;
 
 let guiOverrides: KeymapOverrides = {};
-const listeners: (() => void)[] = [];
+const listeners = new Set<() => void>();
+let chromeListenerAttached = false;
 
 /**
  * @fn getActiveKeymap
@@ -34,7 +35,7 @@ export function getKeymapOverrides(): KeymapOverrides {
 }
 
 function notifyListeners(): void {
-  for (const listener of listeners) listener();
+  for (const listener of [...listeners]) listener();
 }
 
 async function loadOverrides(): Promise<void> {
@@ -46,10 +47,14 @@ async function loadOverrides(): Promise<void> {
  * @fn onKeymapChange
  * @brief Register a callback invoked whenever the active keymap is replaced.
  * @param listener - Receives no arguments
- * @return void
+ * @return () => void - Releases this listener. The chrome listener installed by
+ *         initKeymap stays for the page lifetime and fans out to this list.
  */
-export function onKeymapChange(listener: () => void): void {
-  listeners.push(listener);
+export function onKeymapChange(listener: () => void): () => void {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
 }
 
 /**
@@ -59,6 +64,11 @@ export function onKeymapChange(listener: () => void): void {
  */
 export async function initKeymap(): Promise<void> {
   await loadOverrides();
+  if (chromeListenerAttached) {
+    notifyListeners();
+    return;
+  }
+  chromeListenerAttached = true;
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== "sync") return;
     const change = changes[overridesKey];

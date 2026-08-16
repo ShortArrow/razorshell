@@ -83,8 +83,9 @@ export function KeymapApp() {
       setKeymap(getActiveKeymap());
       setOverrides(getKeymapOverrides());
     };
-    onKeymapChange(refresh);
+    const release = onKeymapChange(refresh);
     refresh();
+    return release;
   }, []);
 
   useEffect(() => {
