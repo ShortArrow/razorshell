@@ -52,8 +52,11 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   checks that a denied SPA route flips the toolbar badge and that
   the extension recovers after each rejected input.
 - docs/assurance.md states the claim the suites support — property,
-  assumptions, boundary, acceptance criterion — maps each sub-claim
-  to the test that would refute it, and lists what remains unassured.
+  assumptions, boundary, acceptance criterion — and lists what
+  remains unassured. The claim-to-test mapping lives in the suites
+  as `@C1.x` tags, and a gate test fails when a sub-claim has no
+  tagged evidence or a tag names a dropped claim, so the document
+  and the suites cannot drift apart silently.
 - The GUI-to-storage contract is exercised against the real
   extension: URL rules are added, reordered and deleted through the
   options page with the stored policy and the content script checked

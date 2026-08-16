@@ -38,7 +38,7 @@ describe("serializeSettings", () => {
   });
 });
 
-describe("parseSettings rejects", () => {
+describe("parseSettings rejects @C1.7", () => {
   test("invalid json", () => {
     expectError("{nope", "JSON");
   });

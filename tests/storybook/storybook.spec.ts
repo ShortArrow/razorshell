@@ -38,6 +38,9 @@
  * contrast, an undecided result is about which properties axe can read rather
  * than their values, so one theme's pass covers both and the run stays at one
  * axe execution per story per theme.
+ *
+ * Evidence for @C1.10, at file level: the tests are generated from `storyIds`,
+ * so no individual title exists to carry the tag.
  */
 import { test, expect } from "@playwright/test";
 import { createRequire } from "node:module";

@@ -50,6 +50,7 @@ export const SwitchLanguage: Story = {
 };
 
 export const SaveFailure: Story = {
+  tags: ['@C1.9'],
   decorators: [seededStory({})],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

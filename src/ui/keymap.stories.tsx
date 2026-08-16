@@ -109,6 +109,7 @@ export const ModifierOnlyKeepsCapturing: Story = {
 };
 
 export const ConflictThenRecover: Story = {
+  tags: ['@C1.5'],
   loaders: [() => loadOverrides({})],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -139,6 +140,7 @@ export const ConflictThenRecover: Story = {
 };
 
 export const SaveFailure: Story = {
+  tags: ['@C1.9'],
   loaders: [() => loadOverrides({})],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -166,6 +168,7 @@ const twoOverrides: Record<string, Chord> = {
 };
 
 export const ResetRow: Story = {
+  tags: ['@C1.5'],
   loaders: [() => loadOverrides(twoOverrides)],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

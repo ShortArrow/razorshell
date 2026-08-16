@@ -249,7 +249,7 @@ test.describe("content script keybindings", () => {
     expect(consoleLogs.some((t) => t.includes("extension razorshell loaded"))).toBe(true);
   });
 
-  test("cursor motion in a text input", async () => {
+  test("cursor motion in a text input @C1.1", async () => {
     const input = page.locator('input[type="text"]').first();
     await input.click();
     await page.keyboard.press("End");
@@ -290,7 +290,7 @@ test.describe("content script keybindings", () => {
     });
   });
 
-  test("line deletion in a text input", async () => {
+  test("line deletion in a text input @C1.1", async () => {
     const input = page.locator('input[type="text"]').first();
     await page.keyboard.press("Control+a");
     for (let i = 0; i < 5; i++) await page.keyboard.press("Control+f");
@@ -303,7 +303,7 @@ test.describe("content script keybindings", () => {
     expect(await fieldState(input)).toEqual({ value: "o", start: 0, end: 0 });
   });
 
-  test("textarea operates on the current line", async () => {
+  test("textarea operates on the current line @C1.1", async () => {
     const ta = page.locator("textarea");
     await ta.evaluate((el: HTMLTextAreaElement) => {
       el.value = "first line\nsecond line\nthird";
@@ -326,7 +326,7 @@ test.describe("content script keybindings", () => {
     });
   });
 
-  test("dynamically added input is covered", async () => {
+  test("dynamically added input is covered @C1.1", async () => {
     await page.evaluate(() => {
       const dyn = document.createElement("input");
       dyn.type = "text";
@@ -380,7 +380,7 @@ test.describe("content script keybindings", () => {
     });
   });
 
-  test("input inside an iframe is covered", async () => {
+  test("input inside an iframe is covered @C1.1", async () => {
     await page.evaluate((base) => {
       const frame = document.createElement("iframe");
       frame.src = `${base}/frame`;
@@ -396,7 +396,7 @@ test.describe("content script keybindings", () => {
     expect(await caretState(frameInput)).toEqual({ start: 0, end: 0 });
   });
 
-  test("password input is covered", async () => {
+  test("password input is covered @C1.1", async () => {
     const pwd = page.locator('input[type="password"]');
     await pwd.evaluate((el: HTMLInputElement) => {
       el.focus();
@@ -500,7 +500,7 @@ test.describe("options page", () => {
   });
 });
 
-test.describe("keymap rebinding", () => {
+test.describe("keymap rebinding @C1.5", () => {
   const currentChord = (id: string) =>
     optionsPage
       .locator(`[data-testid="current-${id}"]`)
@@ -608,7 +608,7 @@ test.describe("keymap rebinding", () => {
   });
 });
 
-test.describe("url policy", () => {
+test.describe("url policy @C1.3", () => {
   test("a deny rule disables the keybindings", async () => {
     await setPolicy({
       defaultAction: "allow",
@@ -690,7 +690,7 @@ test.describe("url policy", () => {
     await setPolicy({ defaultAction: "allow", rules: [] });
   });
 
-  test("a same-document navigation re-evaluates the policy", async () => {
+  test("a same-document navigation re-evaluates the policy @C1.4", async () => {
     await setPolicy({
       defaultAction: "allow",
       rules: [{ pattern: `${origin}/denied-spa`, matchType: "exact", action: "deny" }],
@@ -732,7 +732,7 @@ test.describe("url policy", () => {
  * test and leaves exactly that state behind, so the blocks after it are
  * unaffected.
  */
-test.describe("url rules edited through the gui", () => {
+test.describe("url rules edited through the gui @C1.3", () => {
   // Both selects are labelled only by their tooltip message, so the accessible
   // name is the handle the real DOM offers. Matching a stable fragment of it
   // keeps the locator readable and survives rewording around it.
@@ -809,7 +809,7 @@ test.describe("url rules edited through the gui", () => {
 });
 
 test.describe("event trust and the inspector", () => {
-  test("synthetic key events are ignored", async () => {
+  test("synthetic key events are ignored @C1.2", async () => {
     await addPageKeydownListener("cancelCtrlK");
     await seedTextInput("hello", 5);
     await page.evaluate(() => {
@@ -899,7 +899,7 @@ test.describe("event trust and the inspector", () => {
   });
 });
 
-test.describe("rich text editors", () => {
+test.describe("rich text editors @C1.1", () => {
   const setCaret = (offset: number) =>
     page.evaluate((o) => {
       const div = document.querySelector<HTMLElement>('[contenteditable="true"]')!;
@@ -996,7 +996,7 @@ test.describe("rich text editors", () => {
 });
 
 test.describe("settings import and export", () => {
-  test("export carries the full current state", async () => {
+  test("export carries the full current state @C1.8", async () => {
     await optionsPage.evaluate(() =>
       chrome.storage.sync.set({
         keymapOverrides: { move_cursor_to_the_beginning: { key: "m", ctrl: true } },
@@ -1048,7 +1048,7 @@ test.describe("settings import and export", () => {
     await expect(optionsPage.locator('[data-testid="effective-language"]')).toContainText("fr");
   });
 
-  test("an unsupported version is rejected with the reason", async () => {
+  test("an unsupported version is rejected with the reason @C1.7", async () => {
     await optionsPage.locator('[data-testid="config-text"]').fill('{"version":2}');
     await optionsPage.locator('[data-testid="config-apply"]').click();
     await optionsPage.waitForTimeout(300);
@@ -1069,7 +1069,7 @@ test.describe("settings import and export", () => {
    * the whole parse-and-store path. Any value differing from current state
    * would drift into the restart assertions below.
    */
-  test("malformed json is rejected and the page recovers", async () => {
+  test("malformed json is rejected and the page recovers @C1.7", async () => {
     const before = await optionsPage.evaluate(() => chrome.storage.sync.get(null));
 
     await optionsPage.locator('[data-testid="config-text"]').fill("{nope");
@@ -1089,7 +1089,7 @@ test.describe("settings import and export", () => {
     expect(await optionsPage.evaluate(() => chrome.storage.sync.get(null))).toEqual(before);
   });
 
-  test("a policy past the sync quota reports the failure and is not stored", async () => {
+  test("a policy past the sync quota reports the failure and is not stored @C1.7", async () => {
     const oversized = await optionsPage.evaluate(() =>
       JSON.stringify({
         version: 1,
@@ -1139,7 +1139,7 @@ test.describe("settings import and export", () => {
    * `ja` and the single example.com rule — so the policy is re-seeded after the
    * refusal exactly as the quota test does.
    */
-  test("a failing import applies none of its keys", async () => {
+  test("a failing import applies none of its keys @C1.6", async () => {
     expect(await optionsPage.evaluate(() => chrome.storage.sync.get("language"))).toEqual({
       language: "ja",
     });
@@ -1184,7 +1184,7 @@ test.describe("settings import and export", () => {
   });
 });
 
-test.describe("persistence across a browser restart", () => {
+test.describe("persistence across a browser restart @C1.5", () => {
   let restartedOptions: Page;
   let restartedPage: Page;
 

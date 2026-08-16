@@ -91,7 +91,7 @@ describe("dispatchEditableKey", () => {
   });
 });
 
-describe("keydown during IME composition is left alone", () => {
+describe("keydown during IME composition is left alone @C1.2", () => {
   function composingCtrlKeydown(key: string): KeyboardEvent {
     const event = new KeyboardEvent("keydown", { key, ctrlKey: true, cancelable: true });
     Object.defineProperty(event, "isComposing", { value: true });

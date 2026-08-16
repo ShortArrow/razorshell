@@ -83,6 +83,7 @@ export const SystemDefault: Story = {
 };
 
 export const SaveFailure: Story = {
+  tags: ['@C1.9'],
   decorators: [paintedThemes, seededStory({})],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

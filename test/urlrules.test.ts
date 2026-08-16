@@ -8,7 +8,7 @@ import {
   UrlPolicy,
 } from "../src/urlrules";
 
-describe("matchesRule", () => {
+describe("matchesRule @C1.3", () => {
   test("exact matches the whole url only", () => {
     const rule = { pattern: "https://example.com/a", matchType: "exact", action: "deny" } as const;
     expect(matchesRule("https://example.com/a", rule)).toBe(true);
@@ -64,7 +64,7 @@ describe("matchesRule", () => {
   });
 });
 
-describe("resolveAction: first match wins, then default policy", () => {
+describe("resolveAction: first match wins, then default policy @C1.3", () => {
   const policy: UrlPolicy = {
     defaultAction: "allow",
     rules: [

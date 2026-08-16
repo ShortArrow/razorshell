@@ -106,6 +106,7 @@ const oneRule: UrlPolicy = {
 };
 
 export const SaveFailure: Story = {
+  tags: ['@C1.9'],
   decorators: [seededStory({ urlPolicy: oneRule })],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

@@ -1,10 +1,12 @@
 # Assurance case
 
 What the test suites assure, under which assumptions, up to which
-boundary, and what risk remains. This is a living document: when a
-suite or a claim changes, this file changes with it. Test names are
-the stable handles here; counts and timings are not recorded because
-they rot.
+boundary, and what risk remains. The suites hold every claim they
+can express; this file holds the remainder — the claim and its
+conditions, the hazard inventory, the out-of-scope line, frozen
+measurement records, and residual risk. The claim-to-test mapping
+lives in the suites as tags and is checked by a test, not repeated
+here.
 
 ## Claim
 
@@ -51,36 +53,53 @@ dirtying storage; a policy change not reaching an open tab; the
 story-layer chrome mock diverging from the real API; an exported
 file the importer refuses; a rendering readable in one theme only.
 
-## Evidence
+## Sub-claims
 
-Each sub-claim names the suite and the test or story that would fail
-if it broke. Commands: `pnpm test` (unit + stories), `pnpm test:e2e`
-(real extension in Playwright Chromium), `pnpm test:storybook`
-(screenshots and axe, both themes, win32 baselines).
-
-| Sub-claim | Evidence |
+| Id | Property |
 |---|---|
-| C1.1 Keybindings move the caret and selection as documented, in inputs, textareas, contenteditable, open shadow roots, iframes and dynamically added fields | e2e: cursor motion, line deletion, textarea, dynamically added input, iframe, password, rich text describes |
-| C1.2 Untrusted synthetic events and IME composition never trigger a binding | e2e: "synthetic key events are ignored"; unit: isComposing guards |
-| C1.3 URL rules apply first-match with the default action as fallback, edited through the real GUI: each add, reorder, default-action change and delete lands in real storage and flips the open tab's behavior and badge | unit: urlrules; e2e: "url policy" and "url rules edited through the gui" describes |
-| C1.4 Same-document navigations re-evaluate the policy | e2e: "a same-document navigation re-evaluates the policy" |
-| C1.5 A rebind reaches storage in full chord form, open tabs, and a restarted browser; a conflict is refused without touching storage; per-row reset clears only its row; reset-all empties storage and unbinds the chord in an open tab | e2e: keymap rebinding and restart describes; stories: ResetRow, ConflictThenRecover, SaveFailure |
-| C1.6 An import is atomic — a refused write applies none of its keys, in the mock and in real Chrome | e2e: "a failing import applies none of its keys"; story: ImportAtomicity |
-| C1.7 Malformed or invalid input is rejected with the reason, leaves storage identical, and a corrected apply then succeeds | unit: settingsio rejects; e2e: malformed json test with full-storage snapshot compare; story: ImportRecovery |
-| C1.8 Every export re-parses through the importer | e2e: export test's parseSettings round trip |
-| C1.9 A refused write is shown beside the control and the view rolls back to what storage kept, in every settings section | stories: SaveFailure in url, keymap, theme, richtext, language, config |
-| C1.10 The options page renders both themes with zero axe violations and zero undecided results | storybook screenshot suite, light and dark passes |
+| C1.1 | Keybindings move the caret and selection as documented, in inputs, textareas, opt-in contenteditable, open shadow roots, iframes and dynamically added fields, and the opt-in itself reaches storage and open tabs |
+| C1.2 | Untrusted synthetic events and IME composition never trigger a binding |
+| C1.3 | URL rules apply first-match with the default action as fallback, and editing them through the real GUI — add, reorder, default-action change, delete — lands in real storage and flips the open tab's behavior and badge |
+| C1.4 | Same-document navigations re-evaluate the policy |
+| C1.5 | A rebind reaches storage in full chord form, open tabs, and a restarted browser; a conflict is refused without touching storage; per-row reset clears only its row; reset-all empties storage and unbinds the chord in an open tab |
+| C1.6 | An import is atomic: a refused write applies none of its keys, in the mock and in real Chrome |
+| C1.7 | Malformed or invalid input is rejected with the reason, leaves storage identical, and a corrected apply then succeeds |
+| C1.8 | Every export re-parses through the importer |
+| C1.9 | A refused write is shown beside the control and the view rolls back to what storage kept, in every settings section |
+| C1.10 | The options page renders both themes with zero axe violations and zero undecided results |
 
-Two of these were checked for sensitivity by mutation: breaking
-per-row reset into reset-all turns ResetRow red, and turning the
-import into per-key writes turns C1.6's e2e test red in real Chrome.
-The remaining tests have not had that check (R7).
+## Traceability
+
+The tests are the evidence, and they carry the mapping themselves: a
+test or story supporting a sub-claim is tagged `@C1.x` — in its title
+for Playwright and vitest, in its `tags` array for stories, at file
+level where one spec generates its tests. This file does not repeat
+the mapping; `test/assurance.test.ts` reads the sub-claim ids from
+the table above, scans the suites for tags, and fails when a claim
+has no tagged evidence or a tag names a claim that no longer exists.
+`rg "@C1\." test tests src` prints the current matrix.
+
+Suite commands: `pnpm test` (unit + stories), `pnpm test:e2e` (real
+extension in Playwright Chromium), `pnpm test:storybook`
+(screenshots and axe, both themes, win32 baselines).
 
 The stories run against an in-memory chrome mock that structured-
 clones values, keeps `local` and `sync` as separate areas, and omits
 unstored keys from string-form `get`, matching the real API on every
 point a divergence was found. What the mock is known not to settle
 is listed under residual risk.
+
+## Measurement records
+
+Frozen observations; each holds only for its date.
+
+- 2026-08-16, mutation check: replacing per-row reset with reset-all
+  turned the ResetRow story red; rewriting the import into per-key
+  writes turned C1.6's e2e test red in real Chrome. Both reverted.
+  No other test has had a sensitivity check (R7).
+- 2026-08-16, Ctrl+Shift+9 under Playwright's `press` reports
+  `KeyboardEvent.key === "9"`, not `"("` — the stored-chord
+  assertions depend on this.
 
 ## Verification and validation
 

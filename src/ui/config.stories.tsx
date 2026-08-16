@@ -20,6 +20,7 @@ export const Default: Story = {
 const importedKeys = ['urlPolicy', 'keymapOverrides', 'language', 'theme', 'enableContentEditable'];
 
 export const ImportError: Story = {
+  tags: ['@C1.7'],
   decorators: [seededStory({})],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -40,6 +41,7 @@ export const ImportError: Story = {
 };
 
 export const ImportRecovery: Story = {
+  tags: ['@C1.7'],
   decorators: [seededStory({})],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -63,6 +65,7 @@ export const ImportRecovery: Story = {
 };
 
 export const ImportAtomicity: Story = {
+  tags: ['@C1.6'],
   decorators: [seededStory({})],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -121,6 +124,7 @@ export const ChooseFile: Story = {
 };
 
 export const SaveFailure: Story = {
+  tags: ['@C1.9'],
   decorators: [seededStory({ language: 'auto' })],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
