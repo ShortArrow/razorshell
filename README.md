@@ -6,9 +6,13 @@ This is a browser extension that adds bash shell-like keyboard shortcuts to text
 
 ![main image](./image/razorshell.svg)
 
-![Each chord moving the caret and deleting lines in the options test area](./image/demo.gif)
+<p align="center">
+  <img src="./image/demo.gif" alt="Each chord moving the caret and deleting lines in the options test area">
+</p>
 
-[▶ Full demo video (webm, 20s): test area, URL policy probe, rebinding](./image/demo.webm)
+<p align="center">
+  <a href="./image/demo.webm">▶ Full demo video (webm, 20s): test area, URL policy probe, rebinding</a>
+</p>
 
 ## Features
 

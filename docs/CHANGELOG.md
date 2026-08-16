@@ -6,6 +6,15 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ## [Unreleased]
 
+### Changed
+
+- Every shipped PNG — the four extension icons and the README banner
+  — regenerates from its committed SVG source through the asset
+  generator, and image/promotion.svg is written from the same
+  palette and typography as the promo tiles, so no image depends on
+  a manual export and the store art cannot drift from the tiles. The
+  README demo media are centered.
+
 ## [0.0.3] - 2026-08-16
 
 ### Added
