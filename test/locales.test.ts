@@ -28,4 +28,29 @@ describe("packaged locales", () => {
       expect(value.message.trim(), `${locale}/${key}`).not.toBe("");
     }
   });
+
+  /**
+   * getMessage falls back to the empty string for a key no locale defines,
+   * so a stale key renders as blank UI instead of failing anywhere.
+   */
+  test("every getMessage key in src exists in en", () => {
+    const srcDir = join(__dirname, "..", "src");
+    const sources: string[] = [];
+    const walk = (dir: string) => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const full = join(dir, entry.name);
+        if (entry.isDirectory()) walk(full);
+        else if (/\.(ts|tsx)$/.test(entry.name)) sources.push(full);
+      }
+    };
+    walk(srcDir);
+
+    const known = new Set(english);
+    for (const file of sources) {
+      const text = readFileSync(file, "utf8");
+      for (const match of text.matchAll(/getMessage\(\s*['"]([^'"]+)['"]/g)) {
+        expect(known.has(match[1]), `${file} references missing key ${match[1]}`).toBe(true);
+      }
+    }
+  });
 });

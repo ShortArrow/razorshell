@@ -126,6 +126,11 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   typecheck, lint and the vitest suites into one command, and
   CLAUDE.md records the commands, test structure and conventions an
   agent session needs.
+- Two more silent gaps have gates: every story in the Storybook
+  build must be screenshot-captured or listed as excluded with the
+  rendering it repeats, and every `getMessage` key in src/ must
+  exist in the packaged locales — a missing key rendered as blank
+  text without failing anything.
 - Options page strings outside tooltips are English literals; only
   tooltips (and the extension description) localize (ADR-0007). Six
   message keys leave all eleven locales.

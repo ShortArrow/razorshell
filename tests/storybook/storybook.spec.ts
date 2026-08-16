@@ -56,16 +56,13 @@ const staticDir = path.resolve(
 );
 
 /**
- * One id per visually distinct end state. Stories whose end state repeats a
- * captured one are left out — `ReorderRule` and `MoveRuleUp` end as the same
- * rule table as `WithRules`, config's `SaveFailure`, `ImportRecovery` and
- * `ImportAtomicity` render the same result line as `ImportError` or
- * `AppliedBadge`, `ConflictThenRecover` and `ResetRow` end as override rows
- * like `WithOverride`, and `DefaultActionChange` ends as `ProbeDefault` with
- * the other action — because a second screenshot of the same rendering
- * doubles the baseline maintenance without widening what a regression can
- * hit. The keymap `SaveFailure` stands in for the inline save-error line all
- * four settings sections share.
+ * One id per visually distinct end state. A story whose end state repeats a
+ * captured one goes to `excludedStoryIds` instead, because a second
+ * screenshot of the same rendering doubles the baseline maintenance without
+ * widening what a regression can hit. Every story in the build must appear
+ * in exactly one of the two lists — the coverage test below fails on a new
+ * story that lands in neither, and on an entry naming a story that no
+ * longer exists.
  */
 const storyIds = [
   "options-configapp--default",
@@ -95,6 +92,37 @@ const storyIds = [
   "inspect-toast--conflicts",
   "inspect-toast--no-conflicts",
   "inspect-toast--inspect-mode",
+];
+
+/** Stories deliberately not captured, each ending as a rendering above. */
+const excludedStoryIds = [
+  // end as the WithRules rule table
+  "options-urlapp--reorder-rule",
+  "options-urlapp--move-rule-up",
+  "options-urlapp--add-rule",
+  "options-urlapp--remove-rule",
+  // ends as ProbeDefault with the other action
+  "options-urlapp--default-action-change",
+  // end as an override row like WithOverride
+  "options-keymapapp--conflict-then-recover",
+  "options-keymapapp--reset-row",
+  "options-keymapapp--rebind-by-keyboard",
+  // end as the Default table
+  "options-keymapapp--escape-cancels-capture",
+  "options-keymapapp--modifier-only-keeps-capturing",
+  // end as the ImportError/AppliedBadge result line
+  "options-configapp--import-recovery",
+  "options-configapp--import-atomicity",
+  "options-configapp--save-failure",
+  // keymap SaveFailure stands in for the shared inline save-error line
+  "options-themeapp--save-failure",
+  "options-richtextapp--save-failure",
+  "options-langapp--save-failure",
+  // end as a rendering another story already captures
+  "options-langapp--switch-language",
+  "options-testapp--ctrl-a-handled",
+  "options-richtextapp--toggle-persists",
+  "options-themeapp--system-default",
 ];
 
 const themes = ["light", "dark"] as const;
@@ -212,6 +240,21 @@ test.beforeAll(async () => {
 test.afterAll(async () => {
   if (!server) return;
   await new Promise<void>((resolve) => server.close(() => resolve()));
+});
+
+test("every story in the build is captured or explicitly excluded", () => {
+  const index = JSON.parse(
+    fs.readFileSync(path.join(staticDir, "index.json"), "utf8"),
+  ) as { entries: Record<string, { id: string; type: string }> };
+  const built = Object.values(index.entries)
+    .filter((entry) => entry.type === "story")
+    .map((entry) => entry.id)
+    .sort();
+  const listed = [...storyIds, ...excludedStoryIds].sort();
+  expect(
+    built,
+    "each new story goes into storyIds (visually distinct end state) or excludedStoryIds (with the rendering it repeats); a listed id missing from the build is stale",
+  ).toEqual(listed);
 });
 
 for (const storyId of storyIds) {
