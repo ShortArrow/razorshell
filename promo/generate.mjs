@@ -329,6 +329,56 @@ async function renderGif(browser) {
   console.log(`wrote image/demo.gif (${Math.round(fs.statSync(gifPath).size / 1024)} KB, ${frames.length} frames, ${width}x${height})`);
 }
 
+/**
+ * A screencast-style key overlay: a fixed pill at the bottom of the page
+ * showing what the script is pressing, since the viewer cannot see the
+ * keyboard. The demo drives it explicitly before each press.
+ */
+async function installOsd(page) {
+  await page.evaluate(() => {
+    const osd = document.createElement("div");
+    osd.id = "promo-osd";
+    Object.assign(osd.style, {
+      position: "fixed",
+      left: "50%",
+      bottom: "26px",
+      transform: "translateX(-50%)",
+      display: "flex",
+      alignItems: "center",
+      gap: "10px",
+      padding: "10px 18px",
+      background: "rgba(22, 13, 42, 0.92)",
+      border: "1px solid #7a5cff",
+      borderRadius: "12px",
+      zIndex: "2147483647",
+      opacity: "0",
+      transition: "opacity 120ms ease",
+      pointerEvents: "none",
+      fontFamily: "Consolas, monospace",
+    });
+    document.body.appendChild(osd);
+    const chip = (label) =>
+      `<span style="background:#241640;border:1px solid #9d86ff;border-bottom-width:3px;` +
+      `border-radius:8px;color:#ede8ff;font-size:22px;padding:4px 14px;">${label}</span>`;
+    const plus = `<span style="color:#9d86ff;font-size:20px;">+</span>`;
+    window.__osdShow = (parts) => {
+      osd.innerHTML = parts.map(chip).join(plus);
+      osd.style.opacity = "1";
+      clearTimeout(window.__osdTimer);
+      window.__osdTimer = setTimeout(() => {
+        osd.style.opacity = "0";
+      }, 1300);
+    };
+  });
+}
+
+function osdParts(chord) {
+  return chord.split("+").map((part) => {
+    if (part === "Control") return "Ctrl";
+    return part.length === 1 ? part.toUpperCase() : part;
+  });
+}
+
 /** The repository demo recording, sized and paced for a README link. */
 async function renderWebm() {
   const distPath = path.join(root, "dist");
@@ -355,6 +405,17 @@ async function renderWebm() {
   await boot.close();
   await page.goto(`chrome-extension://${extensionId}/options.html`);
   await page.waitForTimeout(1500);
+  await installOsd(page);
+
+  const press = async (chord) => {
+    await page.evaluate((parts) => window.__osdShow(parts), osdParts(chord));
+    await page.waitForTimeout(180);
+    await page.keyboard.press(chord);
+  };
+  const announce = async (label) => {
+    await page.evaluate((parts) => window.__osdShow(parts), [label]);
+    await page.waitForTimeout(180);
+  };
 
   const scrollTo = async (name) => {
     await page.getByRole("heading", { name }).evaluate((el) => {
@@ -369,7 +430,7 @@ async function renderWebm() {
   await page.keyboard.press("End");
   for (const chord of ["Control+a", "Control+e", "Alt+b", "Alt+b", "Control+k", "Control+u"]) {
     await page.waitForTimeout(750);
-    await page.keyboard.press(chord);
+    await press(chord);
   }
   await page.waitForTimeout(900);
   await scrollTo("URL policy");
@@ -377,12 +438,15 @@ async function renderWebm() {
     "https://docs.google.com/document/d/1", { delay: 30 });
   await page.waitForTimeout(1100);
   await scrollTo("Keymap");
+  await announce("rebind…");
   await page.locator('[data-testid="rebind-move_cursor_to_the_beginning"]').click();
   await page.waitForTimeout(700);
-  await page.keyboard.press("Control+m");
+  await press("Control+m");
   await page.waitForTimeout(1200);
+  await announce("reset all");
   await page.locator('[data-testid="keymap-reset-all"]').click();
   await page.waitForTimeout(1000);
+  await page.screenshot({ path: path.join(root, "test-results", "promo-osd-check.png") });
 
   const video = page.video();
   await context.close();
