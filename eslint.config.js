@@ -24,4 +24,25 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // Storage writes used to be fired and forgotten, and four settings
+    // sections shipped with refusals silently dropped. A promise in src/ is
+    // either awaited, returned, `.catch`-handled or explicitly `void`-ed.
+    // `checksVoidReturn.attributes` stays off: async React handlers are the
+    // convention here, with rejection handling inside the handler.
+    files: ['src/**/*.{ts,tsx}'],
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+    rules: {
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-misused-promises': [
+        'error',
+        { checksVoidReturn: { attributes: false } },
+      ],
+    },
+  },
 );

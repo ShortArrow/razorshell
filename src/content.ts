@@ -43,14 +43,16 @@ function reapplyUrlPolicy(): void {
   applyUrlPolicy(urlPolicy);
 }
 
-loadUrlPolicy({ migrate: window === window.top }).then(applyUrlPolicy);
+// The console is this script's only surface: an init that fails silently
+// leaves the keybindings inert with nothing to diagnose from.
+loadUrlPolicy({ migrate: window === window.top }).then(applyUrlPolicy).catch(console.error);
 subscribeUrlPolicy(applyUrlPolicy);
 document.addEventListener("razorshell-navigate", reapplyUrlPolicy);
 window.addEventListener("popstate", reapplyUrlPolicy);
 window.addEventListener("hashchange", reapplyUrlPolicy);
-loadContentEditableSetting().then(applyEditableSetting);
+loadContentEditableSetting().then(applyEditableSetting).catch(console.error);
 subscribeContentEditableSetting(applyEditableSetting);
-initKeymap();
+initKeymap().catch(console.error);
 
 // Delegate at document level so text fields added after page load are
 // also covered, unlike per-element listeners bound once at injection.
@@ -214,7 +216,7 @@ function onInspectClick(event: MouseEvent): void {
   event.preventDefault();
   event.stopPropagation();
   stopInspecting();
-  inspectTarget(target);
+  inspectTarget(target).catch(console.error);
 }
 
 function onInspectKeydown(event: KeyboardEvent): void {

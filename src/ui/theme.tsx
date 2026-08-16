@@ -17,7 +17,7 @@ export function ThemeApp() {
   const [saveError, setSaveError] = useState<string>("");
 
   useEffect(() => {
-    chrome.storage.sync.get({ [themeKey]: browserDefaultTheme() }).then((data) => {
+    void chrome.storage.sync.get({ [themeKey]: browserDefaultTheme() }).then((data) => {
       const stored = data[themeKey] as string;
       setTheme(stored);
       applyTheme(stored);

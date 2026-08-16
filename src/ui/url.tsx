@@ -52,7 +52,7 @@ export function UrlApp() {
     const fetchPolicy = async () => {
       setPolicy(await loadUrlPolicy());
     };
-    fetchPolicy();
+    void fetchPolicy();
   }, []);
 
   const applyPolicy = (next: UrlPolicy) => {

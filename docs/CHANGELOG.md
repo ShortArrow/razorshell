@@ -120,6 +120,12 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ### Changed
 
+- A promise in src/ must be awaited, handled or explicitly `void`-ed:
+  type-aware `no-floating-promises` now guards the discipline the
+  swallowed-save-failure fixes established, `pnpm check` bundles
+  typecheck, lint and the vitest suites into one command, and
+  CLAUDE.md records the commands, test structure and conventions an
+  agent session needs.
 - Options page strings outside tooltips are English literals; only
   tooltips (and the extension description) localize (ADR-0007). Six
   message keys leave all eleven locales.

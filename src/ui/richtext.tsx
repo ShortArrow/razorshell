@@ -10,7 +10,7 @@ export function RichTextApp() {
     const fetchSetting = async () => {
       setEnabled(await loadContentEditableSetting());
     };
-    fetchSetting();
+    void fetchSetting();
   }, []);
 
   const apply = (value: boolean) => {

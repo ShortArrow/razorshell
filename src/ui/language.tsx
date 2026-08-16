@@ -28,7 +28,7 @@ export function LangApp() {
       setUiLanguage(getUILanguage());
       setSetting(await getLanguageSetting());
     };
-    fetchLanguages();
+    void fetchLanguages();
   }, []);
 
   const applyLanguage = (value: string) => {

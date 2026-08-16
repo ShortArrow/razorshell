@@ -101,6 +101,6 @@ export async function initI18n(): Promise<void> {
     const change = changes[languageKey];
     if (!change) return;
     const locale = normalizeLocale(change.newValue as string | undefined);
-    loadDicts(locale).then(notifyListeners);
+    void loadDicts(locale).then(notifyListeners);
   });
 }

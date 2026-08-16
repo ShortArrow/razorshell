@@ -15,7 +15,8 @@
     "test:storybook": "playwright test --project=storybook",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check": "tsc --noEmit && eslint . --report-unused-disable-directives --max-warnings 0 && vitest run"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
