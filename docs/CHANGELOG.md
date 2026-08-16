@@ -6,7 +6,14 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ## [Unreleased]
 
+## [0.0.3] - 2026-08-16
+
 ### Added
+
+- A Sample button beside Export downloads config.sample.json, round-
+  tripped through the importer so the file it hands out is one Apply
+  accepts by construction.
+- The theme toggle sits centered at the top of the options page.
 
 - URL rules: each rule pairs a pattern (exact, glob or regex) with an
   allow or deny action. Rules apply in list order and unmatched pages

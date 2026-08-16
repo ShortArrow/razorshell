@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { getMessage } from '../languages';
 import { SettingsFile, parseSettings, serializeSettings } from '../settingsio';
+import sampleConfig from '../../config.sample.json';
 
 const storedKeys = ['urlPolicy', 'keymapOverrides', 'language', 'theme', 'enableContentEditable'];
 const downloadName = 'razorshell-config.json';
+const sampleName = 'config.sample.json';
 const maxFileSize = 1024 * 1024;
 
 type Result = { kind: 'none' } | { kind: 'applied' } | { kind: 'error'; message: string };
@@ -18,11 +20,11 @@ async function readSettings(): Promise<SettingsFile> {
   return settings;
 }
 
-function download(text: string): void {
+function download(text: string, name: string): void {
   const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
   const anchor = document.createElement('a');
   anchor.href = url;
-  anchor.download = downloadName;
+  anchor.download = name;
   anchor.click();
   URL.revokeObjectURL(url);
 }
@@ -52,7 +54,7 @@ export function ConfigApp() {
       setResult({ kind: 'error', message: `cannot export: ${parsed.error}` });
       return;
     }
-    download(serialized);
+    download(serialized, downloadName);
   };
 
   const chooseFile = async (file: File | undefined) => {
@@ -74,6 +76,17 @@ export function ConfigApp() {
     setText(content);
     setFileName(file.name);
     setResult({ kind: 'none' });
+  };
+
+  const downloadSample = () => {
+    // Round-tripping the packaged sample through the parser means the file a
+    // user downloads is one the importer accepts by construction.
+    const parsed = parseSettings(JSON.stringify(sampleConfig));
+    if (!parsed.ok) {
+      setResult({ kind: 'error', message: `cannot export: ${parsed.error}` });
+      return;
+    }
+    download(serializeSettings(parsed.settings), sampleName);
   };
 
   const apply = async () => {
@@ -98,6 +111,7 @@ export function ConfigApp() {
         <div className='tooltip tooltip-top' data-tip={getMessage('tooltip_config_export')()}>
           <button className='btn btn-primary btn-sm' data-testid='config-export' onClick={exportSettings}>Export</button>
         </div>
+        <button className='btn btn-outline btn-sm' data-testid='config-sample' onClick={downloadSample}>Sample</button>
         <label className='btn btn-outline btn-sm' htmlFor='config-file-input'>Choose file…</label>
         <input
           type='file'

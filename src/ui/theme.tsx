@@ -41,7 +41,7 @@ export function ThemeApp() {
   };
 
   return <>
-    <div className="flex items-center gap-2">
+    <div className="flex items-center justify-center gap-2">
       <label className="swap swap-rotate">
         <input type="checkbox"
           data-testid="theme-toggle"

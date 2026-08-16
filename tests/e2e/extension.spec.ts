@@ -1331,6 +1331,17 @@ test.describe("rich text editors @C1.1", () => {
 });
 
 test.describe("settings import and export", () => {
+  test("the sample config downloads and the importer accepts it @C1.8", async () => {
+    const downloadPromise = optionsPage.waitForEvent("download");
+    await optionsPage.locator('[data-testid="config-sample"]').click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toBe("config.sample.json");
+
+    const text = fs.readFileSync((await download.path())!, "utf8");
+    const parsed = parseSettings(text);
+    expect(parsed.ok).toBe(true);
+  });
+
   test("export carries the full current state @C1.8", async () => {
     await optionsPage.evaluate(() =>
       chrome.storage.sync.set({
