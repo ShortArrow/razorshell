@@ -126,6 +126,11 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   typecheck, lint and the vitest suites into one command, and
   CLAUDE.md records the commands, test structure and conventions an
   agent session needs.
+- Store assets generate from the repository: `node promo/generate.mjs`
+  renders the two promo tiles from the mascot, five 1280x800 JPEG
+  screenshots from the real extension with a branded caption band,
+  the README demo GIF (gifenc, no ffmpeg), and a 1280x800 webm ready
+  for a YouTube upload. The README opens with the GIF.
 - Double execution has its canary: every earlier key assertion used
   idempotent operations, so a duplicated keydown handler would have
   passed the whole suite. Alt+f — one word per press — now runs once
