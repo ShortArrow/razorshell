@@ -69,7 +69,14 @@ reference `bind -p | grep -E '^"\\(e|C)'`
 
 - [⛔] Browser tab-related shortcuts are reserved and cannot be overwritten
   - [Certain Chrome shortcuts cannot be overridden](https://developer.chrome.com/docs/extensions/reference/api/commands#key-combinations)
-- [🚧] URL allow/deny list
-  - changeable allow list mode or deny list mode
 - [🚧] Verify shortcut registered and make alart
   - [verify commands registered](https://developer.chrome.com/docs/extensions/reference/api/commands?hl=en#verify_commands_registered)
+
+## Works well with Vimium
+
+[Vimium](https://github.com/philc/vimium) gives the rest of the browser
+vim keys: it scrolls, follows links and switches tabs while no text
+field has focus, and steps back the moment one does — exactly where
+Razorshell takes over. The two do not collide: Vimium speaks unmodified
+keys outside text fields, Razorshell speaks `Ctrl`/`Alt` chords inside
+them.
