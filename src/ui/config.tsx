@@ -83,7 +83,7 @@ export function ConfigApp() {
           className='hidden'
           onChange={(e) => chooseFile(e.target.files?.[0])}
         />
-        <span className='text-sm opacity-70'>{fileName}</span>
+        <span className='text-sm opacity-80'>{fileName}</span>
       </div>
       <div className='tooltip tooltip-top' data-tip={getMessage('tooltip_config_import')()}>
         <textarea

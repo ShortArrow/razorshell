@@ -97,6 +97,81 @@ async function seedTextInput(value: string, caret: number): Promise<void> {
   );
 }
 
+/**
+ * The inspector toast, read from its own container rather than the whole body,
+ * so an assertion cannot be satisfied by text that happens to sit on the page.
+ */
+function toastText(): Promise<string> {
+  return page.evaluate(
+    () => document.getElementById("razorshell-inspect-toast")?.innerText ?? "",
+  );
+}
+
+/**
+ * Listeners the tests attach to observe the extension are removed again through
+ * these handles. Left in place they would leak into the inspector's report,
+ * which counts every keydown listener reaching the clicked field.
+ */
+async function addPageKeydownListener(
+  slot: "cancelCtrlK" | "dispatchAltB",
+): Promise<void> {
+  await page.evaluate((which) => {
+    const store = window as unknown as Record<string, EventListener>;
+    if (which === "cancelCtrlK") {
+      const handler = (e: Event) => {
+        const key = e as KeyboardEvent;
+        if (key.ctrlKey && key.key === "k") key.preventDefault();
+      };
+      store.__rsCancelCtrlK = handler;
+      document.querySelector('input[type="text"]')!.addEventListener("keydown", handler);
+      return;
+    }
+    const handler = (e: Event) => {
+      const key = e as KeyboardEvent;
+      if (key.altKey && key.key === "b") key.preventDefault();
+    };
+    store.__rsDispatchAltB = handler;
+    document.addEventListener("keydown", handler);
+  }, slot);
+}
+
+async function removePageKeydownListener(
+  slot: "cancelCtrlK" | "dispatchAltB",
+): Promise<void> {
+  await page.evaluate((which) => {
+    const store = window as unknown as Record<string, EventListener | undefined>;
+    if (which === "cancelCtrlK") {
+      const handler = store.__rsCancelCtrlK;
+      if (handler) {
+        document.querySelector('input[type="text"]')!.removeEventListener("keydown", handler);
+        delete store.__rsCancelCtrlK;
+      }
+      return;
+    }
+    const handler = store.__rsDispatchAltB;
+    if (handler) {
+      document.removeEventListener("keydown", handler);
+      delete store.__rsDispatchAltB;
+    }
+  }, slot);
+}
+
+/** Arms inspect mode on the content page from the extension side. */
+async function startInspecting(): Promise<void> {
+  await optionsPage.evaluate(async (base) => {
+    const tabs = await chrome.tabs.query({ url: `${base}/*` });
+    await chrome.tabs.sendMessage(tabs[0].id!, { type: "razorshell-inspect" });
+  }, origin);
+  await page.waitForTimeout(400);
+}
+
+function badgeText(): Promise<string> {
+  return optionsPage.evaluate(async (base) => {
+    const tabs = await chrome.tabs.query({ url: `${base}/*` });
+    return chrome.action.getBadgeText({ tabId: tabs[0].id });
+  }, origin);
+}
+
 test.describe.configure({ mode: "serial" });
 
 test.beforeAll(async () => {
@@ -223,6 +298,7 @@ test.describe("content script keybindings", () => {
     await page.evaluate(() => {
       const dyn = document.createElement("input");
       dyn.type = "text";
+      dyn.id = "rs-dynamic-input";
       dyn.value = "dynamic input";
       document.body.appendChild(dyn);
       dyn.focus();
@@ -235,6 +311,8 @@ test.describe("content script keybindings", () => {
       return { start: el.selectionStart, end: el.selectionEnd };
     });
     expect(state).toEqual({ start: 0, end: 0 });
+
+    await page.evaluate(() => document.getElementById("rs-dynamic-input")?.remove());
   });
 
   test("an input inside a closed shadow root is out of reach, so Ctrl+a stays the native select-all", async () => {
@@ -245,6 +323,7 @@ test.describe("content script keybindings", () => {
       inp.type = "text";
       inp.value = "hello world";
       root.appendChild(inp);
+      host.id = "rs-closed-host";
       document.body.appendChild(host);
       (window as unknown as { __closedInput: HTMLInputElement }).__closedInput = inp;
     });
@@ -262,6 +341,11 @@ test.describe("content script keybindings", () => {
       return { start: inp.selectionStart, end: inp.selectionEnd };
     });
     expect(state).toEqual({ start: 0, end: 11 });
+
+    await page.evaluate(() => {
+      document.getElementById("rs-closed-host")?.remove();
+      delete (window as unknown as { __closedInput?: HTMLInputElement }).__closedInput;
+    });
   });
 
   test("input inside an iframe is covered", async () => {
@@ -306,6 +390,8 @@ test.describe("content script keybindings", () => {
       () => (document.getElementById("hero_user_email") as HTMLInputElement).value,
     );
     expect(value).toBe("x");
+
+    await page.evaluate(() => document.getElementById("hero_user_email")?.remove());
   });
 });
 
@@ -427,6 +513,22 @@ test.describe("keymap rebinding", () => {
     expect(await currentChord("move_cursor_to_the_end")).toBe("Ctrl+e");
   });
 
+  test("rebinding the rejected row to a free chord clears the conflict", async () => {
+    await optionsPage.locator('[data-testid="rebind-move_cursor_to_the_end"]').click();
+    await optionsPage.keyboard.press("Control+Shift+9");
+    await optionsPage.waitForTimeout(500);
+
+    const chord = await currentChord("move_cursor_to_the_end");
+    expect(chord).toContain("Ctrl");
+    expect(chord).toContain("Shift");
+    expect(chord).toContain("9");
+
+    await expect(
+      optionsPage.locator('[data-testid="conflict-move_cursor_to_the_end"]'),
+    ).toHaveCount(0);
+    await expect(optionsPage.locator('[data-testid="keymap-no-conflict"]')).toHaveCount(1);
+  });
+
   test("reset all restores the defaults", async () => {
     await optionsPage.locator('[data-testid="keymap-reset-all"]').click();
     await optionsPage.waitForTimeout(500);
@@ -449,11 +551,7 @@ test.describe("url policy", () => {
       end: 11,
     });
 
-    const badge = await optionsPage.evaluate(async (base) => {
-      const tabs = await chrome.tabs.query({ url: `${base}/*` });
-      return chrome.action.getBadgeText({ tabId: tabs[0].id });
-    }, origin);
-    expect(badge).toBe("✕");
+    expect(await badgeText()).toBe("✕");
   });
 
   test("the first matching rule beats the default action", async () => {
@@ -470,11 +568,7 @@ test.describe("url policy", () => {
       end: 0,
     });
 
-    const badge = await optionsPage.evaluate(async (base) => {
-      const tabs = await chrome.tabs.query({ url: `${base}/*` });
-      return chrome.action.getBadgeText({ tabId: tabs[0].id });
-    }, origin);
-    expect(badge).toBe("");
+    expect(await badgeText()).toBe("");
   });
 
   test("the probe reports the matching rule", async () => {
@@ -539,6 +633,7 @@ test.describe("url policy", () => {
       start: 0,
       end: 11,
     });
+    expect(await badgeText()).toBe("✕");
 
     await page.evaluate(() => history.back());
     await page.waitForTimeout(400);
@@ -549,6 +644,7 @@ test.describe("url policy", () => {
       start: 0,
       end: 0,
     });
+    expect(await badgeText()).toBe("");
 
     await setPolicy({ defaultAction: "allow", rules: [] });
   });
@@ -556,12 +652,7 @@ test.describe("url policy", () => {
 
 test.describe("event trust and the inspector", () => {
   test("synthetic key events are ignored", async () => {
-    await page.evaluate(() => {
-      const el = document.querySelector<HTMLInputElement>('input[type="text"]')!;
-      el.addEventListener("keydown", (e) => {
-        if (e.ctrlKey && e.key === "k") e.preventDefault();
-      });
-    });
+    await addPageKeydownListener("cancelCtrlK");
     await seedTextInput("hello", 5);
     await page.evaluate(() => {
       const el = document.querySelector<HTMLInputElement>('input[type="text"]')!;
@@ -581,27 +672,18 @@ test.describe("event trust and the inspector", () => {
   });
 
   test("the inspector reports conflicts on the clicked field", async () => {
-    await page.evaluate(() => {
-      const dispatch = (e: KeyboardEvent) => {
-        if (e.altKey && e.key === "b") e.preventDefault();
-      };
-      document.addEventListener("keydown", dispatch);
-    });
+    await addPageKeydownListener("dispatchAltB");
     await page.locator('input[type="text"]').first().evaluate((el: HTMLInputElement) => {
       el.focus();
       el.setSelectionRange(3, 3);
     });
     await page.keyboard.press("Alt+b");
 
-    await optionsPage.evaluate(async (base) => {
-      const tabs = await chrome.tabs.query({ url: `${base}/*` });
-      await chrome.tabs.sendMessage(tabs[0].id!, { type: "razorshell-inspect" });
-    }, origin);
-    await page.waitForTimeout(400);
+    await startInspecting();
     await page.locator('input[type="text"]').first().click();
     await page.waitForTimeout(500);
 
-    const toast = await page.evaluate(() => document.body.innerText);
+    const toast = await toastText();
     expect(toast).toContain("Ctrl+k");
     expect(toast).toContain("Alt+b");
     expect(toast).toContain("could not be analyzed");
@@ -611,6 +693,51 @@ test.describe("event trust and the inspector", () => {
       start: 0,
       end: 0,
     });
+
+    await removePageKeydownListener("cancelCtrlK");
+    await removePageKeydownListener("dispatchAltB");
+  });
+
+  test("Escape leaves inspect mode and hands the chord back to the keybindings", async () => {
+    await startInspecting();
+    expect(await page.evaluate(() => document.documentElement.style.cursor)).toBe("crosshair");
+
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(300);
+    expect(await page.evaluate(() => document.documentElement.style.cursor)).toBe("");
+
+    await seedTextInput("hello world", 11);
+    await page.keyboard.press("Control+a");
+    expect(await caretState(page.locator('input[type="text"]').first())).toEqual({
+      start: 0,
+      end: 0,
+    });
+  });
+
+  /**
+   * The page keeps one document-level keydown listener of its own for the
+   * `#keyinfo` readout, and the inspector counts every listener reaching the
+   * clicked field. That listener names no chord, so it lands in the
+   * "could not be analyzed" tally on any field of this page and the
+   * no-conflicts wording is out of reach here.
+   *
+   * Observed preventDefault chords accumulate in the page hook for the
+   * lifetime of the document and are reported for every field, so the chords
+   * the earlier tests pressed for real would still be named here. A reload
+   * starts a fresh document where nothing has been observed yet.
+   */
+  test("a field with no chord-bearing listener reports no named conflict", async () => {
+    await page.reload();
+    await page.waitForTimeout(800);
+
+    await startInspecting();
+    await page.locator('input[type="password"]').click();
+    await page.waitForTimeout(700);
+
+    const toast = await toastText();
+    expect(toast).not.toContain("Ctrl+k");
+    expect(toast).not.toContain("Alt+b");
+    expect(toast).toContain("could not be analyzed");
   });
 });
 
@@ -790,21 +917,20 @@ test.describe("persistence across a browser restart", () => {
     await restartedOptions.goto(optionsUrl());
     await restartedOptions.waitForTimeout(1200);
 
-    const chord = await restartedOptions
-      .locator('[data-testid="current-move_cursor_to_the_beginning"]')
-      .innerText();
-    expect(chord.replace(/\s+/g, "")).toBe("Ctrl+m");
+    // The page reads storage while rendering, so a one-shot read right after
+    // the goto races the hydration under load; every check here retries.
+    await expect(
+      restartedOptions.locator('[data-testid="current-move_cursor_to_the_beginning"]'),
+    ).toHaveText(/Ctrl\s*\+\s*m/);
 
     await expect(restartedOptions.locator("body")).toContainText("https://example.com/**");
     await expect(restartedOptions.locator('[data-testid="effective-language"]')).toContainText(
       "ja",
     );
-    expect(
-      await restartedOptions.evaluate(() => document.documentElement.dataset.theme),
-    ).toBe("dark");
-    expect(
-      await restartedOptions.locator('[data-testid="richtext-toggle"]').isChecked(),
-    ).toBe(true);
+    await expect
+      .poll(() => restartedOptions.evaluate(() => document.documentElement.dataset.theme))
+      .toBe("dark");
+    await expect(restartedOptions.locator('[data-testid="richtext-toggle"]')).toBeChecked();
   });
 
   test("the rebound chord still reaches the content script", async () => {

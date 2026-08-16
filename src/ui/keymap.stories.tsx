@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, userEvent, within } from 'storybook/test';
-import { resetStorage } from '../../.storybook/chromemock';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { resetStorage, storedValue } from '../../.storybook/chromemock';
 import { initKeymap } from '../keymapstore';
 import { KeymapApp } from './keymap';
 import type { Chord } from '../keymapmerge';
@@ -63,5 +63,77 @@ export const TwoModifierOverride: Story = {
     await expect(current).toHaveTextContent('Ctrl');
     await expect(current).toHaveTextContent('Alt');
     await expect(current).toHaveTextContent('m');
+  },
+};
+
+export const EscapeCancelsCapture: Story = {
+  loaders: [() => loadOverrides({})],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const rebind = await canvas.findByTestId('rebind-move_cursor_to_the_beginning');
+    await userEvent.click(rebind);
+    await userEvent.keyboard('{Escape}');
+
+    // Escape is the way out of a capture nobody meant to start, so it has to
+    // leave the binding alone rather than binding Escape itself.
+    const current = canvas.getByTestId('current-move_cursor_to_the_beginning');
+    await expect(current).toHaveTextContent('Ctrl');
+    await expect(current).toHaveTextContent('a');
+    await expect(storedValue<Record<string, Chord>>('keymapOverrides')).toBeUndefined();
+    // The button carries the capture state, so a cancelled capture that leaves
+    // it spinning would keep swallowing the next keystroke.
+    await waitFor(() => expect(rebind).toHaveAttribute('aria-label', 'rebind'));
+    (document.activeElement as HTMLElement | null)?.blur();
+  },
+};
+
+export const ModifierOnlyKeepsCapturing: Story = {
+  loaders: [() => loadOverrides({})],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const rebind = await canvas.findByTestId('rebind-move_cursor_to_the_beginning');
+    await userEvent.click(rebind);
+    await userEvent.keyboard('{Control}');
+
+    // A modifier alone is a chord half typed, not a chord. Ending the capture
+    // there would bind Control by itself and swallow every later shortcut.
+    await expect(rebind).toHaveAttribute('aria-label', 'press a key...');
+    await expect(storedValue<Record<string, Chord>>('keymapOverrides')).toBeUndefined();
+
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(rebind).toHaveAttribute('aria-label', 'rebind'));
+    (document.activeElement as HTMLElement | null)?.blur();
+  },
+};
+
+export const ConflictThenRecover: Story = {
+  loaders: [() => loadOverrides({})],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.click(await canvas.findByTestId('rebind-move_cursor_to_the_end'));
+    await userEvent.keyboard('{Control>}a{/Control}');
+
+    // Ctrl+a already belongs to the first row, so the rebind is refused and
+    // named rather than quietly leaving two rows on one chord.
+    await expect(await canvas.findByTestId('conflict-move_cursor_to_the_end'))
+      .toHaveTextContent('conflicts with: move cursor to the beginning');
+    await expect(storedValue<Record<string, Chord>>('keymapOverrides')).toBeUndefined();
+
+    await userEvent.click(canvas.getByTestId('rebind-move_cursor_to_the_end'));
+    await userEvent.keyboard('{Control>}m{/Control}');
+
+    const current = canvas.getByTestId('current-move_cursor_to_the_end');
+    await waitFor(() => expect(current).toHaveTextContent('m'));
+    await expect(current).toHaveTextContent('Ctrl');
+    // A refusal that outlives the correction reads as though the free chord
+    // was refused too.
+    await expect(canvas.getByTestId('keymap-no-conflict')).toBeEmptyDOMElement();
+    await waitFor(() => expect(storedValue<Record<string, Chord>>('keymapOverrides')).toEqual({
+      move_cursor_to_the_end: { key: 'm', ctrl: true, alt: false, shift: false },
+    }));
+    (document.activeElement as HTMLElement | null)?.blur();
   },
 };

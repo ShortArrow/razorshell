@@ -1,5 +1,7 @@
 # Razorshell
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/ShortArrow/razorshell)
+
 This is a browser extension that adds bash shell-like keyboard shortcuts to textboxes.
 
 ![main image](./image/razorshell.svg)

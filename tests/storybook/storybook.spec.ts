@@ -52,22 +52,38 @@ const staticDir = path.resolve(
   "../../storybook-static",
 );
 
+/**
+ * One id per visually distinct end state. Stories whose end state repeats a
+ * captured one are left out — `ReorderRule` ends as the same rule table as
+ * `WithRules`, config's `SaveFailure` renders the same error line as
+ * `ImportError`, and `ConflictThenRecover` ends as an override row like
+ * `WithOverride` — because a second screenshot of the same rendering doubles
+ * the baseline maintenance without widening what a regression can hit.
+ */
 const storyIds = [
   "options-configapp--default",
   "options-configapp--import-error",
+  "options-configapp--applied-badge",
+  "options-configapp--choose-file",
   "options-keymapapp--default",
   "options-keymapapp--with-override",
   "options-keymapapp--two-modifier-override",
   "options-langapp--auto",
   "options-langapp--overridden",
+  "options-langapp--no-browser-languages",
   "options-richtextapp--off",
   "options-richtextapp--on",
   "options-testapp--default",
+  "options-testapp--pass-through",
   "options-themeapp--default",
+  "options-themeapp--dark-stored",
   "options-urlapp--empty",
   "options-urlapp--with-rules",
   "options-urlapp--probe-match",
+  "options-urlapp--probe-default",
   "options-urlapp--invalid-pattern",
+  "options-urlapp--save-failure",
+  "options-urlapp--empty-pattern",
   "inspect-toast--conflicts",
   "inspect-toast--no-conflicts",
   "inspect-toast--inspect-mode",

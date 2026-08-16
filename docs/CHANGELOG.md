@@ -45,6 +45,12 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   inconclusive result appears beyond the two causes axe cannot
   compute — daisyUI's gradient select arrow and tooltip pseudo
   content, both contrast-verified by hand.
+- The failure paths have their own coverage: stories drive a refused
+  storage write, an empty pattern, the probe's default-action badge,
+  a keymap conflict corrected afterwards, staging a config file and
+  a browser reporting no languages, while the end-to-end suite
+  checks that a denied SPA route flips the toolbar badge and that
+  the extension recovers after each rejected input.
 - Six more story scenarios close the review's coverage gaps:
   switching the language, a handled chord in the test area, removing
   a rule, a rejected regex pattern, the inspect-mode hint, and a
@@ -108,6 +114,11 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ### Fixed
 
+- A URL rule edit that storage refuses no longer leaves the table
+  showing the unsaved change: the list reloads from what storage
+  kept and the failure is shown next to it. An empty pattern is
+  rejected before it reaches the list — under glob and regex it
+  would match every URL.
 - Alt+f no longer jumps across newlines and tabs: end-of-word motion
   treated only spaces as separators. Fourteen hardening tests pin the
   behaviors a mutation review found unconstrained, among them glob

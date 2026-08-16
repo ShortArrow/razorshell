@@ -8,17 +8,21 @@
  */
 
 import type { ReactElement } from 'react';
-import { resetStorage } from './chromemock';
+import { resetBrowserLanguages, resetStorage } from './chromemock';
 
 /**
  * @fn seededStory
- * @brief Build a decorator that resets storage to `seed` before each render.
+ * @brief Build a decorator that resets the mock to `seed` before each render.
+ * @details The browser languages are reset alongside storage because they are
+ *          the mock's other piece of global state: a story that seeds them
+ *          would otherwise decide what the next story reads.
  * @param seed - The storage contents the story starts from
  * @return A Storybook decorator
  */
 export function seededStory(seed: Record<string, unknown> = {}) {
   return function SeededDecorator(Story: () => ReactElement) {
     resetStorage(seed);
+    resetBrowserLanguages();
     return <Story />;
   };
 }

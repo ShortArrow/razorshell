@@ -8,13 +8,21 @@ import { Select } from './select';
 const matchTypes: MatchType[] = ['exact', 'glob', 'regex'];
 const ruleActions: RuleAction[] = ['allow', 'deny'];
 
-function isValidPattern(pattern: string, matchType: MatchType): boolean {
-  if (matchType !== 'regex') return true;
+/**
+ * @fn patternRejection
+ * @brief Judge a pattern about to be added, naming why it cannot become a rule.
+ * @param string pattern - The pattern as typed
+ * @param MatchType matchType - The match type selected beside it
+ * @return The message to show, or '' when the pattern is acceptable
+ */
+function patternRejection(pattern: string, matchType: MatchType): string {
+  if (pattern.trim() === '') return 'pattern is empty';
+  if (matchType !== 'regex') return '';
   try {
     new RegExp(pattern);
-    return true;
+    return '';
   } catch {
-    return false;
+    return 'invalid regular expression';
   }
 }
 
@@ -33,7 +41,7 @@ export function UrlApp() {
   const [pattern, setPattern] = useState<string>('');
   const [matchType, setMatchType] = useState<MatchType>('exact');
   const [action, setAction] = useState<RuleAction>('deny');
-  const [patternError, setPatternError] = useState<boolean>(false);
+  const [patternError, setPatternError] = useState<string>('');
   const [probe, setProbe] = useState<string>('');
   const [saveError, setSaveError] = useState<string>('');
 
@@ -51,17 +59,19 @@ export function UrlApp() {
     setPolicy(next);
     saveUrlPolicy(next)
       .then(() => setSaveError(''))
-      .catch((failure: unknown) => {
+      .catch(async (failure: unknown) => {
         setSaveError(failure instanceof Error ? failure.message : String(failure));
+        // The table showed `next` optimistically. Storage refused it, so the
+        // rendered policy is now a claim about state that does not exist;
+        // reading storage back is what makes the two agree again.
+        setPolicy(await loadUrlPolicy());
       });
   };
 
   const addRule = () => {
-    if (!isValidPattern(pattern, matchType)) {
-      setPatternError(true);
-      return;
-    }
-    setPatternError(false);
+    const rejection = patternRejection(pattern, matchType);
+    setPatternError(rejection);
+    if (rejection !== '') return;
     applyPolicy({ ...policy, rules: [...policy.rules, { pattern, matchType, action }] });
     setPattern('');
   };
@@ -87,12 +97,12 @@ export function UrlApp() {
           <input
             type='text'
             id='pattern'
-            className={patternError ? 'grow input-error' : 'grow'}
+            className={patternError === '' ? 'grow' : 'grow input-error'}
             placeholder='pattern'
             value={pattern}
             onChange={(e) => {
               setPattern(e.target.value);
-              setPatternError(false);
+              setPatternError('');
             }}
           />
         </label>
@@ -103,7 +113,7 @@ export function UrlApp() {
             value={matchType}
             onChange={(e) => {
               setMatchType(e.target.value as MatchType);
-              setPatternError(false);
+              setPatternError('');
             }}
           >
             {matchTypes.map((value) => <option key={value} value={value}>{value}</option>)}
@@ -121,7 +131,7 @@ export function UrlApp() {
         </div>
         <button className='btn btn-primary join-item' onClick={addRule}>add rule</button>
       </div>
-      {patternError ? <p className='text-error'>invalid regular expression</p> : null}
+      {patternError === '' ? null : <p className='text-error'>{patternError}</p>}
       <div className='flex items-center gap-2'>
         <div className='tooltip tooltip-top grow' data-tip={getMessage('tooltip_url_probe')()}>
           <input
