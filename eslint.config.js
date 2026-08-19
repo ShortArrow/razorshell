@@ -38,6 +38,13 @@ export default tseslint.config(
       },
     },
     rules: {
+      // A uniform (value, selectionStart, selectionEnd) signature is what lets
+      // the kill-region functions be used interchangeably; the one each does
+      // not read is named with a leading underscore rather than dropped.
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { args: 'after-used', argsIgnorePattern: '^_' },
+      ],
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-misused-promises': [
         'error',

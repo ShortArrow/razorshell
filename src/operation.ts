@@ -1,6 +1,18 @@
 import { cursor } from "./cursor";
+import { endOfLineRegion, KillRegion, topOfLineRegion } from "./killregion";
 
 export type TextField = HTMLInputElement | HTMLTextAreaElement;
+
+/**
+ * Removes a region by rewriting `value` and leaves the caret at its start.
+ *
+ * Assigning `value` is what this has always done; it costs the field's native
+ * undo stack and fires no input event.
+ */
+function spliceOut(textinput: TextField, region: KillRegion) {
+  textinput.value = textinput.value.slice(0, region.start) + textinput.value.slice(region.end);
+  textinput.setSelectionRange(region.start, region.start);
+}
 
 export interface Keymap {
   id: string;
@@ -28,18 +40,16 @@ export const operation = {
     textinput.setSelectionRange(end, end);
   },
   deleteToEOL(textinput: TextField) {
-    const position = textinput.selectionEnd;
-    if (position == null) return;
-    const end = cursor.getEndOfLine(textinput.value, position);
-    textinput.value = textinput.value.slice(0, position) + textinput.value.slice(end);
-    textinput.setSelectionRange(position, position);
+    const start = textinput.selectionStart;
+    const end = textinput.selectionEnd;
+    if (start == null || end == null) return;
+    spliceOut(textinput, endOfLineRegion(textinput.value, start, end));
   },
   deleteToTOL(textinput: TextField) {
-    const position = textinput.selectionStart;
-    if (position == null) return;
-    const top = cursor.getTopOfLine(textinput.value, position);
-    textinput.value = textinput.value.slice(0, top) + textinput.value.slice(position);
-    textinput.setSelectionRange(top, top);
+    const start = textinput.selectionStart;
+    const end = textinput.selectionEnd;
+    if (start == null || end == null) return;
+    spliceOut(textinput, topOfLineRegion(textinput.value, start, end));
   },
   moveToNextChar(textinput: TextField) {
     const position = textinput.selectionEnd;
