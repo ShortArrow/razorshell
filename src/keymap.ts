@@ -22,6 +22,7 @@ export function keymaching(event: KeyboardEvent, key: Keymap): boolean {
   else {
     result &&= event.shiftKey == false;
   }
+  result &&= event.metaKey == false;
   result &&= key.key == event.key;
   return result;
 }

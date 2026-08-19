@@ -75,6 +75,7 @@ file the importer refuses; a rendering readable in one theme only.
 | C1.11 | Fields the extension cannot reach — closed shadow roots, `email` inputs — keep their native behavior instead of dying half-handled |
 | C1.12 | The language override resolves every packaged locale's tooltips, and a failed dictionary fetch falls back to the browser's own messages |
 | C1.13 | A binding runs exactly once per keypress — settings churn, options-page remounts, same-document navigations and an abandoned rebind capture leave no duplicate or stale key handler behind |
+| C1.14 | A kill is undoable, fires one input event the page can see, does nothing on an empty region, and leaves readonly fields alone |
 
 ## Traceability
 
@@ -124,7 +125,8 @@ Frozen observations; each holds only for its date.
   Ctrl+K, then Ctrl+Z leaves the field empty, while a native
   deletion (Shift+Home, Delete) in the same field undoes normally.
   Direct `.value` assignment clears the field's undo stack and fires
-  no input event.
+  no input event. (Superseded as of C1.14: the kill now runs through
+  `execCommand`. The record stands as what was measured that day.)
 - 2026-08-20, `document.execCommand` `insertText` and `delete` work
   on `input` and `textarea`: they fire `input` events with proper
   `inputType`s (`insertText`, `deleteContentBackward`,
@@ -158,4 +160,3 @@ planned section is the current answer, not a test.
 | R6 | The 102,400-byte total sync quota; only the 8 KB per-item limit is exercised |
 | R7 | Interception of browser accelerators (Alt+F today, Alt+D if adopted): Chromium's source lists them outside the reserved set, but the harness cannot exercise that path (see the 2026-08-20 record), so the claim rests on real-browser use, not on a test |
 | R8 | Everything A8 excludes, silently: on macOS the Alt bindings never match and Cmd+key can reach a binding as if unmodified; on AltGr layouts a Ctrl+Alt chord reaches the matcher with both modifiers set. No macOS runner exists in CI |
-| R9 | Killed text is unrecoverable today — no kill ring, no clipboard, no undo (2026-08-17 record). Known defect, not an accepted property; the 0.0.4 plan exists to retire it |

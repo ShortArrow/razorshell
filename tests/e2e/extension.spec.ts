@@ -1531,6 +1531,194 @@ test.describe("settings import and export", () => {
 });
 
 /**
+ * What a kill does to the field beyond the text it removes.
+ *
+ * Removing the right characters was never the hard part; the 2026-08-17 record
+ * measured the cost of doing it by assigning `.value` — the undo stack goes,
+ * and the page's own `input` listeners never learn anything changed, so a
+ * framework-backed editor keeps rendering the text the user just killed. These
+ * tests are about that half of the contract, which only a real engine can show:
+ * jsdom implements no `execCommand`, so the unit suite exercises the fallback
+ * and can assert nothing about undo.
+ *
+ * Each test types its own text and restores what it touched, so the describe is
+ * self-contained and the serial scenario's later boundary assertions still see
+ * the state seeded earlier in the file.
+ */
+test.describe("a kill behaves like a native deletion @C1.14", () => {
+  const input = () => page.locator('input[type="text"]').first();
+
+  /**
+   * Puts the caret where a kill should start, without pressing a chord.
+   *
+   * The motion bindings cannot be used to set up these tests: by this point in
+   * the serial scenario the rebinding describe has moved Ctrl+A off
+   * move-to-line-start, so pressing it reaches Chrome's native select-all and
+   * leaves a selection instead of a caret — which is a different kill entirely.
+   * Setting the selection directly keeps the setup independent of whatever the
+   * keymap currently holds, and only Ctrl+K, the binding under test, is pressed.
+   */
+  async function caretTo(position: number): Promise<void> {
+    await input().evaluate((el: HTMLInputElement, at: number) => {
+      el.focus();
+      el.setSelectionRange(at, at);
+    }, position);
+  }
+
+  /**
+   * Types into the field the way a user does, so a native undo stack exists.
+   *
+   * Clearing has to be native too: assigning `value` would wipe the very undo
+   * stack these tests are about, so the selection is made through the DOM and
+   * removed with a real Delete keypress.
+   */
+  async function typeFresh(text: string): Promise<void> {
+    await input().click();
+    await input().evaluate((el: HTMLInputElement) => {
+      el.focus();
+      el.setSelectionRange(0, el.value.length);
+    });
+    await page.keyboard.press("Delete");
+    expect((await fieldState(input())).value).toBe("");
+    await page.keyboard.type(text);
+    expect((await fieldState(input())).value).toBe(text);
+  }
+
+  /**
+   * The import describe above ends with a deny rule in storage, which switches
+   * the bindings off on every page. These tests are about what a binding does
+   * when it runs, so the block seeds its own allowing policy and puts the
+   * denying one back afterwards for the describes that assert on it.
+   */
+  test.beforeAll(async () => {
+    await setPolicy({ defaultAction: "allow", rules: [] });
+  });
+
+  test.afterAll(async () => {
+    await setPolicy({
+      defaultAction: "allow",
+      rules: [{ pattern: "https://example.com/**", matchType: "glob", action: "deny" }],
+    });
+    await seedTextInput("hello world new order", 0);
+  });
+
+  test("a kill can be undone", async () => {
+    await typeFresh("undo me please");
+
+    // The fixture guard: if native undo does not work in this harness at all,
+    // the Ctrl+K assertion below would pass vacuously for the wrong reason.
+    await page.keyboard.press("Shift+Home");
+    await page.keyboard.press("Delete");
+    expect((await fieldState(input())).value).toBe("");
+    await page.keyboard.press("Control+z");
+    expect((await fieldState(input())).value).toBe("undo me please");
+
+    // The undo restored the selection along with the text, and a kill measured
+    // from a non-collapsed selection starts at its far edge — an empty region
+    // at the end of the line. Collapse to the start so Ctrl+K has a line to
+    // take; Ctrl+A is move-to-line-start here, not select-all.
+    await caretTo(0);
+    await page.keyboard.press("Control+k");
+    expect((await fieldState(input())).value).toBe("");
+
+    await page.keyboard.press("Control+z");
+    expect((await fieldState(input())).value).toBe("undo me please");
+  });
+
+  test("a kill is visible to the page", async () => {
+    await typeFresh("visible kill");
+    await caretTo(0);
+
+    await input().evaluate((el: HTMLInputElement) => {
+      const seen: string[] = [];
+      (el as unknown as { __killLog: string[] }).__killLog = seen;
+      const listener = (event: Event) => seen.push((event as InputEvent).inputType ?? "");
+      (el as unknown as { __killListener: EventListener }).__killListener = listener;
+      el.addEventListener("input", listener);
+    });
+
+    await page.keyboard.press("Control+k");
+
+    const types = await input().evaluate((el: HTMLInputElement) => {
+      const holder = el as unknown as { __killLog: string[]; __killListener: EventListener };
+      el.removeEventListener("input", holder.__killListener);
+      const seen = holder.__killLog;
+      delete (el as unknown as Record<string, unknown>).__killLog;
+      delete (el as unknown as Record<string, unknown>).__killListener;
+      return seen;
+    });
+
+    expect(types.length).toBeGreaterThanOrEqual(1);
+    expect(types.length).toBe(1);
+    expect(types[0]).toBe("deleteContentBackward");
+    expect((await fieldState(input())).value).toBe("");
+  });
+
+  test("an empty kill region does nothing", async () => {
+    await typeFresh("nothing to kill");
+    await caretTo("nothing to kill".length);
+
+    await input().evaluate((el: HTMLInputElement) => {
+      let count = 0;
+      const listener = () => (count += 1);
+      (el as unknown as { __emptyCount: () => number }).__emptyCount = () => count;
+      (el as unknown as { __emptyListener: EventListener }).__emptyListener = listener;
+      el.addEventListener("input", listener);
+    });
+
+    await page.keyboard.press("Control+k");
+
+    const fired = await input().evaluate((el: HTMLInputElement) => {
+      const holder = el as unknown as {
+        __emptyCount: () => number;
+        __emptyListener: EventListener;
+      };
+      el.removeEventListener("input", holder.__emptyListener);
+      const count = holder.__emptyCount();
+      delete (el as unknown as Record<string, unknown>).__emptyCount;
+      delete (el as unknown as Record<string, unknown>).__emptyListener;
+      return count;
+    });
+
+    expect(fired).toBe(0);
+
+    // The measured Backspace hazard: `execCommand("delete")` on an empty
+    // selection eats the character behind the caret. Nothing may have been
+    // removed, and the caret must still be where it was put.
+    expect(await fieldState(input())).toEqual({
+      value: "nothing to kill",
+      start: "nothing to kill".length,
+      end: "nothing to kill".length,
+    });
+
+    // A Backspace would also have pushed an entry onto the undo stack, so the
+    // check that separates "did nothing" from "deleted a character" is whether
+    // an undo has a kill to reverse. Typing is undone one character at a time
+    // here, so the value alone cannot tell the two apart — the redo is what
+    // does: after undo-then-redo the field must be exactly as it was left. Had
+    // Ctrl+K eaten a character, the redo would replay that deletion instead.
+    await page.keyboard.press("Control+z");
+    await page.keyboard.press("Control+y");
+    expect((await fieldState(input())).value).toBe("nothing to kill");
+  });
+
+  test("a readonly field is left alone", async () => {
+    await typeFresh("read only text");
+    await caretTo(0);
+    await input().evaluate((el: HTMLInputElement) => {
+      el.readOnly = true;
+    });
+
+    await page.keyboard.press("Control+k");
+    expect((await fieldState(input())).value).toBe("read only text");
+
+    await input().evaluate((el: HTMLInputElement) => {
+      el.readOnly = false;
+    });
+  });
+});
+
+/**
  * What `chrome.storage.onChanged` does about a write that changes nothing.
  *
  * This is a characterization test, not a specification: the expected value is

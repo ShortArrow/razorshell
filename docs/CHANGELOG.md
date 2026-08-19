@@ -6,6 +6,19 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ## [Unreleased]
 
+### Fixed
+
+- Ctrl+K and Ctrl+U delete through the browser instead of assigning
+  `value`, so a kill lands on the field's own undo stack and fires
+  the `input` event a page listener needs. Where `execCommand` is
+  unavailable the old splice still runs, without those two
+  properties.
+- A kill with an empty region — Ctrl+K at the end of a line — now
+  does nothing at all rather than deleting the character behind the
+  caret, and a readonly or disabled field is left untouched.
+- Meta never matches a chord, so Cmd+K no longer reaches the Ctrl+K
+  binding.
+
 ### Changed
 
 - The assurance case now states its platform contract: A8 assumes
