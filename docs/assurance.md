@@ -32,6 +32,7 @@ the commit under assessment.
 | A5 | No other code writes this extension's `sync` keys |
 | A6 | Editable fields are `input` of type text, search, url, tel or password, `textarea`, and — behind the opt-in — `contenteditable`, including open shadow roots and same-process iframes |
 | A7 | For the `auto` language setting, the browser UI language is one the packaged locales cover (see R2) |
+| A8 | The OS is Windows or Linux and the keyboard layout reports the plain letter in `event.key` for Alt+letter chords, with the browser window not in fullscreen. macOS is outside this assumption: Option composes glyphs (`event.key` is `"ƒ"` for Option+F), so the shipped Alt bindings never match there, and the Command modifier is not part of the chord model |
 
 ## Boundary
 
@@ -39,12 +40,15 @@ Nothing is claimed about: the Google-account sync transport (the
 suites exercise `storage.sync` as persistence inside one profile;
 cross-device merge is never run), branded Chrome Stable/Beta 137 and
 later (no unpacked loading), browser or OS crashes, interference
-from other extensions, and the Storybook dev preview during manual
-story-to-story navigation (the preview reloads itself when a play
-function outlives a navigation; assurance rests on the vitest and CI
-runs, not on the panel). Fields the extension cannot reach — closed
-shadow roots, `email` and `number` inputs — are not out of scope but
-a claim of their own: C1.11 says they keep their native behavior.
+from other extensions, macOS in its entirety (A8), keyboard layouts
+whose AltGr raises both `ctrlKey` and `altKey`, fullscreen windows
+(Chrome's reserved-shortcut set inverts there), and the Storybook
+dev preview during manual story-to-story navigation (the preview
+reloads itself when a play function outlives a navigation; assurance
+rests on the vitest and CI runs, not on the panel). Fields the
+extension cannot reach — closed shadow roots, `email` and `number`
+inputs — are not out of scope but a claim of their own: C1.11 says
+they keep their native behavior.
 
 ## Hazards the suites are built against
 
@@ -115,6 +119,25 @@ Frozen observations; each holds only for its date.
 - 2026-08-16, Ctrl+Shift+9 under Playwright's `press` reports
   `KeyboardEvent.key === "9"`, not `"("` — the stored-chord
   assertions depend on this.
+- 2026-08-17, the kill operations destroy their text unrecoverably:
+  in Playwright Chromium with the built extension, type, Ctrl+A,
+  Ctrl+K, then Ctrl+Z leaves the field empty, while a native
+  deletion (Shift+Home, Delete) in the same field undoes normally.
+  Direct `.value` assignment clears the field's undo stack and fires
+  no input event.
+- 2026-08-20, `document.execCommand` `insertText` and `delete` work
+  on `input` and `textarea`: they fire `input` events with proper
+  `inputType`s (`insertText`, `deleteContentBackward`,
+  `historyUndo`) and the deletion undoes. With an EMPTY selection,
+  `delete` acts as Backspace and removes one character — any rework
+  built on it must not call it with an empty kill region.
+- 2026-08-20, CDP-injected keys never reach Chrome's browser-
+  accelerator handling on Windows and Linux (the native-event
+  builder exists only for mac/ios, so injected events carry
+  `skip_if_unhandled`), so whether a page handler can cancel a
+  browser accelerator such as Alt+D is outside what this harness can
+  ever test; the existing green runs for Ctrl+U and Alt+F prove
+  nothing about interception, only real-browser use does.
 
 ## Verification and validation
 
@@ -133,3 +156,6 @@ planned section is the current answer, not a test.
 | R4 | Test sensitivity outside the deliberate-violation checks the measurement records list: a test that cannot fail would count as evidence here without being any |
 | R5 | An orphaned content script after an extension update or reload: Chrome leaves the old script's DOM listeners in place, so a binding can run twice until the page reloads — reproducing an update in the harness is not automated |
 | R6 | The 102,400-byte total sync quota; only the 8 KB per-item limit is exercised |
+| R7 | Interception of browser accelerators (Alt+F today, Alt+D if adopted): Chromium's source lists them outside the reserved set, but the harness cannot exercise that path (see the 2026-08-20 record), so the claim rests on real-browser use, not on a test |
+| R8 | Everything A8 excludes, silently: on macOS the Alt bindings never match and Cmd+key can reach a binding as if unmodified; on AltGr layouts a Ctrl+Alt chord reaches the matcher with both modifiers set. No macOS runner exists in CI |
+| R9 | Killed text is unrecoverable today — no kill ring, no clipboard, no undo (2026-08-17 record). Known defect, not an accepted property; the 0.0.4 plan exists to retire it |

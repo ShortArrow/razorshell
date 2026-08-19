@@ -8,6 +8,14 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ### Changed
 
+- The assurance case now states its platform contract: A8 assumes
+  Windows/Linux with a layout that reports plain letters for
+  Alt+letter chords, macOS and AltGr layouts and fullscreen move to
+  the boundary, and new records freeze what an adversarial review of
+  the v0.0.4 plan measured — kills are unrecoverable today, what
+  execCommand does and does not do, and why accelerator interception
+  can only ever be verified in a real browser.
+
 - Every shipped PNG — the four extension icons and the README banner
   — regenerates from its committed SVG source through the asset
   generator, and image/promotion.svg is written from the same
