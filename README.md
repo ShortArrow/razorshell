@@ -20,8 +20,7 @@ This is a browser extension that adds bash shell-like keyboard shortcuts to text
 
 ### Implemented
 
-These work today. `Alt` + `f` and `Alt` + `b` also respond to the `Esc`,`f` and
-`Esc`,`b` two-stroke forms.
+These work today.
 
 <!-- keymap:implemented:start -->
 

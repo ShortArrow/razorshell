@@ -6,6 +6,8 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ## [Unreleased]
 
+## [0.0.4] - 2026-08-27
+
 ### Fixed
 
 - Ctrl+K and Ctrl+U delete through the browser instead of assigning
@@ -18,6 +20,9 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   caret, and a readonly or disabled field is left untouched.
 - Meta never matches a chord, so Cmd+K no longer reaches the Ctrl+K
   binding.
+- The README no longer promises the `Esc`,`f` two-stroke forms;
+  nothing implements them. They stay a candidate feature, not a
+  documented one.
 
 ### Changed
 
