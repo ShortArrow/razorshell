@@ -8,6 +8,13 @@ export interface Keymap {
   label: string;
   operation: (textinput: TextField) => void;
   editableOperation?: (root: HTMLElement) => void;
+  /**
+   * Whether this entry will act on the given field at this moment. An entry
+   * that declares itself unable is left to the page in full — the default
+   * action is not cancelled — which is how a binding shadowing a native key
+   * gives that key back when it has nothing to do. Absent means always.
+   */
+  canHandle?: (field: TextField | HTMLElement) => boolean;
   description?: () => string;
   key: string;
   alt?: boolean;
