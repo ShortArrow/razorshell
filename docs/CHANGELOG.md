@@ -6,6 +6,20 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ## [Unreleased]
 
+### Added
+
+- A kill ring. Ctrl+K and Ctrl+U put what they delete on it,
+  consecutive kills at one caret joining into a single entry in
+  readline's order, and Ctrl+Y yanks the newest entry back. Alt+Y
+  straight after a yank rotates to the entry before it.
+- The ring is per frame, holds ten plain-text entries, and is never
+  persisted; it clears when the URL policy denies the frame. A kill
+  in a password field is not stored. See
+  [ADR-0010](decisions/0010-kill-ring.md).
+- Ctrl+Y shadows the browser's redo on Windows and Linux only while
+  the ring has something to paste; on an empty ring the key reaches
+  the browser untouched.
+
 ## [0.0.4] - 2026-08-27
 
 ### Fixed

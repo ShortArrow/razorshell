@@ -39,6 +39,14 @@
     "message": "行の先頭まで削除",
     "description": "Delete to the beginning of the line"
   },
+  "yank": {
+    "message": "ヤンク(削除したテキストを貼り付け)",
+    "description": "Yank (paste killed text)"
+  },
+  "yank_pop": {
+    "message": "ヤンクポップ(一つ前の削除テキストに切り替え)",
+    "description": "Yank pop (cycle to the previous killed text)"
+  },
   "tooltip_default_policy": {
     "message": "どのルールにもマッチしないときに適用されます",
     "description": "Applied when no rule matches"

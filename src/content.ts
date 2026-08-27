@@ -1,7 +1,8 @@
 import { loadContentEditableSetting, subscribeContentEditableSetting } from "./contenteditablesetting";
 import { analyzeHandlerSource } from "./handleranalysis";
 import { showToast } from "./inspecttoast";
-import { dispatchEditableKey, isEditableTarget, isTextField, keyEventHandling, resolveEventTarget } from "./keyhandling";
+import { dispatchEditableKey, isEditableTarget, isTextField, keyEventHandling, resolveEventTarget, setCommandReporter } from "./keyhandling";
+import { clearRing, noteForeignCommand } from "./killring";
 import { keyChord } from "./keychord";
 import { Chord } from "./keymapmerge";
 import { getActiveKeymap, initKeymap } from "./keymapstore";
@@ -11,6 +12,24 @@ import { loadUrlPolicy, subscribeUrlPolicy } from "./urlpolicy";
 import { UrlPolicy, resolveAction } from "./urlrules";
 
 console.log("extension razorshell loaded");
+
+/**
+ * Bindings that talk to the kill ring as part of running. Every other binding is
+ * foreign to it, and running one breaks the kill chain and ends any yank
+ * sequence — which is what stops a motion between two kills from letting them
+ * concatenate into a line the user never had.
+ */
+const ringCommands = new Set([
+  "delete_to_the_end_of_the_line",
+  "delete_to_the_beginning_of_the_line",
+  "yank",
+  "yank_pop",
+]);
+
+setCommandReporter((id) => {
+  if (ringCommands.has(id)) return;
+  noteForeignCommand();
+});
 
 const inspectMessage = "razorshell-inspect";
 const stateMessage = "razorshell-state";
@@ -30,9 +49,12 @@ function reportState(): void {
 
 let urlPolicy: UrlPolicy | null = null;
 
+// Text killed while the extension was allowed must not survive into a page it
+// is denied on, so the ring goes when the frame does.
 function applyUrlPolicy(policy: UrlPolicy) {
   urlPolicy = policy;
   enabled = resolveAction(location.href, policy) !== "deny";
+  if (!enabled) clearRing();
   reportState();
 }
 

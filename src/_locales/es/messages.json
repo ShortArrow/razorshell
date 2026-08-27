@@ -39,6 +39,14 @@
     "message": "Borrar hasta el principio de la línea",
     "description": "Delete to the beginning of the line"
   },
+  "yank": {
+    "message": "Pegar (insertar el texto eliminado)",
+    "description": "Yank (paste killed text)"
+  },
+  "yank_pop": {
+    "message": "Pegar anterior (cambiar al texto eliminado anterior)",
+    "description": "Yank pop (cycle to the previous killed text)"
+  },
   "tooltip_default_policy": {
     "message": "Se aplica cuando ninguna regla coincide",
     "description": "Applied when no rule matches"

@@ -39,6 +39,14 @@
     "message": "Excluir até o início da linha",
     "description": "Delete to the beginning of the line"
   },
+  "yank": {
+    "message": "Colar (inserir o texto removido)",
+    "description": "Yank (paste killed text)"
+  },
+  "yank_pop": {
+    "message": "Colar anterior (alternar para o texto removido anterior)",
+    "description": "Yank pop (cycle to the previous killed text)"
+  },
   "tooltip_default_policy": {
     "message": "Aplicado quando nenhuma regra corresponde",
     "description": "Applied when no rule matches"

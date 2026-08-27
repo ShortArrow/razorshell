@@ -39,6 +39,14 @@
     "message": "Hapus sampai awal baris",
     "description": "Delete to the beginning of the line"
   },
+  "yank": {
+    "message": "Tempel teks yang dihapus",
+    "description": "Yank (paste killed text)"
+  },
+  "yank_pop": {
+    "message": "Tempel teks yang dihapus sebelumnya",
+    "description": "Yank pop (cycle to the previous killed text)"
+  },
   "tooltip_default_policy": {
     "message": "Diterapkan bila tidak ada aturan yang cocok",
     "description": "Applied when no rule matches"

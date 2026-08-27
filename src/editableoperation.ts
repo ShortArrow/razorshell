@@ -7,7 +7,24 @@
  * rendered lines rather than the source text. Deletion extends the selection and
  * hands the removal to execCommand("delete") so the host editor still sees its
  * input event and keeps its undo history.
+ *
+ * The kill ring reaches into these operations with a weaker chain check than the
+ * text-field side has. There is no caret offset to compare here — a
+ * contenteditable's selection is a node and an offset inside arbitrary markup,
+ * not an index into a value — so a chained kill is recognised by the root
+ * element and the last-command flag alone. An arrow key that moves the caret
+ * within the same root is therefore invisible: the kill after it still
+ * concatenates. That is a known looseness, not an oversight.
+ *
+ * Yank-pop is refused outright in contenteditable, and that is the v0.0.5
+ * boundary. A pop is a replacement, and replacing needs proof that the recorded
+ * range still holds exactly the text that was inserted. In a rich-text root
+ * there is no offset pair that survives the host editor's own normalisation, so
+ * the only honest options were an optimistic replace that can destroy text the
+ * user wrote, or nothing. Nothing is what ships.
  */
+
+import { beginYank, recordKill } from "./killring";
 
 interface ModifiableSelection extends Selection {
   modify(alter: string, direction: string, granularity: string): void;
@@ -26,12 +43,42 @@ function move(direction: string, granularity: string): void {
   current.modify("move", direction, granularity);
 }
 
-function deleteToBoundary(direction: string): void {
+/**
+ * Extends to the line boundary and removes it, reporting what was taken to the
+ * ring. The text has to be read off the selection before the delete, because
+ * afterwards there is nothing left to read.
+ */
+function deleteToBoundary(root: HTMLElement, direction: string): void {
   const current = selection();
   if (!current) return;
   current.modify("extend", direction, "lineboundary");
   if (current.isCollapsed) return;
+  const text = current.toString();
   document.execCommand("delete");
+  recordKill({
+    direction: direction === "forward" ? "forward" : "backward",
+    text,
+    elementToken: root,
+    caretAfter: editableCaret,
+    storable: true,
+  });
+}
+
+/**
+ * The stand-in for a caret offset in a contenteditable root.
+ *
+ * A rich-text selection has no single number to compare, so every CE kill
+ * reports the same value and the chain rests on the root and the last-command
+ * flag alone — the looseness the file header describes.
+ */
+const editableCaret = 0;
+
+/** Inserts ring text as plain text, so nothing carries markup into the editor. */
+function yankInto(root: HTMLElement): void {
+  const text = beginYank();
+  if (text === undefined) return;
+  root.focus();
+  document.execCommand("insertText", false, text);
 }
 
 export const editableOperation: Record<string, (root: HTMLElement) => void> = {
@@ -41,6 +88,7 @@ export const editableOperation: Record<string, (root: HTMLElement) => void> = {
   move_cursor_to_the_previous_character: () => move("backward", "character"),
   move_cursor_to_the_next_word: () => move("forward", "word"),
   move_cursor_to_the_previous_word: () => move("backward", "word"),
-  delete_to_the_end_of_the_line: () => deleteToBoundary("forward"),
-  delete_to_the_beginning_of_the_line: () => deleteToBoundary("backward"),
+  delete_to_the_end_of_the_line: (root) => deleteToBoundary(root, "forward"),
+  delete_to_the_beginning_of_the_line: (root) => deleteToBoundary(root, "backward"),
+  yank: (root) => yankInto(root),
 };

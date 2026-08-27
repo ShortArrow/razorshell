@@ -1,6 +1,6 @@
 import { editableOperation } from "./editableoperation";
 import { getMessage } from "./languages";
-import { Keymap, operation } from "./operation";
+import { canYank, canYankPopField, Keymap, operation } from "./operation";
 
 export function keymaching(event: KeyboardEvent, key: Keymap): boolean {
   let result = true;
@@ -99,5 +99,24 @@ export const defaultKeymap: Keymap[] = [
     editableOperation: editableOperation.delete_to_the_beginning_of_the_line,
     ctrl: true,
     key: "u",
+  },
+  {
+    id: "yank",
+    label: "yank",
+    description: getMessage("yank"),
+    operation: operation.yank,
+    editableOperation: editableOperation.yank,
+    canHandle: canYank,
+    ctrl: true,
+    key: "y",
+  },
+  {
+    id: "yank_pop",
+    label: "yank pop",
+    description: getMessage("yank_pop"),
+    operation: operation.yankPop,
+    canHandle: canYankPopField,
+    alt: true,
+    key: "y",
   },
 ];

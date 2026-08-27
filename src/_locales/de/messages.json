@@ -39,6 +39,14 @@
     "message": "Bis zum Zeilenanfang löschen",
     "description": "Delete to the beginning of the line"
   },
+  "yank": {
+    "message": "Einfügen (gelöschten Text einfügen)",
+    "description": "Yank (paste killed text)"
+  },
+  "yank_pop": {
+    "message": "Einfügen zurück (zum vorherigen gelöschten Text wechseln)",
+    "description": "Yank pop (cycle to the previous killed text)"
+  },
   "tooltip_default_policy": {
     "message": "Wird angewendet, wenn keine Regel zutrifft",
     "description": "Applied when no rule matches"

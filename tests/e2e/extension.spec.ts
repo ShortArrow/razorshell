@@ -1697,8 +1697,13 @@ test.describe("a kill behaves like a native deletion @C1.14", () => {
     // here, so the value alone cannot tell the two apart — the redo is what
     // does: after undo-then-redo the field must be exactly as it was left. Had
     // Ctrl+K eaten a character, the redo would replay that deletion instead.
+    //
+    // The redo is spelled Ctrl+Shift+Z, not Ctrl+Y: since the kill ring landed
+    // (C1.15) Ctrl+Y is the yank, and pressing it here would insert ring text
+    // instead of redoing. Chromium accepts both chords for redo, and this one
+    // no binding claims.
     await page.keyboard.press("Control+z");
-    await page.keyboard.press("Control+y");
+    await page.keyboard.press("Control+Shift+z");
     expect((await fieldState(input())).value).toBe("nothing to kill");
   });
 
@@ -1715,6 +1720,281 @@ test.describe("a kill behaves like a native deletion @C1.14", () => {
     await input().evaluate((el: HTMLInputElement) => {
       el.readOnly = false;
     });
+  });
+});
+
+/**
+ * The kill ring: what a kill leaves behind and what a yank brings back.
+ *
+ * The ring lives in the content script's frame and is never persisted, so every
+ * test here seeds the state it needs through real keypresses rather than reading
+ * it out — there is nothing to read. What can be observed is the field, and that
+ * is what each assertion is written against.
+ *
+ * The block seeds its own allowing policy and restores the denying one the
+ * surrounding scenario expects, in the manner of the C1.14 block above.
+ */
+test.describe("killed text can be yanked back @C1.15", () => {
+  const input = () => page.locator('input[type="text"]').first();
+  const password = () => page.locator('input[type="password"]');
+
+  /** The caret, set directly — see the note in the C1.14 block on why not a chord. */
+  async function caretTo(position: number): Promise<void> {
+    await input().evaluate((el: HTMLInputElement, at: number) => {
+      el.focus();
+      el.setSelectionRange(at, at);
+    }, position);
+  }
+
+  /** Types into the field natively, so the field owns a real undo stack. */
+  async function typeFresh(text: string): Promise<void> {
+    await input().click();
+    await input().evaluate((el: HTMLInputElement) => {
+      el.focus();
+      el.setSelectionRange(0, el.value.length);
+    });
+    await page.keyboard.press("Delete");
+    await page.keyboard.type(text);
+    expect((await fieldState(input())).value).toBe(text);
+  }
+
+  /**
+   * Empties the ring the only way a page can: by reloading the frame, which
+   * takes the content script's module state with it.
+   */
+  async function freshFrame(): Promise<void> {
+    await page.goto(`${origin}/`);
+    await page.waitForTimeout(1000);
+  }
+
+  /**
+   * The C1.14 block above kills three times in this same field at caret 0, and
+   * those kills are on the ring by the time this block starts — chained into one
+   * entry, since nothing there moved the caret between them. Every assertion
+   * below is about what this block itself killed, so the frame is reloaded first
+   * to start from an empty ring.
+   */
+  /**
+   * The contenteditable test in this block turns the opt-in on, and the restart
+   * describe near the end of the file asserts the value the import block left in
+   * storage. So the setting is read here and put back as it was found rather
+   * than forced to a constant, which would quietly rewrite that later claim.
+   */
+  let editableWasEnabled = false;
+
+  test.beforeAll(async () => {
+    await setPolicy({ defaultAction: "allow", rules: [] });
+    editableWasEnabled = await optionsPage.evaluate(async () => {
+      const data = (await chrome.storage.sync.get("enableContentEditable")) as {
+        enableContentEditable?: boolean;
+      };
+      return data.enableContentEditable === true;
+    });
+    await freshFrame();
+  });
+
+  test.afterAll(async () => {
+    await optionsPage.evaluate(
+      (value) => chrome.storage.sync.set({ enableContentEditable: value }),
+      editableWasEnabled,
+    );
+    await page.waitForTimeout(500);
+    await freshFrame();
+    await setPolicy({
+      defaultAction: "allow",
+      rules: [{ pattern: "https://example.com/**", matchType: "glob", action: "deny" }],
+    });
+    await seedTextInput("hello world new order", 0);
+  });
+
+  test("a kill and a yank round trip", async () => {
+    await typeFresh("hello world");
+    await caretTo(0);
+    await page.keyboard.press("Control+k");
+    expect((await fieldState(input())).value).toBe("");
+
+    await page.keyboard.press("Control+y");
+    expect(await fieldState(input())).toEqual({
+      value: "hello world",
+      start: "hello world".length,
+      end: "hello world".length,
+    });
+  });
+
+  test("a backward kill then a forward kill reconstruct the line", async () => {
+    await typeFresh("abcdef");
+    await caretTo(3);
+    await page.keyboard.press("Control+u");
+    expect((await fieldState(input())).value).toBe("def");
+    await page.keyboard.press("Control+k");
+    expect((await fieldState(input())).value).toBe("");
+
+    await page.keyboard.press("Control+y");
+    expect((await fieldState(input())).value).toBe("abcdef");
+  });
+
+  test("two entries rotate under yank-pop", async () => {
+    await typeFresh("one");
+    await caretTo(0);
+    await page.keyboard.press("Control+k");
+
+    // The chain has to break between the two kills, or they accumulate into one
+    // entry and there is nothing to rotate through. What breaks it is killing
+    // from a caret the previous kill did not leave behind — the first kill left
+    // the caret at 0, so this one runs at 1 and starts a fresh entry. Retyping
+    // alone does not break it (same element, caret back at 0), and neither does
+    // an arrow key that happens to land on 0 again: both were measured merging
+    // into "onetwo". The caret value is the whole check.
+    await typeFresh("xtwo");
+    await caretTo(1);
+    await page.keyboard.press("Control+k");
+    expect((await fieldState(input())).value).toBe("x");
+
+    await caretTo(1);
+    await page.keyboard.press("Control+y");
+    expect((await fieldState(input())).value).toBe("xtwo");
+
+    await page.keyboard.press("Alt+y");
+    expect((await fieldState(input())).value).toBe("xone");
+  });
+
+  test("a caret move between kills keeps them as two entries", async () => {
+    await typeFresh("alpha");
+    await caretTo(0);
+    await page.keyboard.press("Control+k");
+
+    await typeFresh("beta");
+    await caretTo(0);
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("Control+k");
+    expect((await fieldState(input())).value).toBe("b");
+
+    await typeFresh("");
+    await caretTo(0);
+    await page.keyboard.press("Control+y");
+    expect((await fieldState(input())).value).toBe("eta");
+
+    // Two distinct entries exist only if the arrow key broke the chain; had it
+    // not, "eta" and "alpha" would be one entry and this rotation would return
+    // the same text it just inserted.
+    await page.keyboard.press("Alt+y");
+    expect((await fieldState(input())).value).toBe("alpha");
+  });
+
+  test("a password kill is never stored", async () => {
+    await freshFrame();
+
+    await password().evaluate((el: HTMLInputElement) => {
+      el.value = "hunter2 secret phrase";
+      el.focus();
+      el.setSelectionRange(0, 0);
+    });
+    await page.keyboard.press("Control+k");
+    expect((await fieldState(password())).value).toBe("");
+
+    await typeFresh("carrier");
+    await caretTo("carrier".length);
+    await page.keyboard.press("Control+y");
+
+    // The ring was empty, so the yank must have inserted nothing at all, and
+    // the secret must not have reached the field by any route.
+    const after = (await fieldState(input())).value;
+    expect(after).toBe("carrier");
+    expect(after).not.toContain("hunter2");
+    expect(after).not.toContain("secret");
+
+    await password().evaluate((el: HTMLInputElement) => {
+      el.value = "hunter2 secret phrase";
+    });
+  });
+
+  test("an empty ring leaves Ctrl+Y to the browser", async () => {
+    await freshFrame();
+
+    await input().evaluate((el: HTMLInputElement) => {
+      const seen: boolean[] = [];
+      const listener = (event: Event) => {
+        const key = event as KeyboardEvent;
+        if (key.ctrlKey && key.key === "y") seen.push(key.defaultPrevented);
+      };
+      (el as unknown as { __yankSeen: boolean[] }).__yankSeen = seen;
+      (el as unknown as { __yankListener: EventListener }).__yankListener = listener;
+      el.addEventListener("keydown", listener);
+    });
+
+    await input().click();
+    await caretTo(0);
+    const before = (await fieldState(input())).value;
+    await page.keyboard.press("Control+y");
+
+    const prevented = await input().evaluate((el: HTMLInputElement) => {
+      const holder = el as unknown as { __yankSeen: boolean[]; __yankListener: EventListener };
+      el.removeEventListener("keydown", holder.__yankListener);
+      const seen = holder.__yankSeen;
+      delete (el as unknown as Record<string, unknown>).__yankSeen;
+      delete (el as unknown as Record<string, unknown>).__yankListener;
+      return seen;
+    });
+
+    expect(prevented).toEqual([false]);
+    expect((await fieldState(input())).value).toBe(before);
+  });
+
+  test("denying the page clears the ring", async () => {
+    await freshFrame();
+    await typeFresh("disposable");
+    await caretTo(0);
+    await page.keyboard.press("Control+k");
+    expect((await fieldState(input())).value).toBe("");
+
+    await setPolicy({
+      defaultAction: "allow",
+      rules: [{ pattern: `${origin}/**`, matchType: "glob", action: "deny" }],
+    });
+    await setPolicy({ defaultAction: "allow", rules: [] });
+
+    await caretTo(0);
+    await page.keyboard.press("Control+y");
+    expect((await fieldState(input())).value).toBe("");
+  });
+
+  test("a contenteditable kill yanks back, and into a plain field as text", async () => {
+    await freshFrame();
+    await optionsPage.evaluate(() => chrome.storage.sync.set({ enableContentEditable: true }));
+    await page.waitForTimeout(500);
+    await expect(page.locator("#ce-status")).toContainText("enabled in options");
+
+    const editorText = () =>
+      page.evaluate(() => document.querySelector('[contenteditable="true"]')!.textContent ?? "");
+    const setCaret = (offset: number) =>
+      page.evaluate((o) => {
+        const div = document.querySelector<HTMLElement>('[contenteditable="true"]')!;
+        div.focus();
+        const range = document.createRange();
+        range.setStart(div.firstChild!, o);
+        range.collapse(true);
+        const sel = window.getSelection()!;
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }, offset);
+
+    await page.locator('[contenteditable="true"]').click();
+    await setCaret(0);
+    await page.keyboard.press("Control+k");
+    expect(await editorText()).not.toContain("first line");
+
+    await page.keyboard.press("Control+y");
+    expect(await editorText()).toContain("first line");
+
+    // The ring carries plain text only, so the same entry lands in an input
+    // unchanged rather than as markup.
+    await typeFresh("");
+    await caretTo(0);
+    await page.keyboard.press("Control+y");
+    expect((await fieldState(input())).value).toBe("first line");
+
+    // The block's afterAll restores the setting to whatever storage held before
+    // this describe ran, so nothing is forced here.
   });
 });
 

@@ -32,10 +32,18 @@ These work today.
 | `Ctrl` + `f` | move cursor to the next character     |
 | `Ctrl` + `k` | delete to the end of the line         |
 | `Ctrl` + `u` | delete to the beginning of the line   |
+| `Ctrl` + `y` | yank                                  |
 | `Alt` + `b`  | move cursor to the previous word      |
 | `Alt` + `f`  | move cursor to the next word          |
+| `Alt` + `y`  | yank pop                              |
 
 <!-- keymap:implemented:end -->
+
+Killed text goes onto a kill ring: consecutive kills join into one entry,
+`Ctrl` + `y` puts the newest entry back, and `Alt` + `y` immediately after a
+yank cycles to the entry before it. On Windows and Linux `Ctrl` + `y` is the
+browser's redo, and Razorshell shadows it while the ring has something to
+paste; with an empty ring the key is left alone and redo still works.
 
 ### Planned (not implemented yet)
 
@@ -47,7 +55,6 @@ Listed for reference; none of these are wired up.
 | `Ctrl` + `l`     | clear screen                          |
 | `Ctrl` + `p`     | previous history                      |
 | `Ctrl` + `r`     | reverse search history                |
-| `Ctrl` + `y`     | Paste the yanked                      |
 | `Ctrl` + `\`     |                                       |
 | `Ctrl` + `[`     |                                       |
 | `Ctrl` + `]`     | character search                      |

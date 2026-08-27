@@ -39,6 +39,14 @@
     "message": "删除到行首",
     "description": "Delete to the beginning of the line"
   },
+  "yank": {
+    "message": "粘贴已删除的文本",
+    "description": "Yank (paste killed text)"
+  },
+  "yank_pop": {
+    "message": "循环粘贴上一段已删除的文本",
+    "description": "Yank pop (cycle to the previous killed text)"
+  },
   "tooltip_default_policy": {
     "message": "当没有任何规则匹配时应用",
     "description": "Applied when no rule matches"

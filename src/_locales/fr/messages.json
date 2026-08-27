@@ -39,6 +39,14 @@
     "message": "Supprimer jusqu'au début de la ligne",
     "description": "Delete to the beginning of the line"
   },
+  "yank": {
+    "message": "Coller (insérer le texte supprimé)",
+    "description": "Yank (paste killed text)"
+  },
+  "yank_pop": {
+    "message": "Coller précédent (passer au texte supprimé précédent)",
+    "description": "Yank pop (cycle to the previous killed text)"
+  },
   "tooltip_default_policy": {
     "message": "Appliqué lorsqu'aucune règle ne correspond",
     "description": "Applied when no rule matches"

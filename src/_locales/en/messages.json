@@ -39,6 +39,14 @@
     "message": "Delete to the beginning of the line",
     "description": "Delete to the beginning of the line"
   },
+  "yank": {
+    "message": "Yank (paste killed text)",
+    "description": "Yank (paste killed text)"
+  },
+  "yank_pop": {
+    "message": "Yank pop (cycle to the previous killed text)",
+    "description": "Yank pop (cycle to the previous killed text)"
+  },
   "tooltip_default_policy": {
     "message": "Applied when no rule matches",
     "description": "Applied when no rule matches"

@@ -39,6 +39,14 @@
     "message": "Удалить до начала строки",
     "description": "Delete to the beginning of the line"
   },
+  "yank": {
+    "message": "Вставить удалённый текст",
+    "description": "Yank (paste killed text)"
+  },
+  "yank_pop": {
+    "message": "Вставить предыдущий удалённый текст",
+    "description": "Yank pop (cycle to the previous killed text)"
+  },
   "tooltip_default_policy": {
     "message": "Применяется, когда ни одно правило не подходит",
     "description": "Applied when no rule matches"

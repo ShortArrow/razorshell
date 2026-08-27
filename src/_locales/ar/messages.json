@@ -39,6 +39,14 @@
     "message": "الحذف حتى بداية السطر",
     "description": "Delete to the beginning of the line"
   },
+  "yank": {
+    "message": "لصق النص المحذوف",
+    "description": "Yank (paste killed text)"
+  },
+  "yank_pop": {
+    "message": "لصق النص المحذوف السابق",
+    "description": "Yank pop (cycle to the previous killed text)"
+  },
   "tooltip_default_policy": {
     "message": "يُطبَّق عندما لا تطابق أي قاعدة",
     "description": "Applied when no rule matches"

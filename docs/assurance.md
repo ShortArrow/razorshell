@@ -76,6 +76,7 @@ file the importer refuses; a rendering readable in one theme only.
 | C1.12 | The language override resolves every packaged locale's tooltips, and a failed dictionary fetch falls back to the browser's own messages |
 | C1.13 | A binding runs exactly once per keypress — settings churn, options-page remounts, same-document navigations and an abandoned rebind capture leave no duplicate or stale key handler behind |
 | C1.14 | A kill is undoable, fires one input event the page can see, does nothing on an empty region, and leaves readonly fields alone |
+| C1.15 | Killed text lands on a frame-local ring: chained kills concatenate in readline order, Ctrl+Y yanks the newest entry, Alt+Y rotates with verified replacement, a password kill is never stored, and an empty-ring Ctrl+Y leaves the native key untouched |
 
 ## Traceability
 
