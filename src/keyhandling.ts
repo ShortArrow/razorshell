@@ -1,6 +1,7 @@
 import { keymaching } from "./keymap";
 import { getActiveKeymap } from "./keymapstore";
 import { debug } from "./debug";
+import { noteForeignCommand } from "./killring";
 import { Keymap, TextField } from "./operation";
 
 const targetInputTypes = ["text", "search", "url", "tel", "password"];
@@ -33,22 +34,18 @@ export function isEditableTarget(target: EventTarget | null): target is HTMLElem
 }
 
 /**
- * Announces which binding is about to run, so the kill ring can tell a command
- * of its own from any other and break the kill chain accordingly.
+ * Tells the ring that a binding foreign to it just ran.
  *
- * Entries that speak to the ring themselves — kills and yanks — record what they
- * did as part of running, so this default reports every other binding as
- * foreign. It is a module-level seam rather than an argument because the whole
- * dispatch path is reached through `getActiveKeymap`, and threading a reporter
- * through it would put ring state in every caller's signature.
+ * Kills and yanks report themselves as part of running, so only the entries
+ * carrying no `ringRole` are announced here. The call sits in the dispatchers
+ * rather than behind an injected reporter because every path that runs a binding
+ * runs through them — the content script's document listener and the options
+ * page's React handler alike — and a seam installed by one entry point leaves
+ * the other silently unwired.
  */
-let reportCommand: (id: string) => void = () => {};
-
-/** Replaces the command reporter. Returns the previous one, so tests restore it. */
-export function setCommandReporter(reporter: (id: string) => void): (id: string) => void {
-  const previous = reportCommand;
-  reportCommand = reporter;
-  return previous;
+function noteIfForeign(entry: Keymap): void {
+  if (entry.ringRole !== undefined) return;
+  noteForeignCommand();
 }
 
 /**
@@ -68,7 +65,7 @@ export function dispatchKey(event: KeyboardEvent, textinput: TextField, keymap: 
   if (matched.canHandle && !matched.canHandle(textinput)) return;
   console.debug("key matched");
   event.preventDefault(); // cancel default action
-  reportCommand(matched.id);
+  noteIfForeign(matched);
   matched.operation(textinput);
 }
 
@@ -93,6 +90,6 @@ export function dispatchEditableKey(event: KeyboardEvent, root: HTMLElement, key
   if (!matched || !matched.editableOperation) return;
   if (matched.canHandle && !matched.canHandle(root)) return;
   event.preventDefault(); // cancel default action
-  reportCommand(matched.id);
+  noteIfForeign(matched);
   matched.editableOperation(root);
 }

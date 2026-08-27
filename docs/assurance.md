@@ -134,6 +134,28 @@ Frozen observations; each holds only for its date.
   `historyUndo`) and the deletion undoes. With an EMPTY selection,
   `delete` acts as Backspace and removes one character — any rework
   built on it must not call it with an empty kill region.
+- 2026-08-27, mutation panel over the kill ring, run before and after
+  the yank-pop remediation. M1, the password kill stored anyway:
+  red in three unit tests. M2, the yank-pop text check forced true:
+  ALL GREEN before this remediation — no test in any suite could see
+  a stale record replaced, which is what the page-rewrite e2e test
+  now covers. M3, the ring keeping password text: red only in the
+  e2e test that surfaces the secret into a visible field; no unit
+  test distinguished it. M4, the empty-ring Ctrl+Y cancelled anyway:
+  red on the pass-through assertion alone. M5, the deny path leaving
+  the ring intact: red on the deny test alone. Each mutation was
+  reverted and the revert confirmed by `git status`.
+  Detection outside e2e exists for M1 only; M2 through M5 are held by
+  the e2e suite, so a green unit run is not evidence for them.
+- 2026-08-27, sensitivity of the three tests added by that
+  remediation, each planted and reverted: the M2 mutation replanted
+  turns the page-rewrite e2e red; dropping the caret condition from
+  `canYankPop` turns the typing-after-yank e2e and two unit cases
+  (U-y4, U-y5) red; dropping `clearYankRecord` from the deny path
+  turns the deny e2e red. The weak element references in
+  `killring.ts` and `yank.ts` have NO behavioral test — garbage
+  collection cannot be forced from a test, so no assertion can tell a
+  weak reference from a strong one, and that fix rests on reading.
 - 2026-08-20, CDP-injected keys never reach Chrome's browser-
   accelerator handling on Windows and Linux (the native-event
   builder exists only for mac/ios, so injected events carry

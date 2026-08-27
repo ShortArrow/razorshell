@@ -43,9 +43,21 @@ export interface KillRecord {
   storable: boolean;
 }
 
-/** Where a chained kill would have to land to join the newest entry. */
+/**
+ * Where a chained kill would have to land to join the newest entry.
+ *
+ * The element is held weakly. The chain is transient — the next foreign command
+ * drops it — but nothing guarantees a next command, and a page that removes the
+ * field after a kill would otherwise leave this module pinning the detached
+ * element and its subtree for the life of the frame. Nothing is lost by holding
+ * it weakly: a chain whose element is gone could never match a later kill.
+ *
+ * The leak fix has no behavioral test — garbage collection cannot be forced from
+ * a test, so no assertion can tell a weak reference from a strong one. Reviewers
+ * must check this one by reading it.
+ */
 interface ChainState {
-  elementToken: object;
+  elementToken: WeakRef<object>;
   caretAfter: number;
 }
 
@@ -103,7 +115,7 @@ export function recordKill(record: KillRecord): void {
   }
   if (chained) entries[0] = merged;
   else push(merged);
-  chain = { elementToken: record.elementToken, caretAfter: record.caretAfter };
+  chain = { elementToken: new WeakRef(record.elementToken), caretAfter: record.caretAfter };
 }
 
 /**
@@ -146,9 +158,13 @@ export function rotateYank(): string | undefined {
   return entries[yankIndex];
 }
 
-/** Whether a kill lands exactly where the previous one left the caret. */
+/**
+ * Whether a kill lands exactly where the previous one left the caret. An
+ * element the chain can no longer reach — collected since — is a mismatch, so
+ * a dead reference starts a fresh entry rather than chaining onto one.
+ */
 function isSamePlace(state: ChainState, record: KillRecord): boolean {
-  return state.elementToken === record.elementToken && state.caretAfter === record.caretAfter;
+  return state.elementToken.deref() === record.elementToken && state.caretAfter === record.caretAfter;
 }
 
 /** Readline's accumulation order: forward kills append, backward kills prepend. */

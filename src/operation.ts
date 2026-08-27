@@ -17,6 +17,20 @@ export interface Keymap {
    * gives that key back when it has nothing to do. Absent means always.
    */
   canHandle?: (field: TextField | HTMLElement) => boolean;
+  /**
+   * How this entry speaks to the kill ring, when it does.
+   *
+   * A `"kill"` entry records what it removed and a `"yank"` entry drives the
+   * yank sequence; both report themselves as part of running. Absent means the
+   * entry is foreign to the ring, and the dispatcher tells the ring so — which
+   * is what stops a motion between two kills from letting them concatenate into
+   * a line the user never had.
+   *
+   * The role lives on the entry rather than in a list held elsewhere so that a
+   * new binding declares its own relationship to the ring, instead of the ring's
+   * correctness depending on a second file being edited in step.
+   */
+  ringRole?: "kill" | "yank";
   description?: () => string;
   key: string;
   alt?: boolean;

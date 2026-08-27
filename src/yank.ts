@@ -18,9 +18,22 @@
  */
 import type { TextField } from "./operation";
 
-/** What the last yank put into a field, and where. */
+/**
+ * What the last yank put into a field, and where.
+ *
+ * The field is held weakly. A record outlives the yank only until the next
+ * command, but nothing guarantees a next command: a page that removes the field
+ * — an SPA swapping a view, a dialog closing — would otherwise leave this module
+ * pinning the detached element, and through it the subtree, for as long as the
+ * frame lives. A strong reference here buys nothing, because a record whose
+ * field is gone can never verify anyway.
+ *
+ * The leak fix has no behavioral test: garbage collection cannot be forced from
+ * a test, so nothing can observe the difference between a weak and a strong
+ * reference. Reviewers must check this one by reading it.
+ */
 interface YankRecord {
-  field: TextField;
+  field: WeakRef<TextField>;
   start: number;
   end: number;
   text: string;
@@ -37,7 +50,7 @@ export function applyYank(field: TextField, text: string): void {
   const start = field.selectionStart ?? field.value.length;
   const end = field.selectionEnd ?? start;
   replaceRange(field, start, end, text);
-  lastYank = { field, start, end: start + text.length, text };
+  lastYank = { field: new WeakRef(field), start, end: start + text.length, text };
 }
 
 /**
@@ -51,23 +64,54 @@ export function applyYankPop(field: TextField, text: string): boolean {
   if (!canYankPop(field)) return false;
   const record = lastYank!;
   replaceRange(field, record.start, record.end, text);
-  lastYank = { field, start: record.start, end: record.start + text.length, text };
+  lastYank = { field: new WeakRef(field), start: record.start, end: record.start + text.length, text };
   return true;
 }
 
 /**
  * Whether the region the last yank recorded still holds exactly what was put
- * there. A different element, an edited value, or a caret-driven change since —
- * anything that makes the record no longer describe the field — answers no.
+ * there, with the caret still resting at its end.
+ *
+ * The verification is text AND place, and both halves are load-bearing. The text
+ * check catches a value that changed under the record — a page script rewriting
+ * the field, an undo. The place check catches everything that moved the caret
+ * without changing that region, and that is the wider class: an arrow key, a
+ * click, a selection, a keystroke elsewhere in the field.
+ *
+ * The place check is also what makes the ring's last-command tracking honest. A
+ * keystroke matching no binding never reaches the dispatcher's reporting path,
+ * so it cannot announce itself to the ring and cannot break the chain that way.
+ * What such a keystroke does do is move the caret, and this is the check that
+ * sees it — which is why an unmatched key can be left unreported safely.
+ *
+ * The selection must be collapsed: a range ending exactly at the recorded end
+ * still means the user selected something, and replacing the record's region
+ * would discard that selection's own text.
+ *
+ * A field the record can no longer reach — collected, so the weak reference is
+ * dead — is a mismatch like any other.
  */
 export function canYankPop(field: TextField): boolean {
   if (lastYank === null) return false;
-  if (lastYank.field !== field) return false;
+  if (lastYank.field.deref() !== field) return false;
+  if (field.selectionStart !== lastYank.end) return false;
+  if (field.selectionEnd !== lastYank.end) return false;
   return field.value.slice(lastYank.start, lastYank.end) === lastYank.text;
 }
 
 /** Forgets the recorded region, so no later pop can act on it. */
 export function noteYankPopFailure(): void {
+  lastYank = null;
+}
+
+/**
+ * Drops the recorded region, as the frame going quiet would.
+ *
+ * The companion to `clearRing`: the entries and the record describe one state
+ * between them, and clearing only the entries leaves a record pointing at text
+ * no rotation can reach — a pop that cancels the key while doing nothing.
+ */
+export function clearYankRecord(): void {
   lastYank = null;
 }
 

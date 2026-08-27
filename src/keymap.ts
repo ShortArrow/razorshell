@@ -48,6 +48,7 @@ export const defaultKeymap: Keymap[] = [
   },
   {
     id: "delete_to_the_end_of_the_line",
+    ringRole: "kill",
     label: "delete to the end of the line",
     description: getMessage("delete_to_the_end_of_the_line"),
     operation: operation.deleteToEOL,
@@ -93,6 +94,7 @@ export const defaultKeymap: Keymap[] = [
   },
   {
     id: "delete_to_the_beginning_of_the_line",
+    ringRole: "kill",
     label: "delete to the beginning of the line",
     description: getMessage("delete_to_the_beginning_of_the_line"),
     operation: operation.deleteToTOL,
@@ -102,6 +104,7 @@ export const defaultKeymap: Keymap[] = [
   },
   {
     id: "yank",
+    ringRole: "yank",
     label: "yank",
     description: getMessage("yank"),
     operation: operation.yank,
@@ -112,6 +115,7 @@ export const defaultKeymap: Keymap[] = [
   },
   {
     id: "yank_pop",
+    ringRole: "yank",
     label: "yank pop",
     description: getMessage("yank_pop"),
     operation: operation.yankPop,

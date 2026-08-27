@@ -20,6 +20,19 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   the ring has something to paste; on an empty ring the key reaches
   the browser untouched.
 
+### Fixed
+
+- Alt+Y refuses unless the caret still rests at the end of what the
+  last yank inserted, so typing or clicking after a yank leaves the
+  key to the page instead of overwriting the text just written.
+- A binding between two kills breaks the chain on the options page's
+  test area too. The ring is wired from the dispatcher, which both
+  entry points share, rather than from the content script alone.
+- Denying a page clears the yank record along with the ring, so Alt+Y
+  no longer cancels the key while having nothing to rotate to.
+- The kill chain and the yank record hold their elements weakly; a
+  field removed after a kill is no longer pinned for the frame's life.
+
 ## [0.0.4] - 2026-08-27
 
 ### Fixed

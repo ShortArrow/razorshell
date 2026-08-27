@@ -1768,6 +1768,47 @@ test.describe("killed text can be yanked back @C1.15", () => {
   }
 
   /**
+   * Presses a chord and reports, for each matching keydown the field saw,
+   * whether the extension cancelled it.
+   *
+   * A binding with nothing to do must leave the native key alone, so "did
+   * nothing" and "did nothing and also swallowed the key" are different
+   * outcomes and only this can tell them apart. The listener is attached and
+   * removed around the press so it cannot leak into the inspector's count.
+   */
+  async function pressAndReadPrevented(
+    chord: string,
+    matches: (event: KeyboardEvent) => boolean,
+  ): Promise<boolean[]> {
+    await input().evaluate((el: HTMLInputElement, source: string) => {
+      const predicate = new Function(`return (${source})`)() as (e: KeyboardEvent) => boolean;
+      const seen: boolean[] = [];
+      const listener = (event: Event) => {
+        const key = event as KeyboardEvent;
+        if (predicate(key)) seen.push(key.defaultPrevented);
+      };
+      const holder = el as unknown as { __seen: boolean[]; __listener: EventListener };
+      holder.__seen = seen;
+      holder.__listener = listener;
+      el.addEventListener("keydown", listener);
+    }, matches.toString());
+
+    // Focus without clicking: a click would move the caret, and in the tests
+    // that turn on caret position that would destroy the very state under test.
+    await input().evaluate((el: HTMLInputElement) => el.focus());
+    await page.keyboard.press(chord);
+
+    return input().evaluate((el: HTMLInputElement) => {
+      const holder = el as unknown as { __seen: boolean[]; __listener: EventListener };
+      el.removeEventListener("keydown", holder.__listener);
+      const seen = holder.__seen;
+      delete (el as unknown as Record<string, unknown>).__seen;
+      delete (el as unknown as Record<string, unknown>).__listener;
+      return seen;
+    });
+  }
+
+  /**
    * The C1.14 block above kills three times in this same field at caret 0, and
    * those kills are on the ring by the time this block starts — chained into one
    * entry, since nothing there moved the caret between them. Every assertion
@@ -1911,30 +1952,13 @@ test.describe("killed text can be yanked back @C1.15", () => {
   test("an empty ring leaves Ctrl+Y to the browser", async () => {
     await freshFrame();
 
-    await input().evaluate((el: HTMLInputElement) => {
-      const seen: boolean[] = [];
-      const listener = (event: Event) => {
-        const key = event as KeyboardEvent;
-        if (key.ctrlKey && key.key === "y") seen.push(key.defaultPrevented);
-      };
-      (el as unknown as { __yankSeen: boolean[] }).__yankSeen = seen;
-      (el as unknown as { __yankListener: EventListener }).__yankListener = listener;
-      el.addEventListener("keydown", listener);
-    });
-
     await input().click();
     await caretTo(0);
     const before = (await fieldState(input())).value;
-    await page.keyboard.press("Control+y");
-
-    const prevented = await input().evaluate((el: HTMLInputElement) => {
-      const holder = el as unknown as { __yankSeen: boolean[]; __yankListener: EventListener };
-      el.removeEventListener("keydown", holder.__yankListener);
-      const seen = holder.__yankSeen;
-      delete (el as unknown as Record<string, unknown>).__yankSeen;
-      delete (el as unknown as Record<string, unknown>).__yankListener;
-      return seen;
-    });
+    const prevented = await pressAndReadPrevented(
+      "Control+y",
+      (key) => key.ctrlKey && key.key === "y",
+    );
 
     expect(prevented).toEqual([false]);
     expect((await fieldState(input())).value).toBe(before);
@@ -1947,15 +1971,134 @@ test.describe("killed text can be yanked back @C1.15", () => {
     await page.keyboard.press("Control+k");
     expect((await fieldState(input())).value).toBe("");
 
+    // A real yank before the deny, so there is a record to leave behind. Without
+    // one the assertion below would pass on any build, having nothing to catch.
+    await page.keyboard.press("Control+y");
+    expect((await fieldState(input())).value).toBe("disposable");
+
     await setPolicy({
       defaultAction: "allow",
       rules: [{ pattern: `${origin}/**`, matchType: "glob", action: "deny" }],
     });
     await setPolicy({ defaultAction: "allow", rules: [] });
 
+    // The ring is empty again, so Ctrl+Y has nothing to insert and the field is
+    // left holding exactly what the earlier yank put there — which is the point:
+    // the text half of the pop's check still verifies, so only the record's own
+    // lifetime decides the outcome.
+    await caretTo("disposable".length);
+    await page.keyboard.press("Control+y");
+    expect((await fieldState(input())).value).toBe("disposable");
+
+    // E-4: the yank record has to go with the ring, not just the entries. The
+    // deny cleared the entries, so a pop has nothing to rotate to; if the record
+    // outlived them the binding still claims Alt+Y and swallows the key while
+    // doing nothing. Leaving the key alone is the same contract the empty-ring
+    // Ctrl+Y test above asserts.
+    const beforePop = (await fieldState(input())).value;
+    const popPrevented = await pressAndReadPrevented("Alt+y", (key) => key.altKey && key.key === "y");
+    expect(popPrevented).toEqual([false]);
+    expect((await fieldState(input())).value).toBe(beforePop);
+  });
+
+  test("a bound motion between kills splits the chain even at the same caret", async () => {
+    // E-1: the options page drives the same dispatch path as a content script,
+    // through React's onKeyDown rather than the document listener. A motion
+    // binding between two kills must break the chain there too, and the caret
+    // returning to where the first kill left it is the case that can only pass
+    // if the motion itself was reported — position alone cannot distinguish it.
+    const testInput = optionsPage.locator('[data-testid="test-input"]');
+    const testState = () => fieldState(testInput);
+    const original = (await testState()).value;
+
+    await testInput.click();
+    await testInput.evaluate((el: HTMLInputElement) => {
+      el.value = "alpha";
+      el.focus();
+      el.setSelectionRange(0, 0);
+    });
+    await optionsPage.keyboard.press("Control+k");
+    expect((await testState()).value).toBe("");
+
+    await testInput.evaluate((el: HTMLInputElement) => {
+      el.value = "beta";
+      el.focus();
+      el.setSelectionRange(0, 0);
+    });
+    // Out and back: the caret ends where the first kill left it, so only the
+    // bindings having been seen can keep these two kills apart.
+    await optionsPage.keyboard.press("Control+f");
+    await optionsPage.keyboard.press("Control+b");
+    expect(await caretState(testInput)).toEqual({ start: 0, end: 0 });
+    await optionsPage.keyboard.press("Control+k");
+    expect((await testState()).value).toBe("");
+
+    await optionsPage.keyboard.press("Control+y");
+    expect((await testState()).value).toBe("beta");
+    await optionsPage.keyboard.press("Alt+y");
+    expect((await testState()).value).toBe("alpha");
+
+    await testInput.evaluate((el: HTMLInputElement, value: string) => {
+      el.value = value;
+      el.blur();
+    }, original);
+  });
+
+  test("typing after a yank makes yank-pop illegal", async () => {
+    // E-2: yank-pop is a replacement aimed at a recorded range. Once the user
+    // types, the caret no longer sits at the end of that range and the record
+    // no longer describes what is on screen, so the pop must refuse and leave
+    // the key to the page rather than overwrite text the user just wrote.
+    await freshFrame();
+    await typeFresh("abc");
+    await caretTo(0);
+    await page.keyboard.press("Control+k");
+
+    await typeFresh("");
     await caretTo(0);
     await page.keyboard.press("Control+y");
-    expect((await fieldState(input())).value).toBe("");
+    expect((await fieldState(input())).value).toBe("abc");
+
+    await page.keyboard.type("z");
+    const seeded = await fieldState(input());
+    expect(seeded.value).toBe("abcz");
+    // Without this the test could pass on a build that never checks the caret:
+    // the text condition alone still holds over the recorded region.
+    expect(seeded.start).not.toBe("abc".length);
+
+    const prevented = await pressAndReadPrevented("Alt+y", (key) => key.altKey && key.key === "y");
+    expect(prevented).toEqual([false]);
+    expect((await fieldState(input())).value).toBe("abcz");
+  });
+
+  test("a page rewrite under the record makes yank-pop illegal", async () => {
+    // E-3: the caret can be exactly where the yank left it while the text under
+    // it has changed — a page script rewriting the field is the realistic
+    // version. Only the text half of the check can catch that, so the caret is
+    // restored to the recorded end to isolate it.
+    await freshFrame();
+    await typeFresh("abc");
+    await caretTo(0);
+    await page.keyboard.press("Control+k");
+
+    await typeFresh("");
+    await caretTo(0);
+    await page.keyboard.press("Control+y");
+    expect((await fieldState(input())).value).toBe("abc");
+
+    const rewritten = await input().evaluate((el: HTMLInputElement) => {
+      el.value = `X${el.value.slice(1)}`;
+      el.focus();
+      el.setSelectionRange(el.value.length, el.value.length);
+      return el.value;
+    });
+    // The guard: if the mutation did not land, the pop would refuse for the
+    // wrong reason and this test would prove nothing.
+    expect(rewritten).toBe("Xbc");
+
+    const prevented = await pressAndReadPrevented("Alt+y", (key) => key.altKey && key.key === "y");
+    expect(prevented).toEqual([false]);
+    expect((await fieldState(input())).value).toBe("Xbc");
   });
 
   test("a contenteditable kill yanks back, and into a plain field as text", async () => {

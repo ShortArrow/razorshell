@@ -11,6 +11,7 @@
 import { describe, expect, test, vi } from "vitest";
 import { operation } from "../src/operation";
 import { applyKillRegion } from "../src/killregion";
+import { clearRing, newestEntry } from "../src/killring";
 
 function makeInput(value: string, start: number, end = start): HTMLInputElement {
   const el = document.createElement("input");
@@ -84,6 +85,36 @@ describe("the fallback path splices the value @C1.14", () => {
     } finally {
       Reflect.deleteProperty(document, "execCommand");
     }
+  });
+});
+
+describe("a password kill is wired as unstorable @C1.15", () => {
+  /**
+   * The ring's own tests prove it stores nothing when told `storable: false`,
+   * passing the flag by hand. What none of them can show is that `operation.ts`
+   * ever passes it — the secret reaches the ring through this call site or not
+   * at all, so the wiring needs an assertion of its own against a real field.
+   */
+  test("deleteToEOL on a password input leaves the ring untouched", () => {
+    clearRing();
+    const el = document.createElement("input");
+    el.type = "password";
+    el.value = "hunter2 secret";
+    el.setSelectionRange(0, 0);
+
+    operation.deleteToEOL(el);
+
+    expect(el.value).toBe("");
+    expect(newestEntry()).toBeUndefined();
+  });
+
+  test("the same kill on a text input does reach the ring", () => {
+    clearRing();
+    const el = makeInput("hunter2 secret", 0);
+
+    operation.deleteToEOL(el);
+
+    expect(newestEntry()).toBe("hunter2 secret");
   });
 });
 
