@@ -32,7 +32,10 @@ the assignment and interception need hands.
 
 | Question | Observed | Date |
 |---|---|---|
-| Shortcuts page accepts Ctrl+W | (unrecorded) | |
-| Focused: intercepted, badge shown, tab stays | (unrecorded) | |
+| Shortcuts page accepts Ctrl+W | Yes — the field captured `Ctrl + W`, scope "In Chrome" | 2026-09-05 |
+| Focused: intercepted, badge shown, tab stays | Yes — purple "W" badge, tab stayed | 2026-09-05 |
 | Unfocused: tab closes via tabs.remove | (unrecorded) | |
 | Ctrl+T / Ctrl+N accepted | (unrecorded) | |
+
+Both recorded observations are from the maintainer's own Chrome with
+the probe loaded unpacked; screenshots live outside the repository.

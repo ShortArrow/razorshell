@@ -121,6 +121,13 @@ Frozen observations; each holds only for its date.
 - 2026-08-16, Ctrl+Shift+9 under Playwright's `press` reports
   `KeyboardEvent.key === "9"`, not `"("` — the stored-chord
   assertions depend on this.
+- 2026-09-05, a reserved chord can be reclaimed through the commands
+  API: in a real Chrome, chrome://extensions/shortcuts accepted a
+  manual `Ctrl+W` assignment for an extension command, and with a
+  text field focused the chord reached the command instead of
+  closing the tab (experiments/commands-probe, maintainer-observed,
+  badge evidence). The harness cannot reproduce this — CDP keys skip
+  the accelerator path — so it stays a manually measured fact.
 - 2026-08-17, the kill operations destroy their text unrecoverably:
   in Playwright Chromium with the built extension, type, Ctrl+A,
   Ctrl+K, then Ctrl+Z leaves the field empty, while a native
