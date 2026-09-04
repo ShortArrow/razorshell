@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Razorshell C-w probe",
+  "description": "Experiment: can a user-assigned Ctrl+W beat tab-close, and can the handler route by focus?",
+  "version": "0.0.1",
+  "permissions": ["tabs"],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "all_frames": false
+    }
+  ],
+  "commands": {
+    "rubout-or-close": {
+      "description": "unix-word-rubout in a text field, close the tab outside one"
+    }
+  },
+  "action": {}
+}
