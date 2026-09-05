@@ -4,19 +4,6 @@ Notable changes to Razorshell. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Design rationale lives in [docs/decisions](decisions/README.md).
 
-## [Unreleased]
-
-### Changed
-
-- The reclaimed chords moved out of their prose section and into the
-  keymap table: one row per chord, showing what
-  `chrome.commands.getAll()` currently reports rather than what
-  razorshell asked for. An unassigned row is grayed with an Assign
-  button onto Chrome's shortcuts page; an assigned one prints the
-  real chord and links out to Chrome, which owns the binding. The
-  rows re-read the assignment whenever the page regains focus, so
-  returning from the shortcuts tab is enough.
-
 ## [0.0.5] - 2026-09-05
 
 ### Added
@@ -26,80 +13,51 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   readline's order, and Ctrl+Y yanks the newest entry back. Alt+Y
   straight after a yank rotates to the entry before it.
 - The ring is per frame, holds ten plain-text entries, and is never
-  persisted; it clears when the URL policy denies the frame. A kill
-  in a password field is not stored. See
+  persisted; it clears when the URL policy denies the frame, and a
+  kill in a password field is not stored. See
   [ADR-0010](decisions/0010-kill-ring.md).
 - Ctrl+Y shadows the browser's redo on Windows and Linux only while
   the ring has something to paste; on an empty ring the key reaches
   the browser untouched.
 - Alt+D and Alt+Backspace kill a word forward and backward. Both go on
   the ring and chain with the line kills.
-- Ctrl+D and Ctrl+H delete one character forward and backward. Neither
-  touches the ring, so a character delete between two kills keeps them
-  as separate entries. A grapheme goes whole: an emoji built from a
-  surrogate pair or joined by zero-width joiners leaves in one press.
+- Ctrl+D and Ctrl+H delete one character forward and backward, off the
+  ring. A grapheme goes whole: an emoji built from a surrogate pair or
+  joined by zero-width joiners leaves in one press.
 - Ctrl+/ and Ctrl+Shift+_ both undo through the field's own history.
 - While a text field has focus, Alt+Backspace shadows Windows' undo
   alias (Ctrl+Z is untouched), Ctrl+D the bookmark shortcut and Ctrl+H
   the history shortcut.
 - Alt+U, Alt+L and Alt+C recase the word ahead of the caret and leave
   the caret at its end; Alt+T swaps the word before the caret with the
-  one after it. All four follow readline, which measures from the
-  caret rather than from the start of the word it sits in, so mid-word
-  Alt+U uppercases only the tail. They write through the field's undo
-  history, and a word already in the target case is not written at
-  all. Alt+T with fewer than two words does nothing while still
-  consuming the key.
-- Casing is locale-insensitive: Turkish dotted and dotless i are not
-  claimed.
-- Two reserved chords can be reclaimed by opting in. Ctrl+W
-  (unix-word-rubout) and Ctrl+T (transpose-chars) ship as UNASSIGNED
-  commands; assigning them once in chrome://extensions/shortcuts makes
-  them reach the extension while a text field has focus. Outside one
-  the tab still closes and a tab still opens. See
+  one after it. All four measure from the caret as readline does,
+  write through the field's undo history, and skip the write when the
+  word is already in the target case. Casing is locale-insensitive.
+- Ctrl+W (unix-word-rubout) and Ctrl+T (transpose-chars) ship as
+  UNASSIGNED commands; assigning them once in
+  chrome://extensions/shortcuts makes them reach the extension while a
+  text field has focus. Outside one the tab still closes and a tab
+  still opens. See
   [ADR-0011](decisions/0011-reclaimed-reserved-chords.md).
 - The rubout goes on the kill ring and chains with the other backward
   kills; transpose swaps whole graphemes through the field's undo
   history and stays off the ring.
-- An options-page section explains the opt-in and opens the shortcuts
-  page, which a link cannot reach.
-- Ctrl+N is deliberately not among them: readline's C-n is
-  next-history, which a text field has no referent for.
+- The keymap table lists the two as rows showing what
+  `chrome.commands.getAll()` reports: grayed with an Assign button
+  onto the shortcuts page while unassigned, the real chord once
+  assigned, re-read whenever the page regains focus.
 
 ### Changed
 
 - Ctrl+K at the end of a line now kills the newline and joins the next
-  line onto it, where 0.0.4 did nothing there. Three presses from a
-  line start put the line, the newline and the line after it onto the
-  ring as one entry, so a single Ctrl+Y restores both lines. At the end
-  of the field the region is still empty and the key still does
-  nothing. In contenteditable the analog is a block join, and what
-  lands on the ring is whatever the selection reports for it.
+  line onto it, where 0.0.4 did nothing there. At the end of the field
+  the region is still empty and the key still does nothing.
 
 ### Fixed
 
-- Consecutive backward kills join into one ring entry, as forward
-  kills already did. The chain compared where two kills each END
-  rather than whether the second BEGINS where the first left off;
-  those are the same number for a forward kill and never the same for
-  a backward one. Present since the ring shipped and hidden by it:
-  Ctrl+U twice kills an empty region the second time, and Ctrl+U then
-  Ctrl+K at one caret matched by accident.
 - `cursor.getTopOfWord` no longer loops forever when nothing but
   separators sits behind the caret. Alt+B hid it by clamping the bad
-  offset; the backward word kill would have deleted from before the
-  start of the value.
-
-- Alt+Y refuses unless the caret still rests at the end of what the
-  last yank inserted, so typing or clicking after a yank leaves the
-  key to the page instead of overwriting the text just written.
-- A binding between two kills breaks the chain on the options page's
-  test area too. The ring is wired from the dispatcher, which both
-  entry points share, rather than from the content script alone.
-- Denying a page clears the yank record along with the ring, so Alt+Y
-  no longer cancels the key while having nothing to rotate to.
-- The kill chain and the yank record hold their elements weakly; a
-  field removed after a kill is no longer pinned for the frame's life.
+  offset.
 
 ## [0.0.4] - 2026-08-27
 
