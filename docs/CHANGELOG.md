@@ -6,6 +6,17 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ## [Unreleased]
 
+### Changed
+
+- The reclaimed chords moved out of their prose section and into the
+  keymap table: one row per chord, showing what
+  `chrome.commands.getAll()` currently reports rather than what
+  razorshell asked for. An unassigned row is grayed with an Assign
+  button onto Chrome's shortcuts page; an assigned one prints the
+  real chord and links out to Chrome, which owns the binding. The
+  rows re-read the assignment whenever the page regains focus, so
+  returning from the shortcuts tab is enough.
+
 ## [0.0.5] - 2026-09-05
 
 ### Added

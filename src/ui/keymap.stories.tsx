@@ -1,6 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import { failNextSet, resetStorage, storedValue } from '../../.storybook/chromemock';
+import {
+  failNextSet,
+  openedTabs,
+  resetStorage,
+  seedCommands,
+  storedValue,
+} from '../../.storybook/chromemock';
 import { initKeymap } from '../keymapstore';
 import { KeymapApp } from './keymap';
 import type { Chord } from '../keymapmerge';
@@ -165,6 +171,83 @@ export const SaveFailure: Story = {
 const twoOverrides: Record<string, Chord> = {
   move_cursor_to_the_beginning: { key: 'm', ctrl: true, alt: false, shift: false },
   move_cursor_to_the_end: { key: 'p', ctrl: true, alt: false, shift: false },
+};
+
+/**
+ * The two rows Chrome owns, as a fresh install shows them.
+ *
+ * Nothing is assigned, because a reserved chord cannot be suggested by a
+ * manifest, so both rows are dimmed and the current column has no chord to
+ * print. The dimming is carried by `aria-disabled` rather than by a pale text
+ * color alone: axe exempts disabled-marked content from `color-contrast`, and a
+ * gray that only lives in the stylesheet fails the storybook spec's zero budget
+ * in one theme or the other.
+ */
+export const ReclaimedUnassigned: Story = {
+  tags: ['@C1.18'],
+  loaders: [() => loadOverrides({})],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    for (const command of ['unix_word_rubout', 'transpose_chars']) {
+      const row = await canvas.findByTestId(`browser-row-${command}`);
+      // Every cell the user READS is marked, and the cell holding the button
+      // is not: marking the whole row would describe the one control an
+      // unassigned row exists for as unavailable.
+      await expect(row.querySelectorAll('td[aria-disabled="true"]')).toHaveLength(3);
+      const current = canvas.getByTestId(`browser-current-${command}`);
+      await expect(current).toHaveTextContent('—');
+      await expect(current.closest('td')).toHaveAttribute('aria-disabled', 'true');
+      await expect(canvas.getByTestId(`assign-${command}`)).toBeEnabled();
+      await expect(canvas.getByTestId(`assign-${command}`).closest('td'))
+        .not.toHaveAttribute('aria-disabled');
+    }
+
+    // The button's whole job is to open a URL a page may not link to. The mock
+    // records the request rather than following it, which is as far as a story
+    // can observe a `chrome://` navigation.
+    await userEvent.click(canvas.getByTestId('assign-unix_word_rubout'));
+    await waitFor(() => expect(openedTabs()).toEqual([{ url: 'chrome://extensions/shortcuts' }]));
+    (document.activeElement as HTMLElement | null)?.blur();
+  },
+};
+
+/**
+ * One chord assigned, the other not, in one rendering.
+ *
+ * Assigning only the rubout is what separates the two states: a row that
+ * brightened for any reason other than its own binding would look right here as
+ * long as both rows moved together. The assigned row prints what CHROME holds,
+ * not the chord the descriptor asked for, so the chips come from the shortcut
+ * string rather than from `browserChords`.
+ */
+export const ReclaimedAssigned: Story = {
+  tags: ['@C1.18'],
+  loaders: [async () => {
+    const context = await loadOverrides({});
+    seedCommands({ unix_word_rubout: 'Ctrl+W' });
+    return context;
+  }],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const assignedCurrent = await canvas.findByTestId('browser-current-unix_word_rubout');
+    await waitFor(() => expect(assignedCurrent).toHaveTextContent('Ctrl'));
+    await expect(assignedCurrent).toHaveTextContent('W');
+    await expect(assignedCurrent.querySelectorAll('kbd')).toHaveLength(2);
+    const assignedRow = canvas.getByTestId('browser-row-unix_word_rubout');
+    await expect(assignedRow.querySelectorAll('td[aria-disabled="true"]')).toHaveLength(0);
+    // The browser owns the binding, so the row offers a way out to Chrome
+    // rather than the in-page rebind the rows above it carry.
+    await expect(canvas.getByTestId('manage-unix_word_rubout'))
+      .toHaveAccessibleName("edit in Chrome's shortcuts page");
+    await expect(canvas.queryByTestId('rebind-unix_word_rubout')).toBeNull();
+
+    const untouched = canvas.getByTestId('browser-row-transpose_chars');
+    await expect(untouched.querySelectorAll('td[aria-disabled="true"]')).toHaveLength(3);
+    await expect(canvas.getByTestId('browser-current-transpose_chars')).toHaveTextContent('—');
+    (document.activeElement as HTMLElement | null)?.blur();
+  },
 };
 
 export const ResetRow: Story = {

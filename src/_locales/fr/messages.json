@@ -115,6 +115,14 @@
     "message": "réattribuer",
     "description": "rebind"
   },
+  "keymap_assign": {
+    "message": "Attribuer",
+    "description": "Assign"
+  },
+  "keymap_manage_in_chrome": {
+    "message": "Modifier sur la page des raccourcis de Chrome",
+    "description": "edit in Chrome's shortcuts page"
+  },
   "keymap_press_key": {
     "message": "appuyez sur une touche...",
     "description": "press a key..."

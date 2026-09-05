@@ -115,6 +115,14 @@
     "message": "重新绑定",
     "description": "rebind"
   },
+  "keymap_assign": {
+    "message": "分配",
+    "description": "Assign"
+  },
+  "keymap_manage_in_chrome": {
+    "message": "在 Chrome 快捷键页面中修改",
+    "description": "edit in Chrome's shortcuts page"
+  },
   "keymap_press_key": {
     "message": "请按一个键...",
     "description": "press a key..."

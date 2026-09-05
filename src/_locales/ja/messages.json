@@ -115,6 +115,14 @@
     "message": "再設定",
     "description": "rebind"
   },
+  "keymap_assign": {
+    "message": "割り当て",
+    "description": "Assign"
+  },
+  "keymap_manage_in_chrome": {
+    "message": "Chrome のショートカット設定ページで変更",
+    "description": "edit in Chrome's shortcuts page"
+  },
   "keymap_press_key": {
     "message": "キーを入力...",
     "description": "press a key..."

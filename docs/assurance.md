@@ -79,7 +79,7 @@ file the importer refuses; a rendering readable in one theme only.
 | C1.15 | Killed text lands on a frame-local ring: chained kills concatenate in readline order, Ctrl+Y yanks the newest entry, Alt+Y rotates with verified replacement, a password kill is never stored, and an empty-ring Ctrl+Y leaves the native key untouched |
 | C1.16 | Word kills join the ring, character deletes remove whole graphemes without touching it, and both undo chords reach the native history |
 | C1.17 | Case operations recase exactly one word and land at its end, transpose-words drags the earlier word past the later, and Ctrl+K at a line end kills the newline joining the lines |
-| C1.18 | The reclaimed chords route by focus: assigned Ctrl+W rubs out a whitespace word inside a field and still closes the tab outside one, Ctrl+T transposes graphemes inside and still opens a tab outside — interception itself rests on the recorded manual measurement |
+| C1.18 | The reclaimed chords route by focus: assigned Ctrl+W rubs out a whitespace word inside a field and still closes the tab outside one, Ctrl+T transposes graphemes inside and still opens a tab outside — interception itself rests on the recorded manual measurement. The keymap table carries a row per chord that reads its binding from `chrome.commands`, grays an unassigned one, and reaches Chrome's shortcuts page, which a link cannot |
 
 ## Traceability
 
@@ -222,6 +222,18 @@ Frozen observations; each holds only for its date.
   `getTopOfWord` to readline's boundary cannot silently drag it along;
   test/reclaimedregion.test.ts asserts the equality so that such a
   move goes red.
+- 2026-09-05, a module shared between the options bundle and the
+  service worker silently disables the worker. Importing
+  `commandroute.ts` from `browserchords.ts` (options) made Vite emit
+  `dist/commandroute.js` and rewrite `service.js` to `import` it; the
+  manifest registers the worker with no `"type": "module"`, so it
+  registered NO listeners. Observed as the toolbar badge never
+  updating while the content script still reported `enabled: false`
+  correctly and `chrome.action.setBadgeText` worked when called
+  directly in the worker — three e2e badge assertions went red with
+  no error anywhere. Fixed by duplicating the two command-name
+  strings and pinning them from a test instead; `dist/service.js` and
+  `dist/content.js` hash identically to the pre-change build.
 - 2026-08-20, CDP-injected keys never reach Chrome's browser-
   accelerator handling on Windows and Linux (the native-event
   builder exists only for mac/ios, so injected events carry

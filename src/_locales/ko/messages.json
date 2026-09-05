@@ -115,6 +115,14 @@
     "message": "다시 지정",
     "description": "rebind"
   },
+  "keymap_assign": {
+    "message": "할당",
+    "description": "Assign"
+  },
+  "keymap_manage_in_chrome": {
+    "message": "Chrome 단축키 페이지에서 편집",
+    "description": "edit in Chrome's shortcuts page"
+  },
   "keymap_press_key": {
     "message": "키를 누르세요...",
     "description": "press a key..."

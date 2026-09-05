@@ -115,6 +115,14 @@
     "message": "atur ulang",
     "description": "rebind"
   },
+  "keymap_assign": {
+    "message": "Tetapkan",
+    "description": "Assign"
+  },
+  "keymap_manage_in_chrome": {
+    "message": "Ubah di halaman pintasan Chrome",
+    "description": "edit in Chrome's shortcuts page"
+  },
   "keymap_press_key": {
     "message": "tekan sebuah tombol...",
     "description": "press a key..."

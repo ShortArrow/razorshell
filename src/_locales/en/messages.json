@@ -115,6 +115,14 @@
     "message": "rebind",
     "description": "rebind"
   },
+  "keymap_assign": {
+    "message": "Assign",
+    "description": "Assign"
+  },
+  "keymap_manage_in_chrome": {
+    "message": "edit in Chrome's shortcuts page",
+    "description": "edit in Chrome's shortcuts page"
+  },
   "keymap_press_key": {
     "message": "press a key...",
     "description": "press a key..."

@@ -115,6 +115,14 @@
     "message": "إعادة التعيين",
     "description": "rebind"
   },
+  "keymap_assign": {
+    "message": "تعيين",
+    "description": "Assign"
+  },
+  "keymap_manage_in_chrome": {
+    "message": "التعديل في صفحة اختصارات Chrome",
+    "description": "edit in Chrome's shortcuts page"
+  },
   "keymap_press_key": {
     "message": "اضغط مفتاحًا...",
     "description": "press a key..."

@@ -90,10 +90,12 @@ they were forgotten. Chrome handles `Ctrl` + `w` (close tab) and
 extension can cancel them from a content script — and Chrome refuses
 to let a manifest suggest them, so they cannot ship switched on.
 
-What Chrome does allow is an assignment you make yourself. Open
-**chrome://extensions/shortcuts** (the button in the options page's
-"Reserved chords" section takes you there, since a page cannot link to
-a `chrome://` URL), find Razorshell's two entries and assign them:
+What Chrome does allow is an assignment you make yourself. The keymap
+table's last two rows are these chords, grayed out until you assign
+them, and the button on each opens
+**chrome://extensions/shortcuts** — a page cannot link to a
+`chrome://` URL, so a button is the way there. Find Razorshell's two
+entries and assign them:
 
 | Chord          | Description                                            |
 | -------------- | ------------------------------------------------------ |

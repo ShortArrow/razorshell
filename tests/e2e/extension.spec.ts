@@ -741,6 +741,67 @@ test.describe("keymap rebinding @C1.5", () => {
   });
 });
 
+/**
+ * The two browser-managed rows at the foot of the keymap table.
+ *
+ * They are not keymap entries: Chrome owns the chord, so the row reads its
+ * current binding from `chrome.commands.getAll()` rather than from the override
+ * store, and offers no in-page rebind. Under Playwright nothing has ever been
+ * assigned — a reserved chord cannot be suggested by the manifest, and the
+ * harness cannot drive chrome://extensions/shortcuts — so `getAll` returns both
+ * commands with an empty shortcut, which is exactly the unassigned rendering.
+ *
+ * The Assign button is the only part of the feature a page can act on, and what
+ * it does is open a URL no link may target. Asserting the opened tab's URL is
+ * therefore the whole of the observable contract; the shortcuts page itself is
+ * Chrome's UI, and nothing here drives it.
+ */
+test.describe("the keymap table carries the browser-managed rows @C1.18", () => {
+  const rowIds = ["unix_word_rubout", "transpose_chars"];
+
+  /**
+   * Hand the shared browser back with only the two tabs the rest of the file
+   * knows about. This is one serial scenario, and a stray third tab would sit
+   * in every later `chrome.tabs.query`.
+   */
+  test.afterAll(async () => {
+    for (const open of context.pages()) {
+      if (open !== page && open !== optionsPage) await open.close();
+    }
+  });
+
+  test("both reserved chords appear as rows in the keymap table", async () => {
+    for (const id of rowIds) {
+      const row = optionsPage.locator(`[data-testid="browser-row-${id}"]`);
+      await expect(row).toHaveCount(1);
+      // The row belongs to the keymap table rather than to a section of its
+      // own; a row rendered outside it would still pass a bare count.
+      expect(
+        await row.evaluate((el) => el.closest("table") !== null),
+      ).toBe(true);
+    }
+  });
+
+  test("an unassigned chord grays its row and offers the assign button", async () => {
+    for (const id of rowIds) {
+      const row = optionsPage.locator(`[data-testid="browser-row-${id}"]`);
+      // The three cells the user reads are marked disabled; the cell holding
+      // the button is not, because the button is the point of the row.
+      await expect(row.locator('td[aria-disabled="true"]')).toHaveCount(3);
+      await expect(optionsPage.locator(`[data-testid="browser-current-${id}"]`)).toHaveText("—");
+      await expect(optionsPage.locator(`[data-testid="assign-${id}"]`)).toBeEnabled();
+    }
+  });
+
+  test("the assign button opens Chrome's shortcuts page", async () => {
+    const opened = context.waitForEvent("page");
+    await optionsPage.locator('[data-testid="assign-unix_word_rubout"]').click();
+    const shortcuts = await opened;
+    expect(shortcuts.url()).toBe("chrome://extensions/shortcuts");
+    await shortcuts.close();
+  });
+});
+
 test.describe("url policy @C1.3", () => {
   test("a deny rule disables the keybindings", async () => {
     await setPolicy({

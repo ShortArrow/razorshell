@@ -115,6 +115,14 @@
     "message": "reasignar",
     "description": "rebind"
   },
+  "keymap_assign": {
+    "message": "Asignar",
+    "description": "Assign"
+  },
+  "keymap_manage_in_chrome": {
+    "message": "Editar en la página de atajos de Chrome",
+    "description": "edit in Chrome's shortcuts page"
+  },
   "keymap_press_key": {
     "message": "pulsa una tecla...",
     "description": "press a key..."

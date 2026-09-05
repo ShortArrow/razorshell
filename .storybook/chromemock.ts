@@ -46,6 +46,24 @@ const armedSetFailures: string[] = [];
 const changeListeners: ChangeListener[] = [];
 const createdTabs: { url?: string }[] = [];
 
+type MockCommand = { name: string; description?: string; shortcut: string };
+
+/**
+ * What `chrome.commands.getAll()` reports.
+ *
+ * Real Chrome always lists every declared command, assigned or not, and reports
+ * an unassigned one with `shortcut: ""` rather than omitting it — which is what
+ * lets the options page tell "not assigned" apart from "not declared". The
+ * default here is both commands unassigned, because that is what a fresh install
+ * looks like: a reserved chord cannot be suggested by the manifest.
+ */
+const unassignedCommands: MockCommand[] = [
+  { name: 'unix_word_rubout', description: 'unix word rubout', shortcut: '' },
+  { name: 'transpose_chars', description: 'transpose chars', shortcut: '' },
+];
+
+let commands: MockCommand[] = unassignedCommands.map((command) => ({ ...command }));
+
 function clone<T>(value: T): T {
   return structuredClone(value);
 }
@@ -135,6 +153,27 @@ export function resetStorage(seed: Record<string, unknown> = {}): void {
   localStore = {};
   armedSetFailures.length = 0;
   createdTabs.length = 0;
+  commands = unassignedCommands.map((command) => ({ ...command }));
+}
+
+/**
+ * @fn seedCommands
+ * @brief Fix what `chrome.commands.getAll()` reports, by command name.
+ * @details Only the named commands change; anything left out keeps the
+ *          unassigned default, so a story that assigns one chord does not have
+ *          to restate the other. A name the manifest does not declare is
+ *          rejected rather than added: real Chrome lists the manifest's
+ *          commands and nothing else, and a story rendering a row for a command
+ *          that cannot exist would be asserting against fiction.
+ * @param assignments - Shortcut strings by command name, as Chrome prints them
+ * @return void
+ */
+export function seedCommands(assignments: Record<string, string>): void {
+  for (const [name, shortcut] of Object.entries(assignments)) {
+    const command = commands.find((candidate) => candidate.name === name);
+    if (command === undefined) throw new Error(`no such command: ${name}`);
+    command.shortcut = shortcut;
+  }
 }
 
 /**
@@ -226,6 +265,9 @@ export function installChromeMock(): void {
         createdTabs.push({ ...properties });
         return { id: createdTabs.length };
       },
+    },
+    commands: {
+      getAll: async () => commands.map((command) => ({ ...command })),
     },
     i18n: {
       getMessage: (name: string) => englishMessages[name as keyof typeof englishMessages]?.message ?? '',

@@ -115,6 +115,14 @@
     "message": "neu belegen",
     "description": "rebind"
   },
+  "keymap_assign": {
+    "message": "Zuweisen",
+    "description": "Assign"
+  },
+  "keymap_manage_in_chrome": {
+    "message": "Auf Chromes Tastenkürzel-Seite bearbeiten",
+    "description": "edit in Chrome's shortcuts page"
+  },
   "keymap_press_key": {
     "message": "Taste drücken...",
     "description": "press a key..."

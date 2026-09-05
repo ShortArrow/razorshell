@@ -115,6 +115,14 @@
     "message": "переназначить",
     "description": "rebind"
   },
+  "keymap_assign": {
+    "message": "Назначить",
+    "description": "Assign"
+  },
+  "keymap_manage_in_chrome": {
+    "message": "Изменить на странице сочетаний клавиш Chrome",
+    "description": "edit in Chrome's shortcuts page"
+  },
   "keymap_press_key": {
     "message": "нажмите клавишу...",
     "description": "press a key..."

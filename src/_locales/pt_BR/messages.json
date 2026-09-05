@@ -115,6 +115,14 @@
     "message": "redefinir atalho",
     "description": "rebind"
   },
+  "keymap_assign": {
+    "message": "Atribuir",
+    "description": "Assign"
+  },
+  "keymap_manage_in_chrome": {
+    "message": "Editar na página de atalhos do Chrome",
+    "description": "edit in Chrome's shortcuts page"
+  },
   "keymap_press_key": {
     "message": "pressione uma tecla...",
     "description": "press a key..."

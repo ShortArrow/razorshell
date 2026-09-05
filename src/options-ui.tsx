@@ -8,7 +8,6 @@ import { ThemeApp } from './ui/theme';
 import { FooterApp } from './ui/footer';
 import { KeymapApp } from './ui/keymap';
 import { RichTextApp } from './ui/richtext';
-import { ReclaimedApp } from './ui/reclaimed';
 import { ConfigApp } from './ui/config';
 
 function OptionsUI() {
@@ -26,7 +25,6 @@ function OptionsUI() {
           <UrlApp />
           <RichTextApp />
           <KeymapApp />
-          <ReclaimedApp />
           <LangApp />
           <ConfigApp />
         </div>

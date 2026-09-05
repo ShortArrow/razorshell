@@ -40,8 +40,12 @@ would not load.
   Ctrl+W, `tabs.create` for Ctrl+T.
 - The routing is a pure function, `commandAction` in
   src/commandroute.ts. The listener gathers two facts and calls it.
-- The options page carries a section explaining the opt-in with a
-  button that opens the shortcuts page through `chrome.tabs.create`.
+- The two chords appear as rows in the options page's keymap table,
+  after the rebindable ones. The row's current column shows what
+  `chrome.commands.getAll()` reports rather than the chord razorshell
+  asked for, since the assignment is the user's; an unassigned row is
+  grayed and offers a button that opens the shortcuts page through
+  `chrome.tabs.create`, which a link cannot reach.
 - Ctrl+N is NOT among them.
 
 ## Criteria
