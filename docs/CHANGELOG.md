@@ -6,6 +6,8 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ## [Unreleased]
 
+## [0.0.5] - 2026-09-05
+
 ### Added
 
 - A kill ring. Ctrl+K and Ctrl+U put what they delete on it,
