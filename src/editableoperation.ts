@@ -16,9 +16,10 @@
  * within the same root is therefore invisible: the kill after it still
  * concatenates. That is a known looseness, not an oversight.
  *
- * Yank-pop is refused outright in contenteditable, and that is the v0.0.5
- * boundary. A pop is a replacement, and replacing needs proof that the recorded
- * range still holds exactly the text that was inserted. In a rich-text root
+ * Yank-pop is refused outright in contenteditable, and that is where the
+ * boundary falls: killing and yanking are in scope for a rich-text root, popping
+ * a yank back is not. A pop is a replacement, and replacing needs proof that the
+ * recorded range still holds exactly the text that was inserted. In a rich-text root
  * there is no offset pair that survives the host editor's own normalisation, so
  * the only honest options were an optimistic replace that can destroy text the
  * user wrote, or nothing. Nothing is what ships.

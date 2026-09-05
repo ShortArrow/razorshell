@@ -8,10 +8,10 @@
  * the backward line kill that may follow it, that a password rubout is never
  * stored, and that transpose carries no ring role at all.
  *
- * The backward+backward chain is the case worth stating: until the `caretBefore`
- * fix earlier in this release two backward kills at one caret could never chain,
- * because the comparison asked whether both kills ENDED in the same place rather
- * than whether the second BEGAN where the first stopped.
+ * The backward+backward chain is the case worth stating: a chain check that asks
+ * whether both kills ENDED in the same place never holds for two backward kills,
+ * which walk the caret left every time, so such a build can never chain them. The
+ * comparison has to ask whether the second kill BEGAN where the first left off.
  */
 // @vitest-environment jsdom
 import { describe, expect, test, beforeEach } from "vitest";

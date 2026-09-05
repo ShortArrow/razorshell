@@ -254,21 +254,12 @@ chrome.runtime.onMessage.addListener((message: { type?: string }) => {
 });
 
 /**
- * The two reclaimed chords arrive here from the service worker rather than as
- * keydowns, because Chrome hands a reserved chord to the command and never to
- * the page. The worker asks this frame whether it would have handled the
- * keystroke, then either sends the operation back or reproduces the browser
- * action itself — the decision is `commandAction` in `commandroute.ts`.
+ * The element a reclaimed operation would act on, or null when there is none.
  *
- * Both handlers read `document.activeElement` rather than an event target: there
- * is no event. `enabled` travels with the answer so the worker can treat a
- * policy-denied frame as no field at all, which is what keeps Ctrl+W closing the
- * tab on a page the user turned razorshell off for.
- *
- * The listener returns true to keep the message channel open for the async
- * reply, which is Chrome's own protocol for a `sendResponse` that is not
- * immediate; a listener that fell through would answer `undefined` and the
- * worker would read it as an unfocused frame.
+ * Reads `document.activeElement`, since these operations arrive as messages and
+ * carry no event target. A text field qualifies always; a contenteditable root
+ * qualifies only while the contenteditable setting is on, and is returned as a
+ * plain `HTMLElement` so callers that need a value to slice can reject it.
  */
 function focusedField(): TextField | HTMLElement | null {
   const active = document.activeElement;
@@ -289,6 +280,27 @@ const reclaimedOperations: Record<string, { run: (field: TextField) => void; kil
   transpose_chars: { run: operation.transposeChars, kill: false },
 };
 
+/**
+ * The frame's half of the reclaimed-chord protocol: a focus query and a request
+ * to run an operation.
+ *
+ * The two reclaimed chords arrive from the service worker rather than as
+ * keydowns, because Chrome hands a reserved chord to the command and never to
+ * the page. The worker asks this frame whether it would have handled the
+ * keystroke, then either sends the operation back or reproduces the browser
+ * action itself — the decision is `commandAction` in `commandroute.ts`.
+ *
+ * Both arms answer from `focusedField()` rather than an event target: there is
+ * no event. `enabled` travels with the focus answer so the worker can treat a
+ * policy-denied frame as no field at all, which is what keeps Ctrl+W closing the
+ * tab on a page the user turned razorshell off for.
+ *
+ * Every arm that answers returns true, keeping the message channel open for a
+ * `sendResponse` that Chrome must not treat as skipped; an arm that fell through
+ * would answer `undefined` and the worker would read it as an unfocused frame.
+ * A message of neither type returns undefined on purpose, leaving it to the
+ * other listeners in this file.
+ */
 chrome.runtime.onMessage.addListener(
   (message: { type?: string; operation?: string }, _sender, sendResponse) => {
     if (message.type === focusQueryMessage) {

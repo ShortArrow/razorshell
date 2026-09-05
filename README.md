@@ -76,8 +76,8 @@ recase back, and a word already in the target case is not rewritten at all.
 `Alt` + `t` on a line with fewer than two words does nothing while still
 consuming the key, which is how readline's bell translates to a browser.
 
-`Ctrl` + `k` at the end of a line now takes the newline and joins the next line
-onto it, instead of doing nothing. Three presses from the start of a line put
+`Ctrl` + `k` at the end of a line takes the newline and joins the next line
+onto it. Three presses from the start of a line put
 the line, the newline and the line after it onto the ring as one entry, so a
 single `Ctrl` + `y` gives all of it back. At the very end of the field there is
 no newline to take and the key still does nothing.

@@ -1,5 +1,5 @@
 /**
- * The chords the v0.0.5 batch adds, matched exactly.
+ * The chords v0.0.5 adds, matched exactly.
  *
  * Every expectation about `event.key` here is an empirical observation, not a
  * guess. Measured 2026-09-05 in Playwright Chromium (channel "chromium",
@@ -142,7 +142,8 @@ describe("the new entries declare their relation to the ring @C1.16", () => {
 });
 
 /**
- * The four chords the case batch adds, and what they declare to the ring.
+ * The four case and transpose chords — Alt+U, Alt+L, Alt+C and Alt+T — and what
+ * they declare to the ring.
  *
  * Alt+letter chords report the plain letter in `event.key` under assumption A8,
  * which is the same premise the shipped Alt+D, Alt+F and Alt+B rest on; nothing

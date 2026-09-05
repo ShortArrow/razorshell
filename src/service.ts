@@ -67,7 +67,7 @@ async function askFocus(tabId: number): Promise<FocusState> {
  *
  * The listener is a shell: it gathers the two facts the decision needs and hands
  * them to `commandAction`, which is pure and unit-tested — the reserved chords
- * cannot be pressed under CDP (see R7 and the 2026-09-05 measurement record), so
+ * cannot be pressed under CDP (see R7 and the 2026-08-20 measurement record), so
  * keeping the decision out of the worker is what lets it be tested at all.
  *
  * The `close-tab` and `new-tab` arms are not fallbacks but the feature: taking a

@@ -178,8 +178,9 @@ export function rotateYank(): string | undefined {
  * `caretAfter` asks whether both kills finish in the same spot — true by
  * coincidence for two forward kills, since a forward kill leaves the caret
  * where it found it, and structurally false for two backward kills, which walk
- * the caret left every time. That coincidence is why the fault stayed hidden
- * behind the forward cases for a whole release.
+ * the caret left every time. For a forward kill the two compared numbers
+ * coincide, so only a backward kill tells the correct comparison from the wrong
+ * one.
  *
  * An element the chain can no longer reach — collected since — is a mismatch,
  * so a dead reference starts a fresh entry rather than chaining onto one.

@@ -134,10 +134,9 @@ describe("a chain is decided by where the next kill starts", () => {
   });
 
   /**
-   * The case the old comparison passed by coincidence. Both kills END at 8, but
-   * the second one STARTS at 2 — the user moved — so this must not chain. A
-   * build comparing `caretAfter` to `caretAfter` sees two matching numbers and
-   * concatenates text that was never adjacent.
+   * Both kills END at 8, but the second one STARTS at 2 — the user moved — so
+   * this must not chain. A build comparing `caretAfter` to `caretAfter` sees two
+   * matching numbers and concatenates text that was never adjacent.
    */
   test("two kills ending in the same place do not chain when the caret moved between them", () => {
     killBackward("first", fieldA, 8, true, 13);

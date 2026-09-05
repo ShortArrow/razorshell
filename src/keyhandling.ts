@@ -64,7 +64,7 @@ export function dispatchKey(event: KeyboardEvent, textinput: TextField, keymap: 
   if (!matched) return;
   if (matched.canHandle && !matched.canHandle(textinput)) return;
   console.debug("key matched");
-  event.preventDefault(); // cancel default action
+  event.preventDefault();
   noteIfForeign(matched);
   matched.operation(textinput);
 }
@@ -89,7 +89,7 @@ export function dispatchEditableKey(event: KeyboardEvent, root: HTMLElement, key
   const matched = keymap.find((entry) => keymaching(event, entry));
   if (!matched || !matched.editableOperation) return;
   if (matched.canHandle && !matched.canHandle(root)) return;
-  event.preventDefault(); // cancel default action
+  event.preventDefault();
   noteIfForeign(matched);
   matched.editableOperation(root);
 }

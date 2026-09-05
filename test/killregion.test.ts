@@ -200,9 +200,9 @@ describe.each(regionFunctions)("%s holds its region properties", (_name, region)
    * A kill takes at most one line's worth of text, and the single newline it may
    * take is the line boundary itself.
    *
-   * The stronger "no newline at all" form was true until Ctrl+K learned to join
-   * lines, and it is now wrong by design rather than by accident: a caret resting
-   * exactly on a newline kills that newline and nothing else. So the property is
+   * Ctrl+K at the end of a line takes the newline and joins the lines, so the
+   * stronger "no newline at all" form is false by design: a caret resting exactly
+   * on a newline kills that newline and nothing else. The property is therefore
    * the disjunction — newline-free, or exactly one `\n` and that `\n` is the
    * whole slice. Anything else would mean a kill had run past a line boundary and
    * swallowed a line the user never asked for, which is the fault this property
@@ -276,10 +276,11 @@ describe("the properties run against non-empty regions", () => {
    * A second Ctrl+K from the caret the first one left takes the newline that the
    * first one stopped at, or nothing when the value has run out.
    *
-   * The old form said the second kill is always a no-op, which held only while a
-   * kill stopped short of the boundary. What survives the change is the bound: a
-   * kill never leaves a whole line behind it, so the follow-up takes at most the
-   * newline that ends the line and never reaches into the line after.
+   * The claim is a bound, not a no-op: a kill never leaves a whole line behind
+   * it, so the follow-up takes at most the newline that ends the line and never
+   * reaches into the line after. The stronger "the second kill takes nothing"
+   * form is false, because a caret resting on a newline has something left to
+   * take — that newline — and taking it joins the lines.
    *
    * The caret the first kill leaves can sit INSIDE a surrogate pair, because
    * this module claims code-unit offsets and not grapheme integrity — the file

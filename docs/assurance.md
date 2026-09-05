@@ -11,7 +11,7 @@ here.
 ## Claim
 
 C1: On a Chromium-based browser that loads unpacked MV3 extensions,
-under assumptions A1–A7, razorshell's keybindings act on editable
+under assumptions A1–A8, razorshell's keybindings act on editable
 fields exactly where the URL policy allows, and every setting changed
 on the options page is written to `chrome.storage.sync`, takes effect
 in open tabs without a reload, survives a browser restart, and
@@ -245,7 +245,7 @@ Frozen observations; each holds only for its date.
 ## Verification and validation
 
 The table above verifies: built as decided. Whether the decisions
-are right — whether eight bindings, first-match policy and a JSON
+are right — whether twenty bindings, first-match policy and a JSON
 file are what a vimmer wants — is validated only by use; the README's
 planned section is the current answer, not a test.
 

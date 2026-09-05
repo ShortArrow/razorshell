@@ -189,11 +189,12 @@ describe("Ctrl+K at a line end joins the lines @C1.17", () => {
   });
 
   /**
-   * The flow the behaviour change exists for: three presses from a line start
-   * take the line, the newline and the next line, and because all three begin at
-   * the same caret the ring chains them into ONE entry in readline's forward
-   * order. Before the change the second press found an empty region, recorded
-   * nothing, and left the newline in the field forever.
+   * Three presses from a line start take the line, the newline and the next
+   * line, and because all three begin at the same caret the ring chains them into
+   * ONE entry in readline's forward order. A build whose region stops short of
+   * the newline fails here: the second press finds an empty region, records
+   * nothing, and leaves the newline in the field forever, so no number of further
+   * presses ever reaches the line after it.
    *
    * Driven through the real operation rather than the region function, because
    * the chaining is what is being asserted and that lives in the ring.

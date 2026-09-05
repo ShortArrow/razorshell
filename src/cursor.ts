@@ -8,18 +8,17 @@ function isStartOfWord(text: string, pos: number): boolean {
 export const cursor = {
   getTopOfWord(text: string, cursor: number): number {
     if (cursor === 0) return cursor;
-    // check already at the beginning
     if (!isStartOfWord(text, cursor)) {
       while (cursor > 0 && !isStartOfWord(text, cursor)) {
-        cursor--; // to the beginning of the word
+        cursor--;
       }
       return cursor;
     }
     while (cursor > 0 && isStartOfWord(text, cursor)) {
-      cursor--;  // ignore separators
+      cursor--;
     }
     while (cursor > 0 && !isStartOfWord(text, cursor)) {
-      cursor--;  // to the previous word
+      cursor--;
     }
     return cursor;
   },
@@ -33,10 +32,10 @@ export const cursor = {
   },
   getEndOfWord(text: string, cursor: number): number {
     while (cursor < text.length && separators.includes(text[cursor])) {
-      cursor++; // ignore separators
+      cursor++;
     }
     while (cursor < text.length && !separators.includes(text[cursor])) {
-      cursor++; // to the end of the word
+      cursor++;
     }
     return cursor;
   },
