@@ -76,6 +76,7 @@ const storyIds = [
   "options-langapp--auto",
   "options-langapp--overridden",
   "options-langapp--no-browser-languages",
+  "options-reclaimedapp--default",
   "options-richtextapp--off",
   "options-richtextapp--on",
   "options-testapp--default",
@@ -119,6 +120,7 @@ const excludedStoryIds = [
   "options-richtextapp--save-failure",
   "options-langapp--save-failure",
   // end as a rendering another story already captures
+  "options-reclaimedapp--opens-shortcuts-page",
   "options-langapp--switch-language",
   "options-testapp--ctrl-a-handled",
   "options-richtextapp--toggle-persists",

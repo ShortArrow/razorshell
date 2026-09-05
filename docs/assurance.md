@@ -79,6 +79,7 @@ file the importer refuses; a rendering readable in one theme only.
 | C1.15 | Killed text lands on a frame-local ring: chained kills concatenate in readline order, Ctrl+Y yanks the newest entry, Alt+Y rotates with verified replacement, a password kill is never stored, and an empty-ring Ctrl+Y leaves the native key untouched |
 | C1.16 | Word kills join the ring, character deletes remove whole graphemes without touching it, and both undo chords reach the native history |
 | C1.17 | Case operations recase exactly one word and land at its end, transpose-words drags the earlier word past the later, and Ctrl+K at a line end kills the newline joining the lines |
+| C1.18 | The reclaimed chords route by focus: assigned Ctrl+W rubs out a whitespace word inside a field and still closes the tab outside one, Ctrl+T transposes graphemes inside and still opens a tab outside — interception itself rests on the recorded manual measurement |
 
 ## Traceability
 
@@ -208,6 +209,19 @@ Frozen observations; each holds only for its date.
   result. Guarded at 0 and pinned under a deadline in
   test/topofword.test.ts, because a regression hangs the runner
   instead of failing an assertion.
+- 2026-09-05, razorshell's `backward_kill_word` and the new
+  `unix_word_rubout` are extensionally EQUAL, where readline's C-w and
+  M-DEL are not. Readline delimits M-DEL with `rl_alphabetic`
+  (isalnum) and C-w with whitespace, so `"foo bar-baz|"` separates
+  them there; razorshell's word kill follows its own Alt+b motion
+  (`cursor.getTopOfWord`), whose separator set is space, tab, newline
+  and carriage return — the rubout's own boundary. An exhaustive
+  search over every string up to length six on `{a, space, newline}`
+  found no caret at which the two regions differ. The rubout is still
+  defined in its own module rather than aliased, so that moving
+  `getTopOfWord` to readline's boundary cannot silently drag it along;
+  test/reclaimedregion.test.ts asserts the equality so that such a
+  move goes red.
 - 2026-08-20, CDP-injected keys never reach Chrome's browser-
   accelerator handling on Windows and Linux (the native-event
   builder exists only for mac/ios, so injected events carry
@@ -235,3 +249,4 @@ planned section is the current answer, not a test.
 | R6 | The 102,400-byte total sync quota; only the 8 KB per-item limit is exercised |
 | R7 | Interception of browser accelerators (Alt+F today, Alt+D if adopted): Chromium's source lists them outside the reserved set, but the harness cannot exercise that path (see the 2026-08-20 record), so the claim rests on real-browser use, not on a test |
 | R8 | Everything A8 excludes, silently: on macOS the Alt bindings never match and Cmd+key can reach a binding as if unmodified; on AltGr layouts a Ctrl+Alt chord reaches the matcher with both modifiers set. No macOS runner exists in CI |
+| R9 | Interception of the two reclaimed chords, and the browser-action arm that follows from it. C1.18's e2e evidence drives the MESSAGE path — the same run-operation message the command handler sends — because a reserved chord cannot be pressed under CDP (see R7 and the 2026-08-20 record). That the chord reaches the command at all, and that `tabs.remove`/`tabs.create` then run in its place, rests on the 2026-09-05 manual measurement, and the unfocused half of that measurement is itself unrecorded |

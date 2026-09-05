@@ -162,5 +162,17 @@
   "tooltip_config_import": {
     "message": "JSON-Einstellungen einfügen oder eine Datei wählen, dann mit Apply anwenden",
     "description": "Paste or choose a JSON settings file, then apply"
+  },
+  "command_unix_word_rubout": {
+    "message": "Wort vor dem Cursor bis zum Leerzeichen löschen (readline C-w)",
+    "description": "Wort vor dem Cursor bis zum Leerzeichen löschen (readline C-w)"
+  },
+  "command_transpose_chars": {
+    "message": "Die beiden Zeichen um den Cursor vertauschen (readline C-t)",
+    "description": "Die beiden Zeichen um den Cursor vertauschen (readline C-t)"
+  },
+  "tooltip_reclaimed": {
+    "message": "Chrome reserviert Strg+W und Strg+T, daher lassen sich beide nicht vorbelegen. Weise sie einmalig auf der Tastenkürzel-Seite zu; außerhalb eines Textfelds wird der Tab weiterhin geschlossen bzw. ein Tab geöffnet",
+    "description": "Chrome reserviert Strg+W und Strg+T, daher lassen sich beide nicht vorbelegen. Weise sie einmalig auf der Tastenkürzel-Seite zu; außerhalb eines Textfelds wird der Tab weiterhin geschlossen bzw. ein Tab geöffnet"
   }
 }

@@ -39,6 +39,19 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   consuming the key.
 - Casing is locale-insensitive: Turkish dotted and dotless i are not
   claimed.
+- Two reserved chords can be reclaimed by opting in. Ctrl+W
+  (unix-word-rubout) and Ctrl+T (transpose-chars) ship as UNASSIGNED
+  commands; assigning them once in chrome://extensions/shortcuts makes
+  them reach the extension while a text field has focus. Outside one
+  the tab still closes and a tab still opens. See
+  [ADR-0011](decisions/0011-reclaimed-reserved-chords.md).
+- The rubout goes on the kill ring and chains with the other backward
+  kills; transpose swaps whole graphemes through the field's undo
+  history and stays off the ring.
+- An options-page section explains the opt-in and opens the shortcuts
+  page, which a link cannot reach.
+- Ctrl+N is deliberately not among them: readline's C-n is
+  next-history, which a text field has no referent for.
 
 ### Changed
 

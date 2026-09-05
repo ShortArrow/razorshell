@@ -82,6 +82,43 @@ the line, the newline and the line after it onto the ring as one entry, so a
 single `Ctrl` + `y` gives all of it back. At the very end of the field there is
 no newline to take and the key still does nothing.
 
+### Reserved chords you can reclaim
+
+Two readline chords are missing from the table above, and not because
+they were forgotten. Chrome handles `Ctrl` + `w` (close tab) and
+`Ctrl` + `t` (new tab) before any page sees the keystroke, so no
+extension can cancel them from a content script — and Chrome refuses
+to let a manifest suggest them, so they cannot ship switched on.
+
+What Chrome does allow is an assignment you make yourself. Open
+**chrome://extensions/shortcuts** (the button in the options page's
+"Reserved chords" section takes you there, since a page cannot link to
+a `chrome://` URL), find Razorshell's two entries and assign them:
+
+| Chord          | Description                                            |
+| -------------- | ------------------------------------------------------ |
+| `Ctrl` + `w`   | unix-word-rubout — kill back to the previous whitespace |
+| `Ctrl` + `t`   | transpose-chars — swap the two characters at the cursor |
+
+Once assigned, the chord reaches Razorshell instead of the browser
+while a text field has focus. `Ctrl` + `w` kills back to the last
+whitespace, which is coarser than `Alt` + `Backspace` in readline —
+in a shell it swallows a whole path or a hyphenated token in one
+press — and it joins the kill ring like any other kill. `Ctrl` + `t`
+swaps the two characters around the cursor, whole graphemes at a time,
+through the field's own undo history.
+
+**Outside a text field the browser behaviour is still there.** Press
+`Ctrl` + `w` with nothing focused and the tab closes; `Ctrl` + `t`
+opens a tab. Razorshell reproduces the action it displaced rather than
+swallowing the key, so assigning these does not cost you two shortcuts
+you use all day. The same applies on a page your URL rules deny: the
+extension is off there, so the chord is the browser's again.
+
+`Ctrl` + `n` is not offered. Readline's C-n is next-history, and a
+text field has no history to step through — claiming a third reserved
+chord to do nothing would only cost you new-window.
+
 ### Planned (not implemented yet)
 
 Listed for reference; none of these are wired up.

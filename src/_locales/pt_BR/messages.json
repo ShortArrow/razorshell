@@ -162,5 +162,17 @@
   "tooltip_config_import": {
     "message": "Cole as configurações JSON ou escolha um arquivo e aplique com Apply",
     "description": "Paste or choose a JSON settings file, then apply"
+  },
+  "command_unix_word_rubout": {
+    "message": "Excluir a palavra delimitada por espaços antes do cursor (readline C-w)",
+    "description": "Excluir a palavra delimitada por espaços antes do cursor (readline C-w)"
+  },
+  "command_transpose_chars": {
+    "message": "Trocar os dois caracteres ao redor do cursor (readline C-t)",
+    "description": "Trocar os dois caracteres ao redor do cursor (readline C-t)"
+  },
+  "tooltip_reclaimed": {
+    "message": "O Chrome reserva Ctrl+W e Ctrl+T, então os dois não podem vir atribuídos por padrão. Atribua-os uma vez na página de atalhos; fora de um campo de texto a aba continua fechando e uma aba continua abrindo",
+    "description": "O Chrome reserva Ctrl+W e Ctrl+T, então os dois não podem vir atribuídos por padrão. Atribua-os uma vez na página de atalhos; fora de um campo de texto a aba continua fechando e uma aba continua abrindo"
   }
 }

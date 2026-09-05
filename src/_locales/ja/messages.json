@@ -162,5 +162,17 @@
   "tooltip_config_import": {
     "message": "JSON設定を貼り付けるかファイルを選んでApplyで適用します",
     "description": "Paste or choose a JSON settings file, then apply"
+  },
+  "command_unix_word_rubout": {
+    "message": "カーソルの前にある空白区切りの単語を削除 (readline C-w)",
+    "description": "カーソルの前にある空白区切りの単語を削除 (readline C-w)"
+  },
+  "command_transpose_chars": {
+    "message": "カーソル前後の文字を入れ替える (readline C-t)",
+    "description": "カーソル前後の文字を入れ替える (readline C-t)"
+  },
+  "tooltip_reclaimed": {
+    "message": "Ctrl+W と Ctrl+T は Chrome の予約キーのため既定では割り当てられません。ショートカットのページで一度割り当ててください。テキスト欄の外ではこれまで通りタブが閉じ、タブが開きます",
+    "description": "Ctrl+W と Ctrl+T は Chrome の予約キーのため既定では割り当てられません。ショートカットのページで一度割り当ててください。テキスト欄の外ではこれまで通りタブが閉じ、タブが開きます"
   }
 }

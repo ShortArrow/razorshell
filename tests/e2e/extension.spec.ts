@@ -2538,6 +2538,236 @@ test.describe("case operations, transpose and the newline kill @C1.17", () => {
 });
 
 /**
+ * The reclaimed chords, driven down the half of their path the harness can
+ * reach.
+ *
+ * WHAT THIS BLOCK COVERS AND WHAT IT DOES NOT. The feature has two halves and
+ * only one of them is testable here:
+ *
+ * - E2E-COVERED (below): everything downstream of the service worker's routing
+ *   decision. The worker's `razorshell-run-operation` message — byte for byte
+ *   what `chrome.commands.onCommand` sends on the `run` arm — is sent from the
+ *   worker itself with a text field focused, and the field is asserted to have
+ *   been rubbed out onto the ring (Ctrl+Y gives it back) or transposed. The
+ *   focus query the worker asks first is exercised the same way.
+ * - NOT E2E-COVERED: that a real Ctrl+W or Ctrl+T ever reaches the command at
+ *   all. The chord cannot be pressed under CDP — injected keys never reach
+ *   Chrome's browser-accelerator handling on Windows and Linux (2026-08-20
+ *   record), which is the same R7-class limit the Alt+D interception claim
+ *   sits behind. That half rests on the 2026-09-05 MANUAL MEASUREMENT: in a
+ *   real Chrome, chrome://extensions/shortcuts accepted a manual Ctrl+W
+ *   assignment and the assigned command fired with a text field focused while
+ *   the tab stayed open (experiments/commands-probe). Recorded as R9.
+ * - NOT E2E-COVERED EITHER: the `close-tab` and `new-tab` arms. Reaching them
+ *   means routing with nothing focused, and the worker acts on the ACTIVE tab —
+ *   which is this suite's one shared page, carried across every remaining test
+ *   in the file. Closing it would take the restart block down with it. Those two
+ *   arms are held by `commandAction`'s unit tests, where all four classes are
+ *   enumerated.
+ *
+ * The message is sent from the service worker rather than the page so that the
+ * sender is the extension, as it is in production; a page-side
+ * `chrome.runtime.sendMessage` would reach the same listener by a path the
+ * feature never uses.
+ */
+test.describe("the reclaimed chords route to the focused field @C1.18", () => {
+  const input = () => page.locator('input[type="text"]').first();
+
+  /** Empties the ring by reloading the frame, taking the module state with it. */
+  async function freshFrame(): Promise<void> {
+    await page.goto(`${origin}/`);
+    await page.waitForTimeout(1000);
+  }
+
+  /** Types into the field natively, so the field owns a real undo stack. */
+  async function typeFresh(text: string): Promise<void> {
+    await input().click();
+    await input().evaluate((el: HTMLInputElement) => {
+      el.focus();
+      el.setSelectionRange(0, el.value.length);
+    });
+    await page.keyboard.press("Delete");
+    await page.keyboard.type(text);
+    expect((await fieldState(input())).value).toBe(text);
+  }
+
+  /** The service worker, which is where the command listener lives. */
+  async function worker() {
+    return context.serviceWorkers()[0] ?? (await context.waitForEvent("serviceworker"));
+  }
+
+  /**
+   * The tab these messages go to, resolved BY URL rather than by
+   * `active: true`.
+   *
+   * Production asks for the active tab, which is right there: a user pressing
+   * the chord is looking at the tab they are typing in. This suite is not that
+   * shape — `optionsPage` is opened after `page` and is therefore the active
+   * tab for the whole file — so an `active: true` query here reaches the
+   * options page, which carries no content script, and the send fails with
+   * "Receiving end does not exist" no matter what the feature does. Naming the
+   * test page is what makes these tests observe the handler rather than the
+   * suite's own tab order.
+   */
+  async function sendToTestPage(message: unknown): Promise<unknown> {
+    const sw = await worker();
+    return sw.evaluate(
+      async (args: { origin: string; message: unknown }) => {
+        const tabs = await chrome.tabs.query({ url: `${args.origin}/*` });
+        const tab = tabs[0];
+        if (tab?.id === undefined) throw new Error("no test page tab");
+        return chrome.tabs.sendMessage(tab.id, args.message);
+      },
+      { origin, message },
+    );
+  }
+
+  /** What the worker's focus query gets back from the test page. */
+  function askFocus(): Promise<unknown> {
+    return sendToTestPage({ type: "razorshell-focus-query" });
+  }
+
+  /** The run-operation message the `run` arm of the routing decision sends. */
+  function runOperation(operation: string): Promise<unknown> {
+    return sendToTestPage({ type: "razorshell-run-operation", operation });
+  }
+
+  test.beforeAll(async () => {
+    await setPolicy({ defaultAction: "allow", rules: [] });
+    await freshFrame();
+  });
+
+  test.afterAll(async () => {
+    await freshFrame();
+    await setPolicy({
+      defaultAction: "allow",
+      rules: [{ pattern: "https://example.com/**", matchType: "glob", action: "deny" }],
+    });
+    await seedTextInput("hello world new order", 0);
+  });
+
+  test("the focus query reports a focused text field", async () => {
+    await freshFrame();
+    await typeFresh("foo bar");
+    expect(await askFocus()).toEqual({ textFieldFocused: true, enabled: true });
+  });
+
+  test("the focus query reports no field once the page is blurred", async () => {
+    await freshFrame();
+    await typeFresh("foo bar");
+    await input().evaluate((el: HTMLInputElement) => el.blur());
+    expect(await askFocus()).toEqual({ textFieldFocused: false, enabled: true });
+  });
+
+  test("the rubout kills a whitespace word onto the ring and Ctrl+Y gives it back", async () => {
+    await freshFrame();
+    await typeFresh("foo bar-baz");
+
+    expect(await runOperation("unix_word_rubout")).toEqual({ ran: true });
+    expect(await fieldState(input())).toEqual({ value: "foo ", start: 4, end: 4 });
+
+    await page.keyboard.press("Control+y");
+    expect((await fieldState(input())).value).toBe("foo bar-baz");
+  });
+
+  /**
+   * The chain, driven across the two entry points: the rubout arrives as a
+   * message from the worker and the Ctrl+U that follows as a real keystroke.
+   * Both are backward kills at one caret, so the ring holds one entry and a
+   * single Ctrl+Y restores the whole line in its original order.
+   */
+  test("a rubout chains with a following Ctrl+U", async () => {
+    await freshFrame();
+    await typeFresh("one two three");
+
+    expect(await runOperation("unix_word_rubout")).toEqual({ ran: true });
+    expect((await fieldState(input())).value).toBe("one two ");
+
+    await page.keyboard.press("Control+u");
+    expect((await fieldState(input())).value).toBe("");
+
+    await page.keyboard.press("Control+y");
+    expect((await fieldState(input())).value).toBe("one two three");
+  });
+
+  test("the rubout is undoable, so it went through the field's own history", async () => {
+    await freshFrame();
+    await typeFresh("foo bar");
+
+    expect(await runOperation("unix_word_rubout")).toEqual({ ran: true });
+    expect((await fieldState(input())).value).toBe("foo ");
+
+    await page.keyboard.press("Control+z");
+    expect((await fieldState(input())).value).toBe("foo bar");
+  });
+
+  test("transpose swaps the two characters before the caret at the end of the line", async () => {
+    await freshFrame();
+    await typeFresh("abc");
+
+    expect(await runOperation("transpose_chars")).toEqual({ ran: true });
+    expect(await fieldState(input())).toEqual({ value: "acb", start: 3, end: 3 });
+  });
+
+  test("transpose moves a whole emoji across the caret", async () => {
+    await freshFrame();
+    await typeFresh("a\u{1F600}");
+
+    expect(await runOperation("transpose_chars")).toEqual({ ran: true });
+    expect((await fieldState(input())).value).toBe("\u{1F600}a");
+  });
+
+  test("transpose at position 0 changes nothing", async () => {
+    await freshFrame();
+    await typeFresh("abc");
+    await input().evaluate((el: HTMLInputElement) => {
+      el.focus();
+      el.setSelectionRange(0, 0);
+    });
+
+    expect(await runOperation("transpose_chars")).toEqual({ ran: true });
+    expect((await fieldState(input())).value).toBe("abc");
+  });
+
+  /**
+   * With nothing focused the content script declines the operation, which is
+   * what leaves the worker's decision — reproduce the browser action — as the
+   * only thing that could have happened. The tab is deliberately NOT closed
+   * here; see this block's header.
+   */
+  test("an unfocused frame refuses to run the operation", async () => {
+    await freshFrame();
+    await typeFresh("foo bar");
+    await input().evaluate((el: HTMLInputElement) => el.blur());
+
+    expect(await runOperation("unix_word_rubout")).toEqual({ ran: false });
+    expect((await fieldState(input())).value).toBe("foo bar");
+  });
+
+  test("a denied frame refuses to run the operation", async () => {
+    await freshFrame();
+    await typeFresh("foo bar");
+    await setPolicy({
+      defaultAction: "deny",
+      rules: [],
+    });
+
+    expect(await runOperation("unix_word_rubout")).toEqual({ ran: false });
+    expect((await fieldState(input())).value).toBe("foo bar");
+
+    await setPolicy({ defaultAction: "allow", rules: [] });
+  });
+
+  test("an unknown operation name is declined", async () => {
+    await freshFrame();
+    await typeFresh("foo bar");
+
+    expect(await runOperation("not_an_operation")).toEqual({ ran: false });
+    expect((await fieldState(input())).value).toBe("foo bar");
+  });
+});
+
+/**
  * What `chrome.storage.onChanged` does about a write that changes nothing.
  *
  * This is a characterization test, not a specification: the expected value is

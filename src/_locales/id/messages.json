@@ -162,5 +162,17 @@
   "tooltip_config_import": {
     "message": "Tempel pengaturan JSON atau pilih berkas, lalu terapkan dengan Apply",
     "description": "Paste or choose a JSON settings file, then apply"
+  },
+  "command_unix_word_rubout": {
+    "message": "Hapus kata yang dibatasi spasi sebelum kursor (readline C-w)",
+    "description": "Hapus kata yang dibatasi spasi sebelum kursor (readline C-w)"
+  },
+  "command_transpose_chars": {
+    "message": "Tukar dua karakter di sekitar kursor (readline C-t)",
+    "description": "Tukar dua karakter di sekitar kursor (readline C-t)"
+  },
+  "tooltip_reclaimed": {
+    "message": "Chrome memesan Ctrl+W dan Ctrl+T, sehingga keduanya tidak bisa disertakan sebagai bawaan. Tetapkan sekali di halaman pintasan; di luar kolom teks, tab tetap tertutup dan tab baru tetap terbuka",
+    "description": "Chrome memesan Ctrl+W dan Ctrl+T, sehingga keduanya tidak bisa disertakan sebagai bawaan. Tetapkan sekali di halaman pintasan; di luar kolom teks, tab tetap tertutup dan tab baru tetap terbuka"
   }
 }

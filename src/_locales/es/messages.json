@@ -162,5 +162,17 @@
   "tooltip_config_import": {
     "message": "Pega la configuración JSON o elige un archivo y aplícalo con Apply",
     "description": "Paste or choose a JSON settings file, then apply"
+  },
+  "command_unix_word_rubout": {
+    "message": "Borrar la palabra delimitada por espacios antes del cursor (readline C-w)",
+    "description": "Borrar la palabra delimitada por espacios antes del cursor (readline C-w)"
+  },
+  "command_transpose_chars": {
+    "message": "Intercambiar los dos caracteres alrededor del cursor (readline C-t)",
+    "description": "Intercambiar los dos caracteres alrededor del cursor (readline C-t)"
+  },
+  "tooltip_reclaimed": {
+    "message": "Chrome reserva Ctrl+W y Ctrl+T, por lo que no pueden venir asignados de fábrica. Asígnalos una vez en la página de atajos; fuera de un campo de texto la pestaña se sigue cerrando y se sigue abriendo una pestaña",
+    "description": "Chrome reserva Ctrl+W y Ctrl+T, por lo que no pueden venir asignados de fábrica. Asígnalos una vez en la página de atajos; fuera de un campo de texto la pestaña se sigue cerrando y se sigue abriendo una pestaña"
   }
 }

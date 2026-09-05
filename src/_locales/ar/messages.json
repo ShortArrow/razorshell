@@ -162,5 +162,17 @@
   "tooltip_config_import": {
     "message": "الصق إعدادات JSON أو اختر ملفًا، ثم طبّقها بزر Apply",
     "description": "Paste or choose a JSON settings file, then apply"
+  },
+  "command_unix_word_rubout": {
+    "message": "حذف الكلمة المفصولة بمسافات قبل المؤشر (readline C-w)",
+    "description": "حذف الكلمة المفصولة بمسافات قبل المؤشر (readline C-w)"
+  },
+  "command_transpose_chars": {
+    "message": "تبديل الحرفين حول المؤشر (readline C-t)",
+    "description": "تبديل الحرفين حول المؤشر (readline C-t)"
+  },
+  "tooltip_reclaimed": {
+    "message": "يحجز Chrome الاختصارين Ctrl+W و Ctrl+T، لذا لا يمكن شحنهما كإعداد افتراضي. عيّنهما مرة واحدة من صفحة الاختصارات؛ خارج حقل النص يظل التبويب يُغلق ويظل تبويب جديد يُفتح",
+    "description": "يحجز Chrome الاختصارين Ctrl+W و Ctrl+T، لذا لا يمكن شحنهما كإعداد افتراضي. عيّنهما مرة واحدة من صفحة الاختصارات؛ خارج حقل النص يظل التبويب يُغلق ويظل تبويب جديد يُفتح"
   }
 }

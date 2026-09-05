@@ -162,5 +162,17 @@
   "tooltip_config_import": {
     "message": "Paste or choose a JSON settings file, then apply",
     "description": "Paste or choose a JSON settings file, then apply"
+  },
+  "command_unix_word_rubout": {
+    "message": "Kill the whitespace-delimited word before the cursor (readline C-w)",
+    "description": "Kill the whitespace-delimited word before the cursor (readline C-w)"
+  },
+  "command_transpose_chars": {
+    "message": "Swap the two characters around the cursor (readline C-t)",
+    "description": "Swap the two characters around the cursor (readline C-t)"
+  },
+  "tooltip_reclaimed": {
+    "message": "Chrome reserves Ctrl+W and Ctrl+T, so these two cannot ship as defaults. Assign them once on the shortcuts page; outside a text field the tab still closes and a tab still opens",
+    "description": "Chrome reserves Ctrl+W and Ctrl+T, so these two cannot ship as defaults. Assign them once on the shortcuts page; outside a text field the tab still closes and a tab still opens"
   }
 }

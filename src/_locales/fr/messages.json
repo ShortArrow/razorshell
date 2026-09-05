@@ -162,5 +162,17 @@
   "tooltip_config_import": {
     "message": "Collez les réglages JSON ou choisissez un fichier, puis appliquez avec Apply",
     "description": "Paste or choose a JSON settings file, then apply"
+  },
+  "command_unix_word_rubout": {
+    "message": "Supprimer le mot délimité par des espaces avant le curseur (readline C-w)",
+    "description": "Supprimer le mot délimité par des espaces avant le curseur (readline C-w)"
+  },
+  "command_transpose_chars": {
+    "message": "Échanger les deux caractères autour du curseur (readline C-t)",
+    "description": "Échanger les deux caractères autour du curseur (readline C-t)"
+  },
+  "tooltip_reclaimed": {
+    "message": "Chrome réserve Ctrl+W et Ctrl+T ; ces deux raccourcis ne peuvent donc pas être fournis par défaut. Attribuez-les une fois sur la page des raccourcis ; hors d'un champ de texte, l'onglet se ferme et un onglet s'ouvre comme avant",
+    "description": "Chrome réserve Ctrl+W et Ctrl+T ; ces deux raccourcis ne peuvent donc pas être fournis par défaut. Attribuez-les une fois sur la page des raccourcis ; hors d'un champ de texte, l'onglet se ferme et un onglet s'ouvre comme avant"
   }
 }

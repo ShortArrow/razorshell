@@ -44,6 +44,7 @@ let uiLanguage = defaultUiLanguage;
 let acceptLanguages = defaultAcceptLanguages;
 const armedSetFailures: string[] = [];
 const changeListeners: ChangeListener[] = [];
+const createdTabs: { url?: string }[] = [];
 
 function clone<T>(value: T): T {
   return structuredClone(value);
@@ -133,6 +134,20 @@ export function resetStorage(seed: Record<string, unknown> = {}): void {
   syncStore = clone(seed);
   localStore = {};
   armedSetFailures.length = 0;
+  createdTabs.length = 0;
+}
+
+/**
+ * @fn openedTabs
+ * @brief The tabs `chrome.tabs.create` was asked to open since the last reset.
+ * @details The options page opens `chrome://extensions/shortcuts` this way,
+ *          because a page cannot navigate to a `chrome://` URL through a link.
+ *          A story cannot follow that navigation, so what it asserts is the
+ *          request — which is the whole of what the component decides.
+ * @return The create properties, oldest first
+ */
+export function openedTabs(): { url?: string }[] {
+  return createdTabs.map((tab) => ({ ...tab }));
 }
 
 /**
@@ -205,6 +220,12 @@ export function installChromeMock(): void {
     },
     runtime: {
       getURL: (path: string) => path,
+    },
+    tabs: {
+      create: async (properties: { url?: string }) => {
+        createdTabs.push({ ...properties });
+        return { id: createdTabs.length };
+      },
     },
     i18n: {
       getMessage: (name: string) => englishMessages[name as keyof typeof englishMessages]?.message ?? '',

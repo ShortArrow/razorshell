@@ -2,13 +2,13 @@ import { loadContentEditableSetting, subscribeContentEditableSetting } from "./c
 import { analyzeHandlerSource } from "./handleranalysis";
 import { showToast } from "./inspecttoast";
 import { dispatchEditableKey, isEditableTarget, isTextField, keyEventHandling, resolveEventTarget } from "./keyhandling";
-import { clearRing } from "./killring";
+import { clearRing, noteForeignCommand } from "./killring";
 import { clearYankRecord } from "./yank";
 import { keyChord } from "./keychord";
 import { Chord } from "./keymapmerge";
 import { getActiveKeymap, initKeymap } from "./keymapstore";
 import { getMessage } from "./languages";
-import { Keymap } from "./operation";
+import { Keymap, TextField, operation } from "./operation";
 import { loadUrlPolicy, subscribeUrlPolicy } from "./urlpolicy";
 import { UrlPolicy, resolveAction } from "./urlrules";
 
@@ -16,6 +16,8 @@ console.log("extension razorshell loaded");
 
 const inspectMessage = "razorshell-inspect";
 const stateMessage = "razorshell-state";
+const focusQueryMessage = "razorshell-focus-query";
+const runOperationMessage = "razorshell-run-operation";
 
 let enabled = true;
 let inspecting = false;
@@ -250,6 +252,65 @@ chrome.runtime.onMessage.addListener((message: { type?: string }) => {
   if (message.type !== inspectMessage) return;
   startInspecting();
 });
+
+/**
+ * The two reclaimed chords arrive here from the service worker rather than as
+ * keydowns, because Chrome hands a reserved chord to the command and never to
+ * the page. The worker asks this frame whether it would have handled the
+ * keystroke, then either sends the operation back or reproduces the browser
+ * action itself — the decision is `commandAction` in `commandroute.ts`.
+ *
+ * Both handlers read `document.activeElement` rather than an event target: there
+ * is no event. `enabled` travels with the answer so the worker can treat a
+ * policy-denied frame as no field at all, which is what keeps Ctrl+W closing the
+ * tab on a page the user turned razorshell off for.
+ *
+ * The listener returns true to keep the message channel open for the async
+ * reply, which is Chrome's own protocol for a `sendResponse` that is not
+ * immediate; a listener that fell through would answer `undefined` and the
+ * worker would read it as an unfocused frame.
+ */
+function focusedField(): TextField | HTMLElement | null {
+  const active = document.activeElement;
+  if (isTextField(active)) return active;
+  if (editableEnabled && isEditableTarget(active)) return active;
+  return null;
+}
+
+/**
+ * Each reclaimed operation with its relationship to the kill ring, the same
+ * declaration a `Keymap` entry carries in `ringRole`. The rubout is a kill and
+ * reports itself through `recordKill`; transpose is foreign to the ring and must
+ * be announced, so that a transpose between two kills breaks their chain instead
+ * of letting them splice across the text it rearranged.
+ */
+const reclaimedOperations: Record<string, { run: (field: TextField) => void; kill: boolean }> = {
+  unix_word_rubout: { run: operation.unixWordRubout, kill: true },
+  transpose_chars: { run: operation.transposeChars, kill: false },
+};
+
+chrome.runtime.onMessage.addListener(
+  (message: { type?: string; operation?: string }, _sender, sendResponse) => {
+    if (message.type === focusQueryMessage) {
+      sendResponse({ textFieldFocused: focusedField() !== null, enabled });
+      return true;
+    }
+    if (message.type !== runOperationMessage) return;
+    const entry = message.operation === undefined ? undefined : reclaimedOperations[message.operation];
+    const field = focusedField();
+    // A contenteditable root has no `value` to slice, so these two decline it
+    // rather than acting on the wrong thing — the same refusal the case
+    // operations make by shipping without an `editableOperation`.
+    if (!entry || !enabled || !isTextField(field)) {
+      sendResponse({ ran: false });
+      return true;
+    }
+    if (!entry.kill) noteForeignCommand();
+    entry.run(field);
+    sendResponse({ ran: true });
+    return true;
+  },
+);
 
 document.addEventListener("razorshell-status-query", () => {
   document.dispatchEvent(

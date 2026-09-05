@@ -53,6 +53,14 @@
   "background": {
     "service_worker": "service.js"
   },
+  "commands": {
+    "unix_word_rubout": {
+      "description": "__MSG_command_unix_word_rubout__"
+    },
+    "transpose_chars": {
+      "description": "__MSG_command_transpose_chars__"
+    }
+  },
   "host_permissions": [
     "*://*/*"
   ]

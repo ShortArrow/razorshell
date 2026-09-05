@@ -17,6 +17,7 @@ import {
   KillRegion,
 } from "./killregion";
 import { beginYank, newestEntry, recordKill, rotateYank } from "./killring";
+import { transposeCharsEdit, unixWordRuboutRegion } from "./reclaimedregion";
 import {
   applyYank,
   applyYankPop,
@@ -209,6 +210,37 @@ export const operation = {
    */
   transposeWords(textinput: TextField) {
     applyCaseEdit(textinput, transposeWordsEdit);
+  },
+  /**
+   * Kills backward to the start of the previous whitespace-delimited word —
+   * readline's C-w, reachable only through a chord the user assigned in
+   * chrome://extensions/shortcuts, because Chrome reserves Ctrl+W.
+   *
+   * A kill like any other: backward direction, so it chains with the line kill
+   * and prepends to the entry, and a password field's text leaves the field
+   * without entering the ring.
+   */
+  unixWordRubout(textinput: TextField) {
+    const start = textinput.selectionStart;
+    const end = textinput.selectionEnd;
+    if (start == null || end == null) return;
+    kill(textinput, unixWordRuboutRegion(textinput.value, start, end), "backward");
+  },
+  /**
+   * Swaps the two graphemes around the caret — readline's C-t, reached the same
+   * way, because Chrome reserves Ctrl+T.
+   *
+   * The edit goes through the same `insertText` path as the case operations, so
+   * it joins the field's own undo history and the page sees an `input` event. It
+   * carries no ring role: nothing leaves the field, so a transpose between two
+   * kills breaks the chain instead of splicing them across text it rearranged.
+   *
+   * A null edit is the refusal `transposeCharsEdit` reports at position 0 and on
+   * a value too short to have two graphemes; the key is still consumed, which is
+   * how readline's bell translates here.
+   */
+  transposeChars(textinput: TextField) {
+    applyCaseEdit(textinput, transposeCharsEdit);
   },
 };
 

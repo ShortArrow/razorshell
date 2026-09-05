@@ -162,5 +162,17 @@
   "tooltip_config_import": {
     "message": "粘贴 JSON 设置或选择文件，然后点 Apply 应用",
     "description": "Paste or choose a JSON settings file, then apply"
+  },
+  "command_unix_word_rubout": {
+    "message": "删除光标前以空白分隔的单词 (readline C-w)",
+    "description": "删除光标前以空白分隔的单词 (readline C-w)"
+  },
+  "command_transpose_chars": {
+    "message": "交换光标前后的两个字符 (readline C-t)",
+    "description": "交换光标前后的两个字符 (readline C-t)"
+  },
+  "tooltip_reclaimed": {
+    "message": "Chrome 保留了 Ctrl+W 和 Ctrl+T，因此无法作为默认快捷键提供。请在快捷键页面手动指定一次；在文本框之外，标签页仍会关闭，新标签页仍会打开",
+    "description": "Chrome 保留了 Ctrl+W 和 Ctrl+T，因此无法作为默认快捷键提供。请在快捷键页面手动指定一次；在文本框之外，标签页仍会关闭，新标签页仍会打开"
   }
 }

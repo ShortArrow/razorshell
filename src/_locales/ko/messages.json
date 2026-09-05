@@ -162,5 +162,17 @@
   "tooltip_config_import": {
     "message": "JSON 설정을 붙여넣거나 파일을 고른 뒤 Apply로 적용합니다",
     "description": "Paste or choose a JSON settings file, then apply"
+  },
+  "command_unix_word_rubout": {
+    "message": "커서 앞의 공백으로 구분된 단어 삭제 (readline C-w)",
+    "description": "커서 앞의 공백으로 구분된 단어 삭제 (readline C-w)"
+  },
+  "command_transpose_chars": {
+    "message": "커서 앞뒤의 두 문자 바꾸기 (readline C-t)",
+    "description": "커서 앞뒤의 두 문자 바꾸기 (readline C-t)"
+  },
+  "tooltip_reclaimed": {
+    "message": "Ctrl+W와 Ctrl+T는 Chrome이 예약한 키라서 기본값으로 제공할 수 없습니다. 단축키 페이지에서 한 번 지정하세요. 텍스트 입력란 밖에서는 지금처럼 탭이 닫히고 새 탭이 열립니다",
+    "description": "Ctrl+W와 Ctrl+T는 Chrome이 예약한 키라서 기본값으로 제공할 수 없습니다. 단축키 페이지에서 한 번 지정하세요. 텍스트 입력란 밖에서는 지금처럼 탭이 닫히고 새 탭이 열립니다"
   }
 }

@@ -23,3 +23,8 @@ record names the files it concerns and is frozen when written.
 - [ADR-0009](0009-pessimistic-storage-writes.md) — state and the view
   update only after the write succeeds; a refusal shows inline and
   the view resyncs from storage
+- [ADR-0010](0010-kill-ring.md) — killed text goes on a frame-local
+  ring that chains, rotates and refuses to store a password
+- [ADR-0011](0011-reclaimed-reserved-chords.md) — Ctrl+W and Ctrl+T
+  ship unassigned as commands the user opts into, and reproduce the
+  browser action they displace outside a text field
