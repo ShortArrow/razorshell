@@ -71,6 +71,22 @@
     "message": "Desfazer",
     "description": "Desfazer"
   },
+  "upcase_word": {
+    "message": "Converter a palavra para maiúsculas",
+    "description": "Converter a palavra para maiúsculas"
+  },
+  "downcase_word": {
+    "message": "Converter a palavra para minúsculas",
+    "description": "Converter a palavra para minúsculas"
+  },
+  "capitalize_word": {
+    "message": "Colocar a inicial da palavra em maiúscula",
+    "description": "Colocar a inicial da palavra em maiúscula"
+  },
+  "transpose_words": {
+    "message": "Trocar as palavras antes e depois do cursor",
+    "description": "Trocar as palavras antes e depois do cursor"
+  },
   "tooltip_default_policy": {
     "message": "Aplicado quando nenhuma regra corresponde",
     "description": "Applied when no rule matches"

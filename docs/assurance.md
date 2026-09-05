@@ -75,9 +75,10 @@ file the importer refuses; a rendering readable in one theme only.
 | C1.11 | Fields the extension cannot reach — closed shadow roots, `email` inputs — keep their native behavior instead of dying half-handled |
 | C1.12 | The language override resolves every packaged locale's tooltips, and a failed dictionary fetch falls back to the browser's own messages |
 | C1.13 | A binding runs exactly once per keypress — settings churn, options-page remounts, same-document navigations and an abandoned rebind capture leave no duplicate or stale key handler behind |
-| C1.14 | A kill is undoable, fires one input event the page can see, does nothing on an empty region, and leaves readonly fields alone |
+| C1.14 | A kill is undoable, fires one input event the page can see, does nothing at the end of the value where the region is empty, and leaves readonly fields alone |
 | C1.15 | Killed text lands on a frame-local ring: chained kills concatenate in readline order, Ctrl+Y yanks the newest entry, Alt+Y rotates with verified replacement, a password kill is never stored, and an empty-ring Ctrl+Y leaves the native key untouched |
 | C1.16 | Word kills join the ring, character deletes remove whole graphemes without touching it, and both undo chords reach the native history |
+| C1.17 | Case operations recase exactly one word and land at its end, transpose-words drags the earlier word past the later, and Ctrl+K at a line end kills the newline joining the lines |
 
 ## Traceability
 

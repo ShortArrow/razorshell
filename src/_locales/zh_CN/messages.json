@@ -71,6 +71,22 @@
     "message": "撤销",
     "description": "撤销"
   },
+  "upcase_word": {
+    "message": "将光标后的单词转为大写",
+    "description": "将光标后的单词转为大写"
+  },
+  "downcase_word": {
+    "message": "将光标后的单词转为小写",
+    "description": "将光标后的单词转为小写"
+  },
+  "capitalize_word": {
+    "message": "将光标后的单词首字母大写",
+    "description": "将光标后的单词首字母大写"
+  },
+  "transpose_words": {
+    "message": "交换光标前后的单词",
+    "description": "交换光标前后的单词"
+  },
   "tooltip_default_policy": {
     "message": "当没有任何规则匹配时应用",
     "description": "Applied when no rule matches"

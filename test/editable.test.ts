@@ -3,15 +3,30 @@ import { defaultKeymap } from "../src/keymap";
 import { mergeKeymap } from "../src/keymapmerge";
 
 /**
- * `yank_pop` is the one binding with no contenteditable counterpart, and that
- * is a decision rather than an omission (ADR-0010): a pop replaces a recorded
- * range, and in a rich-text root there is no offset pair that survives the host
- * editor's normalisation well enough to verify the range still holds what was
- * inserted. The alternative was an optimistic replace that can delete text the
- * user wrote. It is named here so the exception has to be renewed deliberately
- * if a future entry joins it.
+ * The bindings with no contenteditable counterpart, each a decision rather than
+ * an omission. The set is named here so an exception has to be renewed
+ * deliberately rather than acquired by forgetting.
+ *
+ * `yank_pop` (ADR-0010): a pop replaces a recorded range, and in a rich-text
+ * root there is no offset pair that survives the host editor's normalisation
+ * well enough to verify the range still holds what was inserted. The alternative
+ * was an optimistic replace that can delete text the user wrote.
+ *
+ * The four case and transpose entries: each needs the extent of a word measured
+ * in the value, and a contenteditable root has no value to measure. Selection
+ * offsets there are a node and an offset inside arbitrary markup, which the host
+ * editor may renormalise between the read and the write, so the span a recase
+ * would overwrite cannot be pinned down the way it can in a field. A chord with
+ * no counterpart is left to the page, which keeps the editor's own Alt+U working
+ * instead of swallowing it for a binding that could not act.
  */
-const withoutEditableCounterpart = new Set(["yank_pop"]);
+const withoutEditableCounterpart = new Set([
+  "yank_pop",
+  "upcase_word",
+  "downcase_word",
+  "capitalize_word",
+  "transpose_words",
+]);
 
 describe("editable operations", () => {
   test("every default entry supports contenteditable targets", () => {

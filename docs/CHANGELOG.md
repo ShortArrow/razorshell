@@ -29,6 +29,26 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 - While a text field has focus, Alt+Backspace shadows Windows' undo
   alias (Ctrl+Z is untouched), Ctrl+D the bookmark shortcut and Ctrl+H
   the history shortcut.
+- Alt+U, Alt+L and Alt+C recase the word ahead of the caret and leave
+  the caret at its end; Alt+T swaps the word before the caret with the
+  one after it. All four follow readline, which measures from the
+  caret rather than from the start of the word it sits in, so mid-word
+  Alt+U uppercases only the tail. They write through the field's undo
+  history, and a word already in the target case is not written at
+  all. Alt+T with fewer than two words does nothing while still
+  consuming the key.
+- Casing is locale-insensitive: Turkish dotted and dotless i are not
+  claimed.
+
+### Changed
+
+- Ctrl+K at the end of a line now kills the newline and joins the next
+  line onto it, where 0.0.4 did nothing there. Three presses from a
+  line start put the line, the newline and the line after it onto the
+  ring as one entry, so a single Ctrl+Y restores both lines. At the end
+  of the field the region is still empty and the key still does
+  nothing. In contenteditable the analog is a block join, and what
+  lands on the ring is whatever the selection reports for it.
 
 ### Fixed
 

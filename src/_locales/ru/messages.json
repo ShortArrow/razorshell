@@ -71,6 +71,22 @@
     "message": "Отменить",
     "description": "Отменить"
   },
+  "upcase_word": {
+    "message": "Преобразовать слово в верхний регистр",
+    "description": "Преобразовать слово в верхний регистр"
+  },
+  "downcase_word": {
+    "message": "Преобразовать слово в нижний регистр",
+    "description": "Преобразовать слово в нижний регистр"
+  },
+  "capitalize_word": {
+    "message": "Сделать первую букву слова заглавной",
+    "description": "Сделать первую букву слова заглавной"
+  },
+  "transpose_words": {
+    "message": "Поменять местами слова до и после курсора",
+    "description": "Поменять местами слова до и после курсора"
+  },
   "tooltip_default_policy": {
     "message": "Применяется, когда ни одно правило не подходит",
     "description": "Applied when no rule matches"

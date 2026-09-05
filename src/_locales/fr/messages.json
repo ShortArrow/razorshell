@@ -71,6 +71,22 @@
     "message": "Annuler",
     "description": "Annuler"
   },
+  "upcase_word": {
+    "message": "Mettre le mot en majuscules",
+    "description": "Mettre le mot en majuscules"
+  },
+  "downcase_word": {
+    "message": "Mettre le mot en minuscules",
+    "description": "Mettre le mot en minuscules"
+  },
+  "capitalize_word": {
+    "message": "Mettre l'initiale du mot en majuscule",
+    "description": "Mettre l'initiale du mot en majuscule"
+  },
+  "transpose_words": {
+    "message": "Échanger les mots avant et après le curseur",
+    "description": "Échanger les mots avant et après le curseur"
+  },
   "tooltip_default_policy": {
     "message": "Appliqué lorsqu'aucune règle ne correspond",
     "description": "Applied when no rule matches"

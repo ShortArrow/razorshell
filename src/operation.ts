@@ -1,3 +1,10 @@
+import {
+  CaseEdit,
+  capitalizeWordEdit,
+  downcaseWordEdit,
+  transposeWordsEdit,
+  upcaseWordEdit,
+} from "./caseregion";
 import { cursor } from "./cursor";
 import {
   applyKillRegion,
@@ -10,7 +17,13 @@ import {
   KillRegion,
 } from "./killregion";
 import { beginYank, newestEntry, recordKill, rotateYank } from "./killring";
-import { applyYank, applyYankPop, canYankPop, noteYankPopFailure } from "./yank";
+import {
+  applyYank,
+  applyYankPop,
+  canYankPop,
+  noteYankPopFailure,
+  replaceRangeNatively,
+} from "./yank";
 
 export type TextField = HTMLInputElement | HTMLTextAreaElement;
 
@@ -172,7 +185,63 @@ export const operation = {
     const previous = cursor.getTopOfWord(textinput.value, position);
     textinput.setSelectionRange(previous, previous);
   },
+  upcaseWord(textinput: TextField) {
+    applyCaseEdit(textinput, upcaseWordEdit);
+  },
+  downcaseWord(textinput: TextField) {
+    applyCaseEdit(textinput, downcaseWordEdit);
+  },
+  capitalizeWord(textinput: TextField) {
+    applyCaseEdit(textinput, capitalizeWordEdit);
+  },
+  /**
+   * Swaps the word before the caret with the word after it, leaving the caret
+   * past both.
+   *
+   * Fewer than two words is a complete no-op — and the key is still consumed.
+   * Readline rings the bell there, which is a refusal the user hears while the
+   * key stays with the editor; a browser has no bell, so the honest translation
+   * of "refused, not unhandled" is to swallow the key and change nothing. Letting
+   * it fall through to the page instead would make Alt+T mean one thing on a line
+   * with two words and whatever the page decided on a line with one, which is a
+   * worse surprise than silence. The `preventDefault` lives in the dispatcher, so
+   * doing nothing here is what produces it.
+   */
+  transposeWords(textinput: TextField) {
+    applyCaseEdit(textinput, transposeWordsEdit);
+  },
 };
+
+/**
+ * Applies a computed edit to a field, writing only when the text really changes.
+ *
+ * The write goes through the same `execCommand("insertText")` path as the yank,
+ * for the same reason: it joins the field's own undo stack and raises an `input`
+ * event the page can see. A transform that returns the text already there is not
+ * written at all — the caret still moves, but the value is untouched and no undo
+ * entry is created, so Alt+U on a word that is already upper case cannot leave
+ * the user with a Ctrl+Z that appears to do nothing.
+ *
+ * A null edit is the refusal `transposeWordsEdit` reports, and it moves nothing.
+ */
+function applyCaseEdit(
+  textinput: TextField,
+  compute: (value: string, caret: number) => CaseEdit | null,
+): void {
+  if (textinput.readOnly || textinput.disabled) return;
+  const caret = textinput.selectionEnd;
+  if (caret == null) return;
+
+  const edit = compute(textinput.value, caret);
+  if (edit === null) return;
+
+  if (edit.text === textinput.value.slice(edit.start, edit.end)) {
+    textinput.setSelectionRange(edit.caret, edit.caret);
+    return;
+  }
+  replaceRangeNatively(textinput, edit.start, edit.end, edit.text);
+  textinput.setSelectionRange(edit.caret, edit.caret);
+}
 
 /**
  * Removes a region and tells the ring what left the field.

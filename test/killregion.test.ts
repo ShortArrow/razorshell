@@ -38,8 +38,14 @@ describe("endOfLineRegion covers the caret classes", () => {
   test("caret one before end of line takes a single character", () => {
     expect(endOfLineRegion(text, 21, 21)).toEqual({ start: 21, end: 22 });
   });
-  test("caret exactly at end of line yields an empty region", () => {
-    expect(endOfLineRegion(text, 22, 22)).toEqual({ start: 22, end: 22 });
+  /**
+   * The behavior change of v0.0.5: a caret at a line end takes the newline and
+   * joins the lines, where it used to find an empty region and do nothing. The
+   * boundary pair that separates this from the end of the value is asserted in
+   * its own describe below.
+   */
+  test("caret exactly at end of line takes the newline", () => {
+    expect(endOfLineRegion(text, 22, 22)).toEqual({ start: 22, end: 23 });
   });
   test("caret at end of value yields an empty region", () => {
     expect(endOfLineRegion(text, text.length, text.length)).toEqual({
@@ -50,8 +56,8 @@ describe("endOfLineRegion covers the caret classes", () => {
   test("empty value yields an empty region", () => {
     expect(endOfLineRegion("", 0, 0)).toEqual({ start: 0, end: 0 });
   });
-  test("caret before a leading newline yields an empty region", () => {
-    expect(endOfLineRegion("\nbody\n", 0, 0)).toEqual({ start: 0, end: 0 });
+  test("caret before a leading newline takes that newline", () => {
+    expect(endOfLineRegion("\nbody\n", 0, 0)).toEqual({ start: 0, end: 1 });
   });
   test("caret before a trailing newline takes up to it", () => {
     expect(endOfLineRegion("\nbody\n", 1, 1)).toEqual({ start: 1, end: 5 });
@@ -190,12 +196,72 @@ describe.each(regionFunctions)("%s holds its region properties", (_name, region)
     );
   });
 
-  test("P4 the killed slice never crosses a newline", () => {
+  /**
+   * A kill takes at most one line's worth of text, and the single newline it may
+   * take is the line boundary itself.
+   *
+   * The stronger "no newline at all" form was true until Ctrl+K learned to join
+   * lines, and it is now wrong by design rather than by accident: a caret resting
+   * exactly on a newline kills that newline and nothing else. So the property is
+   * the disjunction — newline-free, or exactly one `\n` and that `\n` is the
+   * whole slice. Anything else would mean a kill had run past a line boundary and
+   * swallowed a line the user never asked for, which is the fault this property
+   * exists to catch.
+   */
+  test("P4 the killed slice is newline-free unless it is the line boundary itself", () => {
     fc.assert(
       fc.property(selectionArbitrary, ({ value, start, end }) => {
-        expect(killed(value, region(value, start, end))).not.toContain("\n");
+        const slice = killed(value, region(value, start, end));
+        if (!slice.includes("\n")) return;
+        expect(slice).toBe("\n");
       }),
     );
+  });
+});
+
+/**
+ * The line-joining boundary pair, stated as two cases that must not be confused.
+ *
+ * They look alike — both are a caret with no more text on its line — and the
+ * whole behaviour turns on telling them apart. On a newline there IS something
+ * to take and taking it joins the lines; at the end of the value there is not,
+ * and the region must stay empty so `applyKillRegion`'s guard keeps
+ * `execCommand("delete")` away from an empty selection, where it acts as
+ * Backspace and eats the character behind the caret (measured 2026-08-20).
+ */
+describe("Ctrl+K at a line end takes the newline, at the value end nothing", () => {
+  test("a caret on a newline kills exactly that newline", () => {
+    const value = "first\nsecond";
+    const region = endOfLineRegion(value, 5, 5);
+    expect(region).toEqual({ start: 5, end: 6 });
+    expect(killed(value, region)).toBe("\n");
+    expect(remaining(value, region)).toBe("firstsecond");
+  });
+
+  test("a caret at the end of the value kills nothing", () => {
+    const value = "first\nsecond";
+    const region = endOfLineRegion(value, value.length, value.length);
+    expect(region).toEqual({ start: value.length, end: value.length });
+    expect(killed(value, region)).toBe("");
+  });
+
+  /** A trailing newline is still a newline: the caret before it takes it. */
+  test("a caret on a trailing newline takes it and leaves the value empty of lines", () => {
+    expect(endOfLineRegion("body\n", 4, 4)).toEqual({ start: 4, end: 5 });
+  });
+
+  /** After that trailing newline there is no more value, so nothing is taken. */
+  test("a caret after a trailing newline kills nothing", () => {
+    expect(endOfLineRegion("body\n", 5, 5)).toEqual({ start: 5, end: 5 });
+  });
+
+  /** A value that is one newline: the caret before it joins two empty lines. */
+  test("a caret before a lone newline takes it", () => {
+    expect(endOfLineRegion("\n", 0, 0)).toEqual({ start: 0, end: 1 });
+  });
+
+  test("an empty value still yields an empty region", () => {
+    expect(endOfLineRegion("", 0, 0)).toEqual({ start: 0, end: 0 });
   });
 });
 
@@ -206,8 +272,27 @@ describe("the properties run against non-empty regions", () => {
     return r.end > r.start;
   });
 
-  test("P5 killing to end of line again from the same caret is a no-op", () => {
+  /**
+   * A second Ctrl+K from the caret the first one left takes the newline that the
+   * first one stopped at, or nothing when the value has run out.
+   *
+   * The old form said the second kill is always a no-op, which held only while a
+   * kill stopped short of the boundary. What survives the change is the bound: a
+   * kill never leaves a whole line behind it, so the follow-up takes at most the
+   * newline that ends the line and never reaches into the line after.
+   *
+   * The caret the first kill leaves can sit INSIDE a surrogate pair, because
+   * this module claims code-unit offsets and not grapheme integrity — the file
+   * header says so and two unit cases pin it. The second kill then takes the
+   * orphaned half up to the next newline, which is neither a join nor a no-op.
+   * The property therefore asserts the bound that holds in every case, that the
+   * slice carries no newline but a single trailing one, and the join and
+   * exhaustion branches are counted separately so neither goes unexercised.
+   */
+  test("P5 a second kill from the same caret takes the line boundary or nothing", () => {
     let sawNonEmpty = false;
+    let sawJoin = false;
+    let sawExhausted = false;
     fc.assert(
       fc.property(nonEmptyEndOfLine, ({ value, start, end }) => {
         const first = endOfLineRegion(value, start, end);
@@ -215,12 +300,26 @@ describe("the properties run against non-empty regions", () => {
         sawNonEmpty = true;
         const after = remaining(value, first);
         const second = endOfLineRegion(after, first.start, first.start);
-        expect(second).toEqual({ start: first.start, end: first.start });
+        expect(second.start).toBe(first.start);
+        const taken = killed(after, second);
+        if (taken === "") sawExhausted = true;
+        else if (taken === "\n") sawJoin = true;
+        // Whatever else it took, it stopped at the first line boundary: no
+        // newline inside the slice, and at most one closing it.
+        expect(taken.slice(0, -1)).not.toContain("\n");
       }),
     );
     expect(
       sawNonEmpty,
       "no non-empty region was generated, so the property above asserted nothing",
+    ).toBe(true);
+    expect(
+      sawJoin,
+      "no generated case left a newline at the caret, so the join branch asserted nothing",
+    ).toBe(true);
+    expect(
+      sawExhausted,
+      "no generated case ran the value out, so the empty branch asserted nothing",
     ).toBe(true);
   });
 

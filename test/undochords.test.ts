@@ -140,3 +140,71 @@ describe("the new entries declare their relation to the ring @C1.16", () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 });
+
+/**
+ * The four chords the case batch adds, and what they declare to the ring.
+ *
+ * Alt+letter chords report the plain letter in `event.key` under assumption A8,
+ * which is the same premise the shipped Alt+D, Alt+F and Alt+B rest on; nothing
+ * new is measured here, and macOS stays outside it for the reason A8 gives.
+ */
+describe("the case and transpose chords @C1.17", () => {
+  const chords: [string, string][] = [
+    ["upcase_word", "u"],
+    ["downcase_word", "l"],
+    ["capitalize_word", "c"],
+    ["transpose_words", "t"],
+  ];
+
+  test.each(chords)("%s matches its Alt chord", (id, key) => {
+    expect(keymaching(keydown({ key, altKey: true }), entry(id))).toBe(true);
+  });
+
+  test.each(chords)("%s does not match the bare letter", (id, key) => {
+    expect(keymaching(keydown({ key }), entry(id))).toBe(false);
+  });
+
+  test.each(chords)("%s does not match the Ctrl chord", (id, key) => {
+    expect(keymaching(keydown({ key, ctrlKey: true }), entry(id))).toBe(false);
+  });
+
+  /**
+   * None of the four is a kill: nothing they touch leaves the field. The absence
+   * of a `ringRole` is what makes the dispatcher report them as foreign commands,
+   * so a recase between two kills breaks the chain instead of letting the two
+   * splice into a line the user never had — the property is bought here, not in
+   * the operations.
+   */
+  test("none of them claims a ring role", () => {
+    for (const [id] of chords) {
+      expect(entry(id).ringRole, id).toBeUndefined();
+    }
+  });
+
+  /**
+   * They ship without a contenteditable counterpart on purpose: a rich-text root
+   * has no value to slice, and the word extents cannot be read off a selection
+   * that the host editor normalises. A chord with no counterpart is left to the
+   * page rather than swallowed by a binding that could not act.
+   */
+  test("none of them claims a contenteditable counterpart", () => {
+    for (const [id] of chords) {
+      expect(entry(id).editableOperation, id).toBeUndefined();
+    }
+  });
+
+  test("every one of them carries a description", () => {
+    for (const [id] of chords) {
+      expect(entry(id).description, id).toBeTypeOf("function");
+    }
+  });
+
+  test("they do not collide with the chords already shipped", () => {
+    for (const [id, key] of chords) {
+      const matches = defaultKeymap.filter((candidate) =>
+        keymaching(keydown({ key, altKey: true }), candidate),
+      );
+      expect(matches.map((m) => m.id), id).toEqual([id]);
+    }
+  });
+});

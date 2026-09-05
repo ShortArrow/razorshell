@@ -71,6 +71,22 @@
     "message": "Undo",
     "description": "Undo"
   },
+  "upcase_word": {
+    "message": "Uppercase the word after the cursor",
+    "description": "Uppercase the word after the cursor"
+  },
+  "downcase_word": {
+    "message": "Lowercase the word after the cursor",
+    "description": "Lowercase the word after the cursor"
+  },
+  "capitalize_word": {
+    "message": "Capitalize the word after the cursor",
+    "description": "Capitalize the word after the cursor"
+  },
+  "transpose_words": {
+    "message": "Swap the words before and after the cursor",
+    "description": "Swap the words before and after the cursor"
+  },
   "tooltip_default_policy": {
     "message": "Applied when no rule matches",
     "description": "Applied when no rule matches"

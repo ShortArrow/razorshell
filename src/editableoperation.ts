@@ -50,6 +50,18 @@ function move(direction: string, granularity: string): void {
  *
  * The line kills pass `lineboundary` and the word kills `word`; both are kills,
  * so both record, and the chain rules they meet are the ring's own.
+ *
+ * A `lineboundary` extend that collapses means the caret already sits at the end
+ * of its line, and one character forward is then the block boundary. Extending
+ * by that character and deleting it joins the two blocks — the contenteditable
+ * analog of `endOfLineRegion` taking the newline, and what makes consecutive
+ * Ctrl+K in a rich-text root walk through the document instead of stalling.
+ *
+ * What lands on the ring is whatever the selection reports for that extend, not
+ * a `"\n"` this code writes: a block boundary in markup is an element edge, and
+ * the engine is the only thing that can say what text it stands for. Where the
+ * character extend also collapses there is nothing after the caret at all, and
+ * the kill is a no-op exactly as it is at the end of a value.
  */
 function deleteToBoundary(
   root: HTMLElement,
@@ -59,7 +71,11 @@ function deleteToBoundary(
   const current = selection();
   if (!current) return;
   current.modify("extend", direction, granularity);
-  if (current.isCollapsed) return;
+  if (current.isCollapsed) {
+    if (granularity !== "lineboundary") return;
+    current.modify("extend", direction, "character");
+    if (current.isCollapsed) return;
+  }
   const text = current.toString();
   document.execCommand("delete");
   recordKill({

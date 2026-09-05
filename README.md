@@ -38,8 +38,12 @@ These work today.
 | `Ctrl` + `/`            | undo                                  |
 | `Ctrl` + `Shift` + `_`  | undo                                  |
 | `Alt` + `b`             | move cursor to the previous word      |
+| `Alt` + `c`             | capitalize word                       |
 | `Alt` + `d`             | kill word                             |
 | `Alt` + `f`             | move cursor to the next word          |
+| `Alt` + `l`             | downcase word                         |
+| `Alt` + `t`             | transpose words                       |
+| `Alt` + `u`             | upcase word                           |
 | `Alt` + `y`             | yank pop                              |
 | `Alt` + `Backspace`     | backward kill word                    |
 
@@ -63,6 +67,21 @@ bookmark shortcut, and `Ctrl` + `h` is the history shortcut. `Ctrl` + `/` and
 `Ctrl` + `Shift` + `_` both reach the field's own undo history, which is the
 same history `Ctrl` + `z` walks.
 
+`Alt` + `u`, `Alt` + `l` and `Alt` + `c` recase the word ahead of the caret and
+leave the caret at its end; `Alt` + `t` swaps the word before the caret with the
+one after it. All four follow readline, which means from the caret rather than
+from the start of the word it sits in: mid-word, `Alt` + `u` uppercases only the
+tail. They edit through the field's own undo history, so `Ctrl` + `z` takes a
+recase back, and a word already in the target case is not rewritten at all.
+`Alt` + `t` on a line with fewer than two words does nothing while still
+consuming the key, which is how readline's bell translates to a browser.
+
+`Ctrl` + `k` at the end of a line now takes the newline and joins the next line
+onto it, instead of doing nothing. Three presses from the start of a line put
+the line, the newline and the line after it onto the ring as one entry, so a
+single `Ctrl` + `y` gives all of it back. At the very end of the field there is
+no newline to take and the key still does nothing.
+
 ### Planned (not implemented yet)
 
 Listed for reference; none of these are wired up.
@@ -80,9 +99,6 @@ Listed for reference; none of these are wired up.
 | `Ctrl` + `@`     |                                       |
 | `Ctrl` + `Space` |                                       |
 | `Alt` + `p`      | non incremental reverse serch history |
-| `Alt` + `u`      | up case word                          |
-| `Alt` + `l`      | down case word                        |
-| `Alt` + `c`      | change to capital                     |
 | `Alt` + `.`      | yank last arg                         |
 
 reference `bind -p | grep -E '^"\\(e|C)'`

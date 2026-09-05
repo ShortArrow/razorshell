@@ -2412,6 +2412,132 @@ test.describe("word kills, character deletes and undo @C1.16", () => {
 });
 
 /**
+ * The case operations, transpose-words, and Ctrl+K over a line boundary.
+ *
+ * Self-contained in the manner of the C1.14 and C1.16 blocks: it seeds the
+ * allowing policy it needs and restores the denying one, plus the seeded text,
+ * that the describes further down the file assert against.
+ *
+ * The undo assertion on Alt+U is not decoration. A case change that rewrote
+ * `value` directly would show the same string and be indistinguishable here by
+ * value alone — it is the Ctrl+Z that proves the write went through the
+ * `execCommand("insertText")` path and joined the field's own history, the same
+ * property the yank rests on.
+ */
+test.describe("case operations, transpose and the newline kill @C1.17", () => {
+  const input = () => page.locator('input[type="text"]').first();
+  const textarea = () => page.locator("textarea").first();
+
+  /** The caret, set directly — see the note in the C1.14 block on why not a chord. */
+  async function caretTo(position: number): Promise<void> {
+    await input().evaluate((el: HTMLInputElement, at: number) => {
+      el.focus();
+      el.setSelectionRange(at, at);
+    }, position);
+  }
+
+  /** Types into the field natively, so the field owns a real undo stack. */
+  async function typeFresh(text: string): Promise<void> {
+    await input().click();
+    await input().evaluate((el: HTMLInputElement) => {
+      el.focus();
+      el.setSelectionRange(0, el.value.length);
+    });
+    await page.keyboard.press("Delete");
+    await page.keyboard.type(text);
+    expect((await fieldState(input())).value).toBe(text);
+  }
+
+  /** Empties the ring by reloading the frame, taking the module state with it. */
+  async function freshFrame(): Promise<void> {
+    await page.goto(`${origin}/`);
+    await page.waitForTimeout(1000);
+  }
+
+  test.beforeAll(async () => {
+    await setPolicy({ defaultAction: "allow", rules: [] });
+    await freshFrame();
+  });
+
+  test.afterAll(async () => {
+    await freshFrame();
+    await setPolicy({
+      defaultAction: "allow",
+      rules: [{ pattern: "https://example.com/**", matchType: "glob", action: "deny" }],
+    });
+    await seedTextInput("hello world new order", 0);
+  });
+
+  test("Alt+U uppercases a word and Ctrl+Z takes it back", async () => {
+    await freshFrame();
+    await typeFresh("hello world");
+    await caretTo(0);
+
+    await page.keyboard.press("Alt+u");
+    expect(await fieldState(input())).toEqual({ value: "HELLO world", start: 5, end: 5 });
+
+    await page.keyboard.press("Control+z");
+    expect((await fieldState(input())).value).toBe("hello world");
+  });
+
+  test("Alt+C capitalizes a word whose tail is already upper case", async () => {
+    await freshFrame();
+    await typeFresh("hELLO world");
+    await caretTo(0);
+
+    await page.keyboard.press("Alt+c");
+    expect(await fieldState(input())).toEqual({ value: "Hello world", start: 5, end: 5 });
+  });
+
+  test("Alt+T drags the earlier word past the later one", async () => {
+    await freshFrame();
+    await typeFresh("one two");
+    await caretTo(3);
+
+    await page.keyboard.press("Alt+t");
+    expect(await fieldState(input())).toEqual({ value: "two one", start: 7, end: 7 });
+  });
+
+  /**
+   * Three Ctrl+K from a line start join two lines, and the ring hands back all
+   * of it as ONE entry.
+   *
+   * The first takes "first line", the second takes the newline it now sits on
+   * and joins the lines, the third takes "second line". All three start at the
+   * same caret, so the chain holds and a forward kill appends: the single entry
+   * reads back as the original two lines. A Ctrl+K that stopped at the line end
+   * would leave the newline in the field and make the second press a no-op,
+   * which is the behaviour this replaces.
+   */
+  test("three Ctrl+K join two lines and one Ctrl+Y restores them", async () => {
+    await freshFrame();
+    await textarea().click();
+    await textarea().evaluate((el: HTMLTextAreaElement) => {
+      el.focus();
+      el.setSelectionRange(0, el.value.length);
+    });
+    await page.keyboard.press("Delete");
+    await page.keyboard.type("first line\nsecond line");
+    await textarea().evaluate((el: HTMLTextAreaElement) => {
+      el.focus();
+      el.setSelectionRange(0, 0);
+    });
+
+    await page.keyboard.press("Control+k");
+    expect((await fieldState(textarea())).value).toBe("\nsecond line");
+
+    await page.keyboard.press("Control+k");
+    expect((await fieldState(textarea())).value).toBe("second line");
+
+    await page.keyboard.press("Control+k");
+    expect((await fieldState(textarea())).value).toBe("");
+
+    await page.keyboard.press("Control+y");
+    expect((await fieldState(textarea())).value).toBe("first line\nsecond line");
+  });
+});
+
+/**
  * What `chrome.storage.onChanged` does about a write that changes nothing.
  *
  * This is a characterization test, not a specification: the expected value is

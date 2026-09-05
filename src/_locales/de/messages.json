@@ -71,6 +71,22 @@
     "message": "Rückgängig",
     "description": "Rückgängig"
   },
+  "upcase_word": {
+    "message": "Wort in Großbuchstaben umwandeln",
+    "description": "Wort in Großbuchstaben umwandeln"
+  },
+  "downcase_word": {
+    "message": "Wort in Kleinbuchstaben umwandeln",
+    "description": "Wort in Kleinbuchstaben umwandeln"
+  },
+  "capitalize_word": {
+    "message": "Ersten Buchstaben des Wortes großschreiben",
+    "description": "Ersten Buchstaben des Wortes großschreiben"
+  },
+  "transpose_words": {
+    "message": "Wörter vor und nach dem Cursor vertauschen",
+    "description": "Wörter vor und nach dem Cursor vertauschen"
+  },
   "tooltip_default_policy": {
     "message": "Wird angewendet, wenn keine Regel zutrifft",
     "description": "Applied when no rule matches"

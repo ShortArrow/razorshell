@@ -71,6 +71,22 @@
     "message": "元に戻す",
     "description": "元に戻す"
   },
+  "upcase_word": {
+    "message": "カーソルの後ろの単語を大文字にする",
+    "description": "カーソルの後ろの単語を大文字にする"
+  },
+  "downcase_word": {
+    "message": "カーソルの後ろの単語を小文字にする",
+    "description": "カーソルの後ろの単語を小文字にする"
+  },
+  "capitalize_word": {
+    "message": "カーソルの後ろの単語の先頭を大文字にする",
+    "description": "カーソルの後ろの単語の先頭を大文字にする"
+  },
+  "transpose_words": {
+    "message": "カーソルの前後の単語を入れ替える",
+    "description": "カーソルの前後の単語を入れ替える"
+  },
   "tooltip_default_policy": {
     "message": "どのルールにもマッチしないときに適用されます",
     "description": "Applied when no rule matches"

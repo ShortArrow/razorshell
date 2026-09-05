@@ -17,6 +17,17 @@ export interface KillRegion {
  * The region a kill-to-end-of-line removes: from the selection's end to the
  * next newline, or to the end of the value when the line is the last one.
  *
+ * A caret sitting exactly ON the newline takes the newline itself, which is what
+ * joins the two lines — readline's C-k at a line end, and the reason three
+ * presses from a line start accumulate line, newline and next line into one ring
+ * entry rather than stalling on the boundary. Without this the second press
+ * would find an empty region, record nothing, and leave the newline in place
+ * forever.
+ *
+ * At the END OF THE VALUE there is no newline to take and the region stays
+ * empty, so `applyKillRegion`'s guard still holds and Ctrl+K there does nothing
+ * at all. That is the one empty case, and it is the one C1.14 names.
+ *
  * With a non-collapsed selection the selected text survives and the kill takes
  * only what follows it.
  */
@@ -25,7 +36,11 @@ export function endOfLineRegion(
   _selectionStart: number,
   selectionEnd: number,
 ): KillRegion {
-  return { start: selectionEnd, end: cursor.getEndOfLine(value, selectionEnd) };
+  const end = cursor.getEndOfLine(value, selectionEnd);
+  if (end === selectionEnd && value[selectionEnd] === "\n") {
+    return { start: selectionEnd, end: selectionEnd + 1 };
+  }
+  return { start: selectionEnd, end };
 }
 
 /**

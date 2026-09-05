@@ -71,6 +71,22 @@
     "message": "Deshacer",
     "description": "Deshacer"
   },
+  "upcase_word": {
+    "message": "Convertir la palabra a mayúsculas",
+    "description": "Convertir la palabra a mayúsculas"
+  },
+  "downcase_word": {
+    "message": "Convertir la palabra a minúsculas",
+    "description": "Convertir la palabra a minúsculas"
+  },
+  "capitalize_word": {
+    "message": "Poner en mayúscula la inicial de la palabra",
+    "description": "Poner en mayúscula la inicial de la palabra"
+  },
+  "transpose_words": {
+    "message": "Intercambiar las palabras antes y después del cursor",
+    "description": "Intercambiar las palabras antes y después del cursor"
+  },
   "tooltip_default_policy": {
     "message": "Se aplica cuando ninguna regla coincide",
     "description": "Applied when no rule matches"

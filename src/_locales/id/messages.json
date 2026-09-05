@@ -71,6 +71,22 @@
     "message": "Urungkan",
     "description": "Urungkan"
   },
+  "upcase_word": {
+    "message": "Ubah kata menjadi huruf besar",
+    "description": "Ubah kata menjadi huruf besar"
+  },
+  "downcase_word": {
+    "message": "Ubah kata menjadi huruf kecil",
+    "description": "Ubah kata menjadi huruf kecil"
+  },
+  "capitalize_word": {
+    "message": "Jadikan huruf awal kata menjadi kapital",
+    "description": "Jadikan huruf awal kata menjadi kapital"
+  },
+  "transpose_words": {
+    "message": "Tukar kata sebelum dan sesudah kursor",
+    "description": "Tukar kata sebelum dan sesudah kursor"
+  },
   "tooltip_default_policy": {
     "message": "Diterapkan bila tidak ada aturan yang cocok",
     "description": "Applied when no rule matches"

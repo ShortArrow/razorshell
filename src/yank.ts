@@ -115,6 +115,25 @@ export function clearYankRecord(): void {
   lastYank = null;
 }
 
+/**
+ * Selects a range and writes text over it natively, leaving the caret at the end
+ * of what was written, without recording anything for a yank-pop.
+ *
+ * The case operations rewrite a span for reasons that have nothing to do with
+ * the ring, and they need exactly this: the `execCommand("insertText")` path, so
+ * the edit joins the field's own undo stack and the page sees an `input` event.
+ * Exported from here rather than reimplemented beside them because a second copy
+ * of the fallback and the focus handling would be a second thing to keep right.
+ */
+export function replaceRangeNatively(
+  field: TextField,
+  start: number,
+  end: number,
+  text: string,
+): void {
+  replaceRange(field, start, end, text);
+}
+
 /** Selects a range and writes text over it, natively where the engine allows. */
 function replaceRange(field: TextField, start: number, end: number, text: string): void {
   field.setSelectionRange(start, end);

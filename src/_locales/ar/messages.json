@@ -71,6 +71,22 @@
     "message": "تراجع",
     "description": "تراجع"
   },
+  "upcase_word": {
+    "message": "تحويل الكلمة إلى أحرف كبيرة",
+    "description": "تحويل الكلمة إلى أحرف كبيرة"
+  },
+  "downcase_word": {
+    "message": "تحويل الكلمة إلى أحرف صغيرة",
+    "description": "تحويل الكلمة إلى أحرف صغيرة"
+  },
+  "capitalize_word": {
+    "message": "جعل أول حرف من الكلمة كبيرًا",
+    "description": "جعل أول حرف من الكلمة كبيرًا"
+  },
+  "transpose_words": {
+    "message": "تبديل الكلمتين حول المؤشر",
+    "description": "تبديل الكلمتين حول المؤشر"
+  },
   "tooltip_default_policy": {
     "message": "يُطبَّق عندما لا تطابق أي قاعدة",
     "description": "Applied when no rule matches"

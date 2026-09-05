@@ -26,6 +26,7 @@ import {
   nextGraphemeRegion,
   previousGraphemeRegion,
 } from "../src/killregion";
+import { upcaseWordEdit } from "../src/caseregion";
 
 /** The text a region removes. */
 function killed(value: string, region: { start: number; end: number }): string {
@@ -156,6 +157,34 @@ describe("backwardWordRegion covers the caret classes", () => {
 
   test("a non-collapsed selection survives and the kill runs from its near edge", () => {
     expect(backwardWordRegion("hello world", 6, 9)).toEqual({ start: 0, end: 6 });
+  });
+});
+
+/**
+ * The word boundary the case operations share with the motions.
+ *
+ * `upcaseWordEdit` and its siblings measure their span with the same
+ * `cursor.getEndOfWord` that `forwardWordRegion` uses, so Alt+U recases exactly
+ * what Alt+D would kill and Alt+F would move over. These cases pin that the two
+ * really do agree, class for class — a case operation that drifted onto its own
+ * boundary would recase text the user could not predict from the motion they
+ * already know.
+ */
+describe("the case span matches the forward word region @C1.17", () => {
+  const cases: [string, string, number][] = [
+    ["caret mid-word", "hello world", 2],
+    ["caret at a word start", "hello world", 0],
+    ["caret at a word end", "hello world", 5],
+    ["caret before a whitespace run", "hello   world", 5],
+    ["caret at the end of the value", "hello world", 11],
+    ["an empty value", "", 0],
+    ["leading whitespace", "  hello", 0],
+  ];
+
+  test.each(cases)("%s covers the same span", (_name, value, caret) => {
+    const region = forwardWordRegion(value, caret, caret);
+    const edit = upcaseWordEdit(value, caret);
+    expect({ start: edit.start, end: edit.end }).toEqual(region);
   });
 });
 

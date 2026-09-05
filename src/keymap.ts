@@ -193,4 +193,51 @@ export const defaultKeymap: Keymap[] = [
     ctrl: true,
     key: "/",
   },
+  /**
+   * The case operations and transpose carry no `ringRole` on purpose. None of
+   * them is a kill — nothing they touch leaves the field — so the dispatcher
+   * reports each as a foreign command and a kill chain around one breaks, which
+   * is what stops a recased word between two kills from splicing them into a
+   * line the user never had. The property is bought by this absence, exactly as
+   * it is for the character deletes.
+   *
+   * They ship without an `editableOperation`: a contenteditable root has no
+   * value to slice, and the word extents these need cannot be read off a rich-
+   * text selection without an offset pair that survives the host editor's own
+   * normalisation. A chord with no counterpart is left to the page, so the
+   * editor's own Alt+U keeps working rather than being swallowed by a binding
+   * that could not act.
+   */
+  {
+    id: "upcase_word",
+    label: "upcase word",
+    description: getMessage("upcase_word"),
+    operation: operation.upcaseWord,
+    alt: true,
+    key: "u",
+  },
+  {
+    id: "downcase_word",
+    label: "downcase word",
+    description: getMessage("downcase_word"),
+    operation: operation.downcaseWord,
+    alt: true,
+    key: "l",
+  },
+  {
+    id: "capitalize_word",
+    label: "capitalize word",
+    description: getMessage("capitalize_word"),
+    operation: operation.capitalizeWord,
+    alt: true,
+    key: "c",
+  },
+  {
+    id: "transpose_words",
+    label: "transpose words",
+    description: getMessage("transpose_words"),
+    operation: operation.transposeWords,
+    alt: true,
+    key: "t",
+  },
 ];
