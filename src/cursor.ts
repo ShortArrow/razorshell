@@ -15,10 +15,10 @@ export const cursor = {
       }
       return cursor;
     }
-    while (isStartOfWord(text, cursor)) {
+    while (cursor > 0 && isStartOfWord(text, cursor)) {
       cursor--;  // ignore separators
     }
-    while (!isStartOfWord(text, cursor)) {
+    while (cursor > 0 && !isStartOfWord(text, cursor)) {
       cursor--;  // to the previous word
     }
     return cursor;

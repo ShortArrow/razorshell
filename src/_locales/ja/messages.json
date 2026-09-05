@@ -47,6 +47,30 @@
     "message": "ヤンクポップ(一つ前の削除テキストに切り替え)",
     "description": "Yank pop (cycle to the previous killed text)"
   },
+  "kill_word": {
+    "message": "カーソルの後ろの単語を削除",
+    "description": "カーソルの後ろの単語を削除"
+  },
+  "backward_kill_word": {
+    "message": "カーソルの前の単語を削除",
+    "description": "カーソルの前の単語を削除"
+  },
+  "delete_char": {
+    "message": "カーソルの後ろの1文字を削除",
+    "description": "カーソルの後ろの1文字を削除"
+  },
+  "backward_delete_char": {
+    "message": "カーソルの前の1文字を削除",
+    "description": "カーソルの前の1文字を削除"
+  },
+  "undo": {
+    "message": "元に戻す",
+    "description": "元に戻す"
+  },
+  "undo_slash": {
+    "message": "元に戻す",
+    "description": "元に戻す"
+  },
   "tooltip_default_policy": {
     "message": "どのルールにもマッチしないときに適用されます",
     "description": "Applied when no rule matches"

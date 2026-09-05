@@ -47,6 +47,30 @@
     "message": "Tempel teks yang dihapus sebelumnya",
     "description": "Yank pop (cycle to the previous killed text)"
   },
+  "kill_word": {
+    "message": "Hapus kata setelah kursor",
+    "description": "Hapus kata setelah kursor"
+  },
+  "backward_kill_word": {
+    "message": "Hapus kata sebelum kursor",
+    "description": "Hapus kata sebelum kursor"
+  },
+  "delete_char": {
+    "message": "Hapus karakter setelah kursor",
+    "description": "Hapus karakter setelah kursor"
+  },
+  "backward_delete_char": {
+    "message": "Hapus karakter sebelum kursor",
+    "description": "Hapus karakter sebelum kursor"
+  },
+  "undo": {
+    "message": "Urungkan",
+    "description": "Urungkan"
+  },
+  "undo_slash": {
+    "message": "Urungkan",
+    "description": "Urungkan"
+  },
   "tooltip_default_policy": {
     "message": "Diterapkan bila tidak ada aturan yang cocok",
     "description": "Applied when no rule matches"

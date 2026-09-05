@@ -31,14 +31,48 @@ import {
 const fieldA = { name: "a" };
 const fieldB = { name: "b" };
 
-/** A storable forward kill, spelled out so each test reads as its own scenario. */
+/**
+ * A storable forward kill, spelled out so each test reads as its own scenario.
+ *
+ * A forward kill takes text ahead of the caret and leaves it where it was, so
+ * the caret it started from and the one it left are the same number — which is
+ * why these helpers take one position and hand it to the ring twice.
+ */
 function killForward(text: string, token: object, caretAfter: number, storable = true) {
-  recordKill({ direction: "forward", text, elementToken: token, caretAfter, storable });
+  recordKill({
+    direction: "forward",
+    text,
+    elementToken: token,
+    caretBefore: caretAfter,
+    caretAfter,
+    storable,
+  });
 }
 
-/** A storable backward kill. */
-function killBackward(text: string, token: object, caretAfter: number, storable = true) {
-  recordKill({ direction: "backward", text, elementToken: token, caretAfter, storable });
+/**
+ * A storable backward kill, reported as landing at `caretAfter` having started
+ * from `caretBefore`.
+ *
+ * The default makes the two equal, which is the shape these tests want when
+ * they are about something other than the caret: a run of kills "at one place".
+ * A real backward kill in a field moves the caret left, and the flow-level
+ * tests in wordkill.test.ts are where that asymmetry is exercised.
+ */
+function killBackward(
+  text: string,
+  token: object,
+  caretAfter: number,
+  storable = true,
+  caretBefore = caretAfter,
+) {
+  recordKill({
+    direction: "backward",
+    text,
+    elementToken: token,
+    caretBefore,
+    caretAfter,
+    storable,
+  });
 }
 
 beforeEach(() => {
@@ -75,6 +109,46 @@ describe("chained kills accumulate into one entry", () => {
     killForward("two ", fieldA, 0);
     killForward("three", fieldA, 0);
     expect(ringSnapshot()).toEqual(["one two three"]);
+  });
+});
+
+/**
+ * What "the same place" compares, stated as its own property.
+ *
+ * The chain asks whether the user moved between two kills, which is a question
+ * about where the second kill BEGAN against where the first one ENDED. Every
+ * case below fixes one of the two positions and varies the other, so a build
+ * comparing the wrong pair fails here rather than only in a flow test.
+ */
+describe("a chain is decided by where the next kill starts", () => {
+  test("a backward kill starting where the last one ended chains, though it lands elsewhere", () => {
+    killBackward("three", fieldA, 8, true, 13);
+    killBackward("two ", fieldA, 4, true, 8);
+    expect(ringSnapshot()).toEqual(["two three"]);
+  });
+
+  test("a backward kill starting somewhere else does not chain", () => {
+    killBackward("three", fieldA, 8, true, 13);
+    killBackward("elsewhere", fieldA, 0, true, 2);
+    expect(ringSnapshot()).toEqual(["elsewhere", "three"]);
+  });
+
+  /**
+   * The case the old comparison passed by coincidence. Both kills END at 8, but
+   * the second one STARTS at 2 — the user moved — so this must not chain. A
+   * build comparing `caretAfter` to `caretAfter` sees two matching numbers and
+   * concatenates text that was never adjacent.
+   */
+  test("two kills ending in the same place do not chain when the caret moved between them", () => {
+    killBackward("first", fieldA, 8, true, 13);
+    killBackward("second", fieldA, 8, true, 2);
+    expect(ringSnapshot()).toEqual(["second", "first"]);
+  });
+
+  test("a forward kill reports one position for both ends and still chains", () => {
+    killForward("hello ", fieldA, 3);
+    killForward("world", fieldA, 3);
+    expect(ringSnapshot()).toEqual(["hello world"]);
   });
 });
 
@@ -256,6 +330,7 @@ describe("ring properties", () => {
             direction: kill.direction,
             text: kill.text,
             elementToken: kill.token,
+            caretBefore: kill.caretAfter,
             caretAfter: kill.caretAfter,
             storable: true,
           });
@@ -275,6 +350,7 @@ describe("ring properties", () => {
             direction: kill.direction,
             text: kill.text,
             elementToken: kill.token,
+            caretBefore: kill.caretAfter,
             caretAfter: kill.caretAfter,
             storable: true,
           });
@@ -310,9 +386,12 @@ describe("ring properties", () => {
             expected =
               piece.direction === "forward" ? expected + piece.text : piece.text + expected;
             recordKill({
+              // One place, so every piece starts where the last one ended and
+              // the whole run chains regardless of the directions generated.
               direction: piece.direction,
               text: piece.text,
               elementToken: fieldA,
+              caretBefore: 7,
               caretAfter: 7,
               storable: true,
             });

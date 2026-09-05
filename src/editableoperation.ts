@@ -44,14 +44,21 @@ function move(direction: string, granularity: string): void {
 }
 
 /**
- * Extends to the line boundary and removes it, reporting what was taken to the
- * ring. The text has to be read off the selection before the delete, because
- * afterwards there is nothing left to read.
+ * Extends by one unit of `granularity` and removes it, reporting what was taken
+ * to the ring. The text has to be read off the selection before the delete,
+ * because afterwards there is nothing left to read.
+ *
+ * The line kills pass `lineboundary` and the word kills `word`; both are kills,
+ * so both record, and the chain rules they meet are the ring's own.
  */
-function deleteToBoundary(root: HTMLElement, direction: string): void {
+function deleteToBoundary(
+  root: HTMLElement,
+  direction: string,
+  granularity = "lineboundary",
+): void {
   const current = selection();
   if (!current) return;
-  current.modify("extend", direction, "lineboundary");
+  current.modify("extend", direction, granularity);
   if (current.isCollapsed) return;
   const text = current.toString();
   document.execCommand("delete");
@@ -59,17 +66,49 @@ function deleteToBoundary(root: HTMLElement, direction: string): void {
     direction: direction === "forward" ? "forward" : "backward",
     text,
     elementToken: root,
+    caretBefore: editableCaret,
     caretAfter: editableCaret,
     storable: true,
   });
 }
 
 /**
+ * Extends by one unit of `granularity` and removes it without telling the ring.
+ *
+ * The character deletes are not kills, so unlike `deleteToBoundary` nothing is
+ * recorded — which is also what lets the dispatcher's foreign-command report
+ * break a kill chain around them. Granularity is the engine's own, so what one
+ * press removes is what the engine calls one character: it deletes emoji and
+ * combining sequences whole, the same property `nextGraphemeRegion` buys on the
+ * text-field side by a different route.
+ */
+function deleteByGranularity(direction: string, granularity: string): void {
+  const current = selection();
+  if (!current) return;
+  current.modify("extend", direction, granularity);
+  if (current.isCollapsed) return;
+  document.execCommand("delete");
+}
+
+/**
+ * Steps the host editor's own undo history back one entry, the counterpart of
+ * `operation.undo`. Nothing is spliced when the engine refuses — an undo stack
+ * cannot be rebuilt from outside, least of all in markup the editor normalises.
+ */
+function undoInto(root: HTMLElement): void {
+  root.focus();
+  document.execCommand("undo");
+}
+
+/**
  * The stand-in for a caret offset in a contenteditable root.
  *
  * A rich-text selection has no single number to compare, so every CE kill
- * reports the same value and the chain rests on the root and the last-command
- * flag alone — the looseness the file header describes.
+ * reports the same value for both the caret it started from and the one it
+ * left, and the chain rests on the root and the last-command flag alone — the
+ * looseness the file header describes. Reporting one constant for both is what
+ * keeps consecutive CE kills chaining under a comparison that is otherwise
+ * asymmetric; the text-field side is where the two positions really differ.
  */
 const editableCaret = 0;
 
@@ -90,5 +129,10 @@ export const editableOperation: Record<string, (root: HTMLElement) => void> = {
   move_cursor_to_the_previous_word: () => move("backward", "word"),
   delete_to_the_end_of_the_line: (root) => deleteToBoundary(root, "forward"),
   delete_to_the_beginning_of_the_line: (root) => deleteToBoundary(root, "backward"),
+  kill_word: (root) => deleteToBoundary(root, "forward", "word"),
+  backward_kill_word: (root) => deleteToBoundary(root, "backward", "word"),
+  delete_char: () => deleteByGranularity("forward", "character"),
+  backward_delete_char: () => deleteByGranularity("backward", "character"),
+  undo: (root) => undoInto(root),
   yank: (root) => yankInto(root),
 };

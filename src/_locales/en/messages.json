@@ -47,6 +47,30 @@
     "message": "Yank pop (cycle to the previous killed text)",
     "description": "Yank pop (cycle to the previous killed text)"
   },
+  "kill_word": {
+    "message": "Kill the word after the cursor",
+    "description": "Kill the word after the cursor"
+  },
+  "backward_kill_word": {
+    "message": "Kill the word before the cursor",
+    "description": "Kill the word before the cursor"
+  },
+  "delete_char": {
+    "message": "Delete the character after the cursor",
+    "description": "Delete the character after the cursor"
+  },
+  "backward_delete_char": {
+    "message": "Delete the character before the cursor",
+    "description": "Delete the character before the cursor"
+  },
+  "undo": {
+    "message": "Undo",
+    "description": "Undo"
+  },
+  "undo_slash": {
+    "message": "Undo",
+    "description": "Undo"
+  },
   "tooltip_default_policy": {
     "message": "Applied when no rule matches",
     "description": "Applied when no rule matches"

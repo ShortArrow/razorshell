@@ -19,8 +19,30 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 - Ctrl+Y shadows the browser's redo on Windows and Linux only while
   the ring has something to paste; on an empty ring the key reaches
   the browser untouched.
+- Alt+D and Alt+Backspace kill a word forward and backward. Both go on
+  the ring and chain with the line kills.
+- Ctrl+D and Ctrl+H delete one character forward and backward. Neither
+  touches the ring, so a character delete between two kills keeps them
+  as separate entries. A grapheme goes whole: an emoji built from a
+  surrogate pair or joined by zero-width joiners leaves in one press.
+- Ctrl+/ and Ctrl+Shift+_ both undo through the field's own history.
+- While a text field has focus, Alt+Backspace shadows Windows' undo
+  alias (Ctrl+Z is untouched), Ctrl+D the bookmark shortcut and Ctrl+H
+  the history shortcut.
 
 ### Fixed
+
+- Consecutive backward kills join into one ring entry, as forward
+  kills already did. The chain compared where two kills each END
+  rather than whether the second BEGINS where the first left off;
+  those are the same number for a forward kill and never the same for
+  a backward one. Present since the ring shipped and hidden by it:
+  Ctrl+U twice kills an empty region the second time, and Ctrl+U then
+  Ctrl+K at one caret matched by accident.
+- `cursor.getTopOfWord` no longer loops forever when nothing but
+  separators sits behind the caret. Alt+B hid it by clamping the bad
+  offset; the backward word kill would have deleted from before the
+  start of the value.
 
 - Alt+Y refuses unless the caret still rests at the end of what the
   last yank inserted, so typing or clicking after a yank leaves the

@@ -77,6 +77,7 @@ file the importer refuses; a rendering readable in one theme only.
 | C1.13 | A binding runs exactly once per keypress — settings churn, options-page remounts, same-document navigations and an abandoned rebind capture leave no duplicate or stale key handler behind |
 | C1.14 | A kill is undoable, fires one input event the page can see, does nothing on an empty region, and leaves readonly fields alone |
 | C1.15 | Killed text lands on a frame-local ring: chained kills concatenate in readline order, Ctrl+Y yanks the newest entry, Alt+Y rotates with verified replacement, a password kill is never stored, and an empty-ring Ctrl+Y leaves the native key untouched |
+| C1.16 | Word kills join the ring, character deletes remove whole graphemes without touching it, and both undo chords reach the native history |
 
 ## Traceability
 
@@ -163,6 +164,49 @@ Frozen observations; each holds only for its date.
   `killring.ts` and `yank.ts` have NO behavioral test — garbage
   collection cannot be forced from a test, so no assertion can tell a
   weak reference from a strong one, and that fix rests on reading.
+- 2026-09-05, `event.key` for the chords v0.0.5 adds, read off
+  `keydown` on a focused text input in Playwright Chromium
+  (`channel: "chromium"`, headless): Alt+Backspace reports
+  `"Backspace"` with `altKey` true and `shiftKey` false; Ctrl held
+  while Shift+Minus is struck reports `key: "_"`, `code: "Minus"`,
+  `ctrlKey` and `shiftKey` both true; Ctrl+Slash reports `key: "/"`,
+  `code: "Slash"`, `shiftKey` false. Playwright's `press("Control+_")`
+  shorthand disagrees with the keyboard: it fabricates `_` with
+  `shiftKey` FALSE, which no physical layout produces, so the e2e
+  tests press that chord in its down/up form. The bindings and
+  test/undochords.test.ts rest on these values.
+- 2026-09-05, the kill chain compared the wrong pair of caret
+  positions, and had done so since the ring shipped. `isSamePlace`
+  tested the previous kill's `caretAfter` against the new kill's
+  `caretAfter` — whether both kills END in one place — where the
+  question is whether the new kill BEGINS where the last one ended.
+  A forward kill leaves the caret where it found it, so the two
+  numbers coincide and every forward case passed; a backward kill
+  pulls the caret left, so two of them could never match. Measured on
+  the shipped build: Alt+Backspace twice from the end of
+  "one two three" then Ctrl+Y returned "two " instead of
+  "two three". Invisible until now because C-u twice kills an empty
+  region the second time (nothing is recorded) and C-u then C-k at one
+  caret has both kills reporting the same number by accident. Fixed by
+  adding `caretBefore` to `KillRecord` and comparing it against the
+  chain's `caretAfter`.
+- 2026-09-05, sensitivity of the C1.16 evidence, planted and
+  reverted: rebinding `undo_slash` off `/` turns the Ctrl+slash e2e
+  test red with `received ""` — the field stays killed — so that test
+  observes the binding rather than a native chord doing the work. The
+  pre-batch build was also run against the new e2e block before the
+  implementation landed: the M-d round trip failed with
+  `expected "hello ", received "hello world"`, Alt+d having done
+  nothing.
+- 2026-09-05, `cursor.getTopOfWord` did not terminate for a caret with
+  only separators behind it (`" "` at 1, `"  hello"` at 2): both of
+  its backward loops ran below index 0, where `isStartOfWord` reads
+  `text[-1]` as `undefined` and never reports a boundary. Alt+b
+  tolerated it — a caret motion clamps a bad offset — so it surfaced
+  only when the backward word kill tried to build a region from the
+  result. Guarded at 0 and pinned under a deadline in
+  test/topofword.test.ts, because a regression hangs the runner
+  instead of failing an assertion.
 - 2026-08-20, CDP-injected keys never reach Chrome's browser-
   accelerator handling on Windows and Linux (the native-event
   builder exists only for mac/ios, so injected events carry

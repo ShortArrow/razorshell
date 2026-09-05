@@ -24,18 +24,24 @@ These work today.
 
 <!-- keymap:implemented:start -->
 
-| Shortcut     | Description                           |
-| ------------ | ------------------------------------- |
-| `Ctrl` + `a` | move cursor to the beginning          |
-| `Ctrl` + `b` | move cursor to the previous character |
-| `Ctrl` + `e` | move cursor to the end                |
-| `Ctrl` + `f` | move cursor to the next character     |
-| `Ctrl` + `k` | delete to the end of the line         |
-| `Ctrl` + `u` | delete to the beginning of the line   |
-| `Ctrl` + `y` | yank                                  |
-| `Alt` + `b`  | move cursor to the previous word      |
-| `Alt` + `f`  | move cursor to the next word          |
-| `Alt` + `y`  | yank pop                              |
+| Shortcut                | Description                           |
+| ----------------------- | ------------------------------------- |
+| `Ctrl` + `a`            | move cursor to the beginning          |
+| `Ctrl` + `b`            | move cursor to the previous character |
+| `Ctrl` + `d`            | delete char                           |
+| `Ctrl` + `e`            | move cursor to the end                |
+| `Ctrl` + `f`            | move cursor to the next character     |
+| `Ctrl` + `h`            | backward delete char                  |
+| `Ctrl` + `k`            | delete to the end of the line         |
+| `Ctrl` + `u`            | delete to the beginning of the line   |
+| `Ctrl` + `y`            | yank                                  |
+| `Ctrl` + `/`            | undo                                  |
+| `Ctrl` + `Shift` + `_`  | undo                                  |
+| `Alt` + `b`             | move cursor to the previous word      |
+| `Alt` + `d`             | kill word                             |
+| `Alt` + `f`             | move cursor to the next word          |
+| `Alt` + `y`             | yank pop                              |
+| `Alt` + `Backspace`     | backward kill word                    |
 
 <!-- keymap:implemented:end -->
 
@@ -44,6 +50,18 @@ Killed text goes onto a kill ring: consecutive kills join into one entry,
 yank cycles to the entry before it. On Windows and Linux `Ctrl` + `y` is the
 browser's redo, and Razorshell shadows it while the ring has something to
 paste; with an empty ring the key is left alone and redo still works.
+
+The word kills join that ring — `Alt` + `d` and `Alt` + `Backspace` chain with
+each other and with the line kills — while `Ctrl` + `d` and `Ctrl` + `h` delete
+a single character and deliberately stay off it, so a character delete between
+two kills keeps them apart instead of splicing them together. Both take a whole
+grapheme: an emoji built from a surrogate pair or joined by zero-width joiners
+goes in one press rather than leaving a fragment behind. Three of these shadow
+something while a text field has focus: `Alt` + `Backspace` is Windows' other
+name for undo (`Ctrl` + `z` is untouched and still undoes), `Ctrl` + `d` is the
+bookmark shortcut, and `Ctrl` + `h` is the history shortcut. `Ctrl` + `/` and
+`Ctrl` + `Shift` + `_` both reach the field's own undo history, which is the
+same history `Ctrl` + `z` walks.
 
 ### Planned (not implemented yet)
 
@@ -58,14 +76,12 @@ Listed for reference; none of these are wired up.
 | `Ctrl` + `\`     |                                       |
 | `Ctrl` + `[`     |                                       |
 | `Ctrl` + `]`     | character search                      |
-| `Ctrl` + `_`     | Redo                                  |
 | `Ctrl` + `?`     |                                       |
 | `Ctrl` + `@`     |                                       |
 | `Ctrl` + `Space` |                                       |
 | `Alt` + `p`      | non incremental reverse serch history |
 | `Alt` + `u`      | up case word                          |
 | `Alt` + `l`      | down case word                        |
-| `Alt` + `d`      | kill word                             |
 | `Alt` + `c`      | change to capital                     |
 | `Alt` + `.`      | yank last arg                         |
 

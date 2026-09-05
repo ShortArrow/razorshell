@@ -2142,6 +2142,276 @@ test.describe("killed text can be yanked back @C1.15", () => {
 });
 
 /**
+ * The word kills, the character deletes and the two undo chords.
+ *
+ * Three different contracts meet here and only a real engine can separate them.
+ * A word kill must reach the ring, so a yank brings it back. A character delete
+ * must NOT reach it, and must remove a whole grapheme — jsdom can show the
+ * region arithmetic but not what an engine actually does to a field holding an
+ * emoji. And undo is `execCommand` alone: there is no fallback to assert
+ * against, so a suite without a real undo stack could not tell the binding
+ * working from the binding doing nothing.
+ *
+ * Key names here are measured, not assumed (2026-09-05, see the record in
+ * docs/assurance.md). The one that bites: Playwright's `press("Control+_")`
+ * shorthand fabricates `_` with `shiftKey` FALSE, which no physical keyboard
+ * produces — a US layout makes that character with Shift+Minus and reports
+ * `shiftKey` true. The binding is written for the keyboard, so the chord is
+ * pressed here in its down/up form.
+ *
+ * The block seeds its own allowing policy and restores the denying one the
+ * surrounding scenario expects, in the manner of the C1.14 and C1.15 blocks.
+ */
+test.describe("word kills, character deletes and undo @C1.16", () => {
+  const input = () => page.locator('input[type="text"]').first();
+
+  /** The caret, set directly — see the note in the C1.14 block on why not a chord. */
+  async function caretTo(position: number): Promise<void> {
+    await input().evaluate((el: HTMLInputElement, at: number) => {
+      el.focus();
+      el.setSelectionRange(at, at);
+    }, position);
+  }
+
+  /** Types into the field natively, so the field owns a real undo stack. */
+  async function typeFresh(text: string): Promise<void> {
+    await input().click();
+    await input().evaluate((el: HTMLInputElement) => {
+      el.focus();
+      el.setSelectionRange(0, el.value.length);
+    });
+    await page.keyboard.press("Delete");
+    await page.keyboard.type(text);
+    expect((await fieldState(input())).value).toBe(text);
+  }
+
+  /** Empties the ring by reloading the frame, taking the module state with it. */
+  async function freshFrame(): Promise<void> {
+    await page.goto(`${origin}/`);
+    await page.waitForTimeout(1000);
+  }
+
+  /**
+   * Ctrl+underscore as a keyboard makes it: Shift held over Minus, inside Ctrl.
+   * Playwright's `Control+_` shorthand reports no Shift and would not match the
+   * shipped chord — pressing the physical keys is what tests the real binding.
+   */
+  async function pressCtrlUnderscore(): Promise<void> {
+    await input().evaluate((el: HTMLInputElement) => el.focus());
+    await page.keyboard.down("Control");
+    await page.keyboard.down("Shift");
+    await page.keyboard.press("Minus");
+    await page.keyboard.up("Shift");
+    await page.keyboard.up("Control");
+  }
+
+  test.beforeAll(async () => {
+    await setPolicy({ defaultAction: "allow", rules: [] });
+    await freshFrame();
+  });
+
+  test.afterAll(async () => {
+    await freshFrame();
+    await setPolicy({
+      defaultAction: "allow",
+      rules: [{ pattern: "https://example.com/**", matchType: "glob", action: "deny" }],
+    });
+    await seedTextInput("hello world new order", 0);
+  });
+
+  test("a word kill and a yank round trip", async () => {
+    await freshFrame();
+    await typeFresh("hello world");
+    await caretTo(6);
+    await page.keyboard.press("Alt+d");
+    expect((await fieldState(input())).value).toBe("hello ");
+
+    await page.keyboard.press("Control+y");
+    expect((await fieldState(input())).value).toBe("hello world");
+  });
+
+  /**
+   * Two chained word kills, with the expected strings derived from the word
+   * boundary this extension already ships rather than from readline's.
+   *
+   * `cursor.getEndOfWord` — what Alt+f moves over and therefore what Alt+d
+   * removes — skips any separator run it starts on and then consumes to the end
+   * of the following word. From caret 4 of "one two three" that takes "two",
+   * leaving "one  three" with the caret still at 4. The second Alt+d now starts
+   * ON a separator, so it takes that separator together with "three": " three".
+   * Both kills leave the caret at 4, which is what lets the ring chain them, and
+   * a forward kill appends, so the single entry reads "two three". Ctrl+Y puts
+   * exactly that back.
+   *
+   * Characterization for the boundary flavor, specification for the ring order:
+   * the concatenation direction is readline's rule and is not negotiable, while
+   * which characters each kill takes follows this extension's own motion.
+   */
+  test("two chained word kills yank back as one entry", async () => {
+    await freshFrame();
+    await typeFresh("one two three");
+    await caretTo(4);
+
+    await page.keyboard.press("Alt+d");
+    expect((await fieldState(input())).value).toBe("one  three");
+
+    await page.keyboard.press("Alt+d");
+    expect((await fieldState(input())).value).toBe("one ");
+
+    await page.keyboard.press("Control+y");
+    expect((await fieldState(input())).value).toBe("one two three");
+  });
+
+  /**
+   * Two backward word kills are one run, and the ring gives back what they took
+   * in the order the line held it.
+   *
+   * From the end of "one two three" the first Alt+Backspace takes "three" and
+   * leaves the caret at 8; the second starts there and takes "two ". A backward
+   * kill prepends, so the entry reads "two three" and Ctrl+Y restores exactly
+   * that. This is readline's rule for a run of kills at one place, and the
+   * caret arithmetic is what decides whether the ring sees a run at all.
+   *
+   * Red before the fix: this returned "two " — the second kill started its own
+   * entry, so the yank brought back only the newer piece.
+   */
+  test("two backward word kills yank back as one entry", async () => {
+    await freshFrame();
+    await typeFresh("one two three");
+    await caretTo("one two three".length);
+
+    await page.keyboard.press("Alt+Backspace");
+    expect((await fieldState(input())).value).toBe("one two ");
+
+    await page.keyboard.press("Alt+Backspace");
+    expect((await fieldState(input())).value).toBe("one ");
+
+    await page.keyboard.press("Control+y");
+    expect((await fieldState(input())).value).toBe("one two three");
+  });
+
+  /**
+   * Alt+Backspace kills backward, and Ctrl+Z is the price we did NOT pay.
+   *
+   * On Windows Alt+Backspace is an undo alias, and binding it costs the user
+   * that alias. What must survive is the real undo: if the extension had eaten
+   * Ctrl+Z as well, this kill could not be undone. Asserting the undo is what
+   * separates "we shadowed one chord" from "we broke undo".
+   */
+  test("a backward word kill goes on the ring, and Ctrl+Z still undoes", async () => {
+    await freshFrame();
+    await typeFresh("alpha beta");
+    await caretTo("alpha beta".length);
+
+    await page.keyboard.press("Alt+Backspace");
+    expect((await fieldState(input())).value).toBe("alpha ");
+
+    await page.keyboard.press("Control+z");
+    expect((await fieldState(input())).value).toBe("alpha beta");
+  });
+
+  /**
+   * A character delete takes the whole emoji or it takes nothing worth having.
+   *
+   * Half a surrogate pair renders as a replacement glyph and cannot be typed
+   * back, so the assertion is value equality against the exact remaining string
+   * — a `not.toContain` check would pass on a field holding a lone surrogate.
+   */
+  test("Ctrl+D removes a whole emoji rather than half of one", async () => {
+    await freshFrame();
+    await input().click();
+    await input().evaluate((el: HTMLInputElement) => {
+      el.focus();
+      el.setSelectionRange(0, el.value.length);
+    });
+    await page.keyboard.press("Delete");
+    // Typed through the keyboard so the field owns the text the way a user's
+    // would; the emoji is one grapheme built from a surrogate pair.
+    await page.keyboard.type("a\u{1F600}b");
+    expect((await fieldState(input())).value).toBe("a\u{1F600}b");
+
+    await caretTo(1);
+    await page.keyboard.press("Control+d");
+
+    const after = (await fieldState(input())).value;
+    expect(after).toBe("ab");
+    expect(after.isWellFormed()).toBe(true);
+  });
+
+  test("Ctrl+H removes a whole emoji backward", async () => {
+    await freshFrame();
+    await input().click();
+    await input().evaluate((el: HTMLInputElement) => {
+      el.focus();
+      el.setSelectionRange(0, el.value.length);
+    });
+    await page.keyboard.press("Delete");
+    await page.keyboard.type("a\u{1F600}b");
+
+    await caretTo(3);
+    await page.keyboard.press("Control+h");
+
+    const after = (await fieldState(input())).value;
+    expect(after).toBe("ab");
+    expect(after.isWellFormed()).toBe(true);
+  });
+
+  /**
+   * The chain-breaking property, end to end.
+   *
+   * `delete_char` carries no `ringRole`, so the dispatcher reports it to the
+   * ring as a foreign command. Two kills either side of it must stay two
+   * entries: the yank brings back the second, and the rotation reaches the
+   * first. Had the delete been transparent to the ring, both kills would have
+   * chained into one entry and Alt+Y would return what Ctrl+Y just inserted.
+   */
+  test("a character delete between two kills keeps them apart", async () => {
+    await freshFrame();
+    await typeFresh("alpha");
+    await caretTo(0);
+    await page.keyboard.press("Control+k");
+    expect((await fieldState(input())).value).toBe("");
+
+    await typeFresh("beta");
+    await caretTo(0);
+    await page.keyboard.press("Control+d");
+    expect((await fieldState(input())).value).toBe("eta");
+    await caretTo(0);
+    await page.keyboard.press("Control+k");
+    expect((await fieldState(input())).value).toBe("");
+
+    await page.keyboard.press("Control+y");
+    expect((await fieldState(input())).value).toBe("eta");
+
+    await page.keyboard.press("Alt+y");
+    expect((await fieldState(input())).value).toBe("alpha");
+  });
+
+  test("Ctrl+Shift+underscore undoes a kill", async () => {
+    await freshFrame();
+    await typeFresh("undo by underscore");
+    await caretTo(0);
+    await page.keyboard.press("Control+k");
+    expect((await fieldState(input())).value).toBe("");
+
+    await pressCtrlUnderscore();
+    expect((await fieldState(input())).value).toBe("undo by underscore");
+  });
+
+  test("Ctrl+slash undoes a kill", async () => {
+    await freshFrame();
+    await typeFresh("undo by slash");
+    await caretTo(0);
+    await page.keyboard.press("Control+k");
+    expect((await fieldState(input())).value).toBe("");
+
+    await input().evaluate((el: HTMLInputElement) => el.focus());
+    await page.keyboard.press("Control+/");
+    expect((await fieldState(input())).value).toBe("undo by slash");
+  });
+});
+
+/**
  * What `chrome.storage.onChanged` does about a write that changes nothing.
  *
  * This is a characterization test, not a specification: the expected value is

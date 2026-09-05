@@ -47,6 +47,30 @@
     "message": "لصق النص المحذوف السابق",
     "description": "Yank pop (cycle to the previous killed text)"
   },
+  "kill_word": {
+    "message": "حذف الكلمة التالية للمؤشر",
+    "description": "حذف الكلمة التالية للمؤشر"
+  },
+  "backward_kill_word": {
+    "message": "حذف الكلمة السابقة للمؤشر",
+    "description": "حذف الكلمة السابقة للمؤشر"
+  },
+  "delete_char": {
+    "message": "حذف الحرف التالي للمؤشر",
+    "description": "حذف الحرف التالي للمؤشر"
+  },
+  "backward_delete_char": {
+    "message": "حذف الحرف السابق للمؤشر",
+    "description": "حذف الحرف السابق للمؤشر"
+  },
+  "undo": {
+    "message": "تراجع",
+    "description": "تراجع"
+  },
+  "undo_slash": {
+    "message": "تراجع",
+    "description": "تراجع"
+  },
   "tooltip_default_policy": {
     "message": "يُطبَّق عندما لا تطابق أي قاعدة",
     "description": "Applied when no rule matches"

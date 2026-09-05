@@ -1,5 +1,14 @@
 import { cursor } from "./cursor";
-import { applyKillRegion, endOfLineRegion, topOfLineRegion, KillRegion } from "./killregion";
+import {
+  applyKillRegion,
+  backwardWordRegion,
+  endOfLineRegion,
+  forwardWordRegion,
+  nextGraphemeRegion,
+  previousGraphemeRegion,
+  topOfLineRegion,
+  KillRegion,
+} from "./killregion";
 import { beginYank, newestEntry, recordKill, rotateYank } from "./killring";
 import { applyYank, applyYankPop, canYankPop, noteYankPopFailure } from "./yank";
 
@@ -93,6 +102,54 @@ export const operation = {
     }
     applyYankPop(textinput, text);
   },
+  killWord(textinput: TextField) {
+    const start = textinput.selectionStart;
+    const end = textinput.selectionEnd;
+    if (start == null || end == null) return;
+    kill(textinput, forwardWordRegion(textinput.value, start, end), "forward");
+  },
+  backwardKillWord(textinput: TextField) {
+    const start = textinput.selectionStart;
+    const end = textinput.selectionEnd;
+    if (start == null || end == null) return;
+    kill(textinput, backwardWordRegion(textinput.value, start, end), "backward");
+  },
+  /**
+   * Removes one grapheme ahead of the caret without telling the ring anything.
+   *
+   * This is a delete, not a kill: readline's C-d does not put the character on
+   * the ring, and the binding carries no `ringRole`, so the dispatcher reports
+   * it as a foreign command and a kill chain around it breaks. That break is
+   * the point — a character deleted between two kills is text missing from
+   * between the pieces, and concatenating across the hole would fabricate a
+   * line the user never had.
+   */
+  deleteChar(textinput: TextField) {
+    const start = textinput.selectionStart;
+    const end = textinput.selectionEnd;
+    if (start == null || end == null) return;
+    applyKillRegion(textinput, nextGraphemeRegion(textinput.value, start, end));
+  },
+  backwardDeleteChar(textinput: TextField) {
+    const start = textinput.selectionStart;
+    const end = textinput.selectionEnd;
+    if (start == null || end == null) return;
+    applyKillRegion(textinput, previousGraphemeRegion(textinput.value, start, end));
+  },
+  /**
+   * Steps the field's own undo history back one entry.
+   *
+   * The whole operation is `execCommand("undo")`, for the same reason the kill
+   * and the yank go through `execCommand`: the history belongs to the engine,
+   * and there is no way to reach it from script otherwise. Where `execCommand`
+   * is absent or refuses — jsdom, and any engine that drops it — this does
+   * nothing at all. That is a declared degradation rather than a fallback: a
+   * kill can be spliced back into a value, but an undo stack cannot be
+   * reconstructed from outside, so nothing is attempted.
+   */
+  undo(textinput: TextField) {
+    runUndo(textinput);
+  },
   moveToNextChar(textinput: TextField) {
     const position = textinput.selectionEnd;
     if (position == null || position === textinput.value.length) return;
@@ -123,6 +180,11 @@ export const operation = {
  * The slice is read before the removal, because afterwards it is gone. A
  * password field's text is killed like any other but reported as unstorable, so
  * the secret never enters the ring and the kill chain breaks around it.
+ *
+ * The two caret positions the ring needs are the two ends of the region, and
+ * which is which follows the direction: a forward kill starts at `region.start`
+ * and leaves the caret there, while a backward kill starts at `region.end` and
+ * pulls the caret back to `region.start`.
  */
 function kill(textinput: TextField, region: KillRegion, direction: "forward" | "backward"): void {
   if (textinput.readOnly || textinput.disabled) return;
@@ -132,9 +194,29 @@ function kill(textinput: TextField, region: KillRegion, direction: "forward" | "
     direction,
     text,
     elementToken: textinput,
+    caretBefore: direction === "forward" ? region.start : region.end,
     caretAfter: region.start,
     storable: !isPasswordField(textinput),
   });
+}
+
+/**
+ * The native undo, reported as whether the engine actually performed it.
+ *
+ * Shaped like `deleteSelection` in `killregion.ts` and `insertText` in
+ * `yank.ts`: focus the target, ask the engine, and treat a missing or throwing
+ * `execCommand` as a refusal rather than an error. The boolean is returned for
+ * callers that may want it; the binding itself has nothing to do when the
+ * engine says no, since an undo that did not happen leaves the field as it was.
+ */
+function runUndo(target: TextField | HTMLElement): boolean {
+  if (typeof document.execCommand !== "function") return false;
+  target.focus();
+  try {
+    return document.execCommand("undo");
+  } catch {
+    return false;
+  }
 }
 
 /** A password input, whose contents the ring must never hold. */

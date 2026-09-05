@@ -37,7 +37,17 @@ export interface KillRecord {
   direction: KillDirection;
   text: string;
   elementToken: object;
-  /** Where the caret sits now, and where the next kill must sit to chain. */
+  /**
+   * Where the caret was when this kill started, and therefore what the previous
+   * kill must have left behind for the two to be one run.
+   *
+   * A forward kill takes text ahead of the caret and leaves it where it was, so
+   * this equals `caretAfter`. A backward kill takes text behind the caret and
+   * pulls it left, so the two differ — and it is this one, not `caretAfter`,
+   * that the chain has to compare against.
+   */
+  caretBefore: number;
+  /** Where the caret sits now, and where the next kill must start to chain. */
   caretAfter: number;
   /** False for a password field: the kill happens, the text is not kept. */
   storable: boolean;
@@ -159,12 +169,23 @@ export function rotateYank(): string | undefined {
 }
 
 /**
- * Whether a kill lands exactly where the previous one left the caret. An
- * element the chain can no longer reach — collected since — is a mismatch, so
- * a dead reference starts a fresh entry rather than chaining onto one.
+ * Whether a kill starts exactly where the previous one left the caret.
+ *
+ * The comparison is the previous kill's `caretAfter` against this one's
+ * `caretBefore`, and the asymmetry is the whole point: "same place" means the
+ * user did not move between the two kills, which is a question about where this
+ * kill BEGAN, not about where it will end up. Comparing `caretAfter` to
+ * `caretAfter` asks whether both kills finish in the same spot — true by
+ * coincidence for two forward kills, since a forward kill leaves the caret
+ * where it found it, and structurally false for two backward kills, which walk
+ * the caret left every time. That coincidence is why the fault stayed hidden
+ * behind the forward cases for a whole release.
+ *
+ * An element the chain can no longer reach — collected since — is a mismatch,
+ * so a dead reference starts a fresh entry rather than chaining onto one.
  */
 function isSamePlace(state: ChainState, record: KillRecord): boolean {
-  return state.elementToken.deref() === record.elementToken && state.caretAfter === record.caretAfter;
+  return state.elementToken.deref() === record.elementToken && state.caretAfter === record.caretBefore;
 }
 
 /** Readline's accumulation order: forward kills append, backward kills prepend. */

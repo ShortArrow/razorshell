@@ -47,6 +47,30 @@
     "message": "Вставить предыдущий удалённый текст",
     "description": "Yank pop (cycle to the previous killed text)"
   },
+  "kill_word": {
+    "message": "Удалить слово после курсора",
+    "description": "Удалить слово после курсора"
+  },
+  "backward_kill_word": {
+    "message": "Удалить слово перед курсором",
+    "description": "Удалить слово перед курсором"
+  },
+  "delete_char": {
+    "message": "Удалить символ после курсора",
+    "description": "Удалить символ после курсора"
+  },
+  "backward_delete_char": {
+    "message": "Удалить символ перед курсором",
+    "description": "Удалить символ перед курсором"
+  },
+  "undo": {
+    "message": "Отменить",
+    "description": "Отменить"
+  },
+  "undo_slash": {
+    "message": "Отменить",
+    "description": "Отменить"
+  },
   "tooltip_default_policy": {
     "message": "Применяется, когда ни одно правило не подходит",
     "description": "Applied when no rule matches"

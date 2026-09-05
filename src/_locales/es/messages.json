@@ -47,6 +47,30 @@
     "message": "Pegar anterior (cambiar al texto eliminado anterior)",
     "description": "Yank pop (cycle to the previous killed text)"
   },
+  "kill_word": {
+    "message": "Borrar la palabra después del cursor",
+    "description": "Borrar la palabra después del cursor"
+  },
+  "backward_kill_word": {
+    "message": "Borrar la palabra antes del cursor",
+    "description": "Borrar la palabra antes del cursor"
+  },
+  "delete_char": {
+    "message": "Borrar el carácter después del cursor",
+    "description": "Borrar el carácter después del cursor"
+  },
+  "backward_delete_char": {
+    "message": "Borrar el carácter antes del cursor",
+    "description": "Borrar el carácter antes del cursor"
+  },
+  "undo": {
+    "message": "Deshacer",
+    "description": "Deshacer"
+  },
+  "undo_slash": {
+    "message": "Deshacer",
+    "description": "Deshacer"
+  },
   "tooltip_default_policy": {
     "message": "Se aplica cuando ninguna regla coincide",
     "description": "Applied when no rule matches"

@@ -47,6 +47,30 @@
     "message": "Einfügen zurück (zum vorherigen gelöschten Text wechseln)",
     "description": "Yank pop (cycle to the previous killed text)"
   },
+  "kill_word": {
+    "message": "Wort nach dem Cursor löschen",
+    "description": "Wort nach dem Cursor löschen"
+  },
+  "backward_kill_word": {
+    "message": "Wort vor dem Cursor löschen",
+    "description": "Wort vor dem Cursor löschen"
+  },
+  "delete_char": {
+    "message": "Zeichen nach dem Cursor löschen",
+    "description": "Zeichen nach dem Cursor löschen"
+  },
+  "backward_delete_char": {
+    "message": "Zeichen vor dem Cursor löschen",
+    "description": "Zeichen vor dem Cursor löschen"
+  },
+  "undo": {
+    "message": "Rückgängig",
+    "description": "Rückgängig"
+  },
+  "undo_slash": {
+    "message": "Rückgängig",
+    "description": "Rückgängig"
+  },
   "tooltip_default_policy": {
     "message": "Wird angewendet, wenn keine Regel zutrifft",
     "description": "Applied when no rule matches"

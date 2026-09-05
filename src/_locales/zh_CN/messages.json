@@ -47,6 +47,30 @@
     "message": "循环粘贴上一段已删除的文本",
     "description": "Yank pop (cycle to the previous killed text)"
   },
+  "kill_word": {
+    "message": "删除光标后的单词",
+    "description": "删除光标后的单词"
+  },
+  "backward_kill_word": {
+    "message": "删除光标前的单词",
+    "description": "删除光标前的单词"
+  },
+  "delete_char": {
+    "message": "删除光标后的一个字符",
+    "description": "删除光标后的一个字符"
+  },
+  "backward_delete_char": {
+    "message": "删除光标前的一个字符",
+    "description": "删除光标前的一个字符"
+  },
+  "undo": {
+    "message": "撤销",
+    "description": "撤销"
+  },
+  "undo_slash": {
+    "message": "撤销",
+    "description": "撤销"
+  },
   "tooltip_default_policy": {
     "message": "当没有任何规则匹配时应用",
     "description": "Applied when no rule matches"

@@ -123,4 +123,74 @@ export const defaultKeymap: Keymap[] = [
     alt: true,
     key: "y",
   },
+  {
+    id: "kill_word",
+    ringRole: "kill",
+    label: "kill word",
+    description: getMessage("kill_word"),
+    operation: operation.killWord,
+    editableOperation: editableOperation.kill_word,
+    alt: true,
+    key: "d",
+  },
+  {
+    id: "backward_kill_word",
+    ringRole: "kill",
+    label: "backward kill word",
+    description: getMessage("backward_kill_word"),
+    operation: operation.backwardKillWord,
+    editableOperation: editableOperation.backward_kill_word,
+    alt: true,
+    key: "Backspace",
+  },
+  {
+    id: "delete_char",
+    label: "delete char",
+    description: getMessage("delete_char"),
+    operation: operation.deleteChar,
+    editableOperation: editableOperation.delete_char,
+    ctrl: true,
+    key: "d",
+  },
+  {
+    id: "backward_delete_char",
+    label: "backward delete char",
+    description: getMessage("backward_delete_char"),
+    operation: operation.backwardDeleteChar,
+    editableOperation: editableOperation.backward_delete_char,
+    ctrl: true,
+    key: "h",
+  },
+  /**
+   * Undo reaches the same operation from two chords, so it is two entries with
+   * two ids rather than one entry claiming both. Ids are the handle the rebind
+   * GUI keys its rows by and the settings importer validates against, and
+   * neither can address half of a shared entry — a single id holding two chords
+   * would make one of them unrebindable and unexportable.
+   *
+   * `key: "_"` with shift is the chord a US-layout keyboard actually produces
+   * for Ctrl+underscore: Shift+Minus, measured 2026-09-05 as `key: "_"`,
+   * `code: "Minus"`, `shiftKey` true. See test/undochords.test.ts for the
+   * measurement and for why Playwright's own `press("Control+_")` shorthand
+   * disagrees.
+   */
+  {
+    id: "undo",
+    label: "undo",
+    description: getMessage("undo"),
+    operation: operation.undo,
+    editableOperation: editableOperation.undo,
+    ctrl: true,
+    shift: true,
+    key: "_",
+  },
+  {
+    id: "undo_slash",
+    label: "undo",
+    description: getMessage("undo_slash"),
+    operation: operation.undo,
+    editableOperation: editableOperation.undo,
+    ctrl: true,
+    key: "/",
+  },
 ];

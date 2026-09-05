@@ -47,6 +47,30 @@
     "message": "Coller précédent (passer au texte supprimé précédent)",
     "description": "Yank pop (cycle to the previous killed text)"
   },
+  "kill_word": {
+    "message": "Supprimer le mot après le curseur",
+    "description": "Supprimer le mot après le curseur"
+  },
+  "backward_kill_word": {
+    "message": "Supprimer le mot avant le curseur",
+    "description": "Supprimer le mot avant le curseur"
+  },
+  "delete_char": {
+    "message": "Supprimer le caractère après le curseur",
+    "description": "Supprimer le caractère après le curseur"
+  },
+  "backward_delete_char": {
+    "message": "Supprimer le caractère avant le curseur",
+    "description": "Supprimer le caractère avant le curseur"
+  },
+  "undo": {
+    "message": "Annuler",
+    "description": "Annuler"
+  },
+  "undo_slash": {
+    "message": "Annuler",
+    "description": "Annuler"
+  },
   "tooltip_default_policy": {
     "message": "Appliqué lorsqu'aucune règle ne correspond",
     "description": "Applied when no rule matches"
