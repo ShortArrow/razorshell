@@ -75,6 +75,7 @@ const storyIds = [
   "options-keymapapp--save-failure",
   "options-keymapapp--reclaimed-unassigned",
   "options-keymapapp--reclaimed-assigned",
+  "options-keymapapp--opt-in-assign",
   "options-langapp--auto",
   "options-langapp--overridden",
   "options-langapp--no-browser-languages",
@@ -105,6 +106,8 @@ const excludedStoryIds = [
   "options-urlapp--remove-rule",
   // ends as ProbeDefault with the other action
   "options-urlapp--default-action-change",
+  // ends as the Default table, every opt-in row unassigned again
+  "options-keymapapp--opt-in-reset",
   // end as an override row like WithOverride
   "options-keymapapp--conflict-then-recover",
   "options-keymapapp--reset-row",

@@ -250,6 +250,63 @@ export const ReclaimedAssigned: Story = {
   },
 };
 
+/**
+ * An opt-in row (ADR-0012) starts unassigned and is bound by the same capture
+ * as any other row. The reading cells carry the disabled marking for the same
+ * reason the browser-managed rows do, and the cell holding the buttons does
+ * not. The end state is the assigned row, which no other story renders.
+ */
+export const OptInAssign: Story = {
+  tags: ['@C1.19'],
+  loaders: [() => loadOverrides({})],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // The current cell is re-rendered as a different element once the row is
+    // bound, so it is looked up again after the capture rather than held.
+    const current = () => canvas.getByTestId('current-kill_whole_field');
+    await expect(await canvas.findByTestId('current-kill_whole_field')).toHaveTextContent('—');
+    await expect(current().closest('td')).toHaveAttribute('aria-disabled', 'true');
+    await expect(current().closest('tr')!.querySelectorAll('td[aria-disabled="true"]')).toHaveLength(3);
+    await expect(canvas.getByTestId('reset-kill_whole_field')).toHaveClass(/invisible/);
+    await expect(canvas.getByTestId('rebind-kill_whole_field')).toBeEnabled();
+
+    await userEvent.click(canvas.getByTestId('rebind-kill_whole_field'));
+    await userEvent.keyboard('{Control>}c{/Control}');
+
+    await waitFor(() => expect(current()).toHaveTextContent('Ctrl'));
+    await expect(current()).toHaveTextContent('c');
+    await expect(current().closest('td')).not.toHaveAttribute('aria-disabled');
+    await expect(canvas.getByTestId('reset-kill_whole_field')).not.toHaveClass(/invisible/);
+    await waitFor(() => expect(storedValue<Record<string, Chord>>('keymapOverrides')).toEqual({
+      kill_whole_field: { key: 'c', ctrl: true, alt: false, shift: false },
+    }));
+    (document.activeElement as HTMLElement | null)?.blur();
+  },
+};
+
+const optInOverride: Record<string, Chord> = {
+  open_line: { key: 'o', ctrl: true, alt: false, shift: false },
+};
+
+/** Reset on an assigned opt-in row returns it to unassigned, not to a chord. */
+export const OptInReset: Story = {
+  tags: ['@C1.19'],
+  loaders: [() => loadOverrides(optInOverride)],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const current = () => canvas.getByTestId('current-open_line');
+    await expect(await canvas.findByTestId('current-open_line')).toHaveTextContent('o');
+    await userEvent.click(canvas.getByTestId('reset-open_line'));
+
+    await waitFor(() => expect(current()).toHaveTextContent('—'));
+    await expect(current().closest('td')).toHaveAttribute('aria-disabled', 'true');
+    await waitFor(() => expect(storedValue<Record<string, Chord>>('keymapOverrides')).toEqual({}));
+    (document.activeElement as HTMLElement | null)?.blur();
+  },
+};
+
 export const ResetRow: Story = {
   tags: ['@C1.5'],
   loaders: [() => loadOverrides(twoOverrides)],

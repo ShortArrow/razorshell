@@ -61,6 +61,9 @@ See [ADR-0012](docs/decisions/0012-unassigned-keymap-entries.md).
 
 | Suggested shortcut      | Description                           |
 | ----------------------- | ------------------------------------- |
+| `Ctrl` + `c`            | kill whole field                      |
+| `Ctrl` + `j`            | accept line                           |
+| `Ctrl` + `o`            | open line                             |
 
 <!-- keymap:optin:end -->
 

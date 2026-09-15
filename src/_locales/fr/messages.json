@@ -87,6 +87,18 @@
     "message": "Échanger les mots avant et après le curseur",
     "description": "Échanger les mots avant et après le curseur"
   },
+  "kill_whole_field": {
+    "message": "Effacer tout le champ et le placer dans le kill ring",
+    "description": "Effacer tout le champ et le placer dans le kill ring"
+  },
+  "accept_line": {
+    "message": "Valider la ligne : envoyer le formulaire depuis un input, insérer un saut de ligne dans un textarea",
+    "description": "Valider la ligne : envoyer le formulaire depuis un input, insérer un saut de ligne dans un textarea"
+  },
+  "open_line": {
+    "message": "Insérer un saut de ligne après le curseur et rester avant lui",
+    "description": "Insérer un saut de ligne après le curseur et rester avant lui"
+  },
   "tooltip_default_policy": {
     "message": "Appliqué lorsqu'aucune règle ne correspond",
     "description": "Applied when no rule matches"

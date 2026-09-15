@@ -129,6 +129,29 @@ function undoInto(root: HTMLElement): void {
  */
 const editableCaret = 0;
 
+/**
+ * Selects everything under the root and removes it as one kill, the
+ * counterpart of `operation.killWholeField`. The text goes on the ring as the
+ * selection reports it, and an empty root is not an event.
+ */
+function killAllInto(root: HTMLElement): void {
+  const current = selection();
+  if (!current) return;
+  root.focus();
+  current.selectAllChildren(root);
+  const text = current.toString();
+  if (text === "") return;
+  document.execCommand("delete");
+  recordKill({
+    direction: "backward",
+    text,
+    elementToken: root,
+    caretBefore: editableCaret,
+    caretAfter: editableCaret,
+    storable: true,
+  });
+}
+
 /** Inserts ring text as plain text, so nothing carries markup into the editor. */
 function yankInto(root: HTMLElement): void {
   const text = beginYank();
@@ -152,4 +175,5 @@ export const editableOperation: Record<string, (root: HTMLElement) => void> = {
   backward_delete_char: () => deleteByGranularity("backward", "character"),
   undo: (root) => undoInto(root),
   yank: (root) => yankInto(root),
+  kill_whole_field: (root) => killAllInto(root),
 };

@@ -6,6 +6,17 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ## [Unreleased]
 
+### Added
+
+- Three opt-in bindings that ship UNASSIGNED, because their readline
+  chords are copy, downloads and open-file in the browser: kill whole
+  field (suggested Ctrl+C) kills every line of the field onto the
+  ring; accept line (Ctrl+J) submits the form from an input and inserts
+  a newline in a textarea; open line (Ctrl+O) inserts a newline and
+  keeps the caret before it. Press the row's rebind button and type
+  the chord to take one; reset gives the browser key back. See
+  [ADR-0012](decisions/0012-unassigned-keymap-entries.md).
+
 ### Fixed
 
 - A page could not take its own keydown listeners back out while the

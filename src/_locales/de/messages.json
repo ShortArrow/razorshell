@@ -87,6 +87,18 @@
     "message": "Wörter vor und nach dem Cursor vertauschen",
     "description": "Wörter vor und nach dem Cursor vertauschen"
   },
+  "kill_whole_field": {
+    "message": "Das ganze Feld löschen und in den Kill-Ring legen",
+    "description": "Das ganze Feld löschen und in den Kill-Ring legen"
+  },
+  "accept_line": {
+    "message": "Zeile bestätigen: im Eingabefeld das Formular absenden, im Textbereich einen Zeilenumbruch einfügen",
+    "description": "Zeile bestätigen: im Eingabefeld das Formular absenden, im Textbereich einen Zeilenumbruch einfügen"
+  },
+  "open_line": {
+    "message": "Einen Zeilenumbruch nach dem Cursor einfügen und davor bleiben",
+    "description": "Einen Zeilenumbruch nach dem Cursor einfügen und davor bleiben"
+  },
   "tooltip_default_policy": {
     "message": "Wird angewendet, wenn keine Regel zutrifft",
     "description": "Applied when no rule matches"

@@ -1,6 +1,6 @@
 import { editableOperation } from "./editableoperation";
 import { getMessage } from "./languages";
-import { canYank, canYankPopField, Keymap, operation } from "./operation";
+import { canAcceptLine, canOpenLine, canYank, canYankPopField, Keymap, operation } from "./operation";
 
 export function keymaching(event: KeyboardEvent, key: Keymap): boolean {
   if (key.unassigned === true) return false;
@@ -240,5 +240,47 @@ export const defaultKeymap: Keymap[] = [
     operation: operation.transposeWords,
     alt: true,
     key: "t",
+  },
+  /**
+   * The opt-in entries of ADR-0012. Each ships `unassigned`, so its chord fields
+   * are the SUGGESTION the default column shows and nothing matches until the
+   * user assigns it on the row: Ctrl+C is copy, Ctrl+J downloads and Ctrl+O the
+   * open-file dialog, and a chord that everyday is not taken by default.
+   *
+   * Accept-line and open-line carry no editable counterpart. A rich-text
+   * editor owns Enter — paragraph splitting, list continuation — and a
+   * newline this code inserts would bypass all of it, so the chord is left to
+   * the host editor there.
+   */
+  {
+    id: "kill_whole_field",
+    ringRole: "kill",
+    label: "kill whole field",
+    description: getMessage("kill_whole_field"),
+    operation: operation.killWholeField,
+    editableOperation: editableOperation.kill_whole_field,
+    unassigned: true,
+    ctrl: true,
+    key: "c",
+  },
+  {
+    id: "accept_line",
+    label: "accept line",
+    description: getMessage("accept_line"),
+    operation: operation.acceptLine,
+    canHandle: canAcceptLine,
+    unassigned: true,
+    ctrl: true,
+    key: "j",
+  },
+  {
+    id: "open_line",
+    label: "open line",
+    description: getMessage("open_line"),
+    operation: operation.openLine,
+    canHandle: canOpenLine,
+    unassigned: true,
+    ctrl: true,
+    key: "o",
   },
 ];

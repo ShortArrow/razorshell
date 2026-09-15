@@ -87,6 +87,18 @@
     "message": "Tukar kata sebelum dan sesudah kursor",
     "description": "Tukar kata sebelum dan sesudah kursor"
   },
+  "kill_whole_field": {
+    "message": "Hapus seluruh isi kolom ke kill ring",
+    "description": "Hapus seluruh isi kolom ke kill ring"
+  },
+  "accept_line": {
+    "message": "Terima baris: kirim formulir dari input, sisipkan baris baru di textarea",
+    "description": "Terima baris: kirim formulir dari input, sisipkan baris baru di textarea"
+  },
+  "open_line": {
+    "message": "Sisipkan baris baru setelah kursor dan tetap di depannya",
+    "description": "Sisipkan baris baru setelah kursor dan tetap di depannya"
+  },
   "tooltip_default_policy": {
     "message": "Diterapkan bila tidak ada aturan yang cocok",
     "description": "Applied when no rule matches"

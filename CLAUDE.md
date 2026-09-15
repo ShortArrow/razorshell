@@ -9,7 +9,10 @@
   `dist/` is what the e2e suite loads as the unpacked extension, so
   rebuild before `test:e2e` after touching `src/`.
 - `pnpm test:e2e` / `test:visual` / `test:storybook` — Playwright.
-  `test:storybook` needs `pnpm build-storybook` first.
+  `test:storybook` needs `pnpm build-storybook` first. Run them one at
+  a time: every Playwright run clears `test-results/`, which holds the
+  e2e suite's live browser profile, so a second project started while
+  e2e runs loses its storage and the restart describe fails.
 - `pnpm storybook` — dev server on 6006. Restart it after editing
   `.storybook/**` or shared CSS; the running server pins that
   configuration at startup and then serves stale code without warning.

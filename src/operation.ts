@@ -249,7 +249,55 @@ export const operation = {
   transposeChars(textinput: TextField) {
     applyCaseEdit(textinput, transposeCharsEdit);
   },
+  /**
+   * Kills the whole value onto the ring — every line of a textarea, not the
+   * caret's line. bash's Ctrl+C discards the buffer without keeping it; the
+   * ring is the one departure, so a slip is one Ctrl+Y from undone. Ships
+   * unassigned (ADR-0012) because its suggested chord is copy.
+   *
+   * A backward kill: the caret is pulled to 0, and a line kill chained right
+   * after it at 0 prepends, which is the order readline keeps.
+   */
+  killWholeField(textinput: TextField) {
+    kill(textinput, { start: 0, end: textinput.value.length }, "backward");
+  },
+  /**
+   * readline's accept-line, which is Enter. A textarea takes a newline at the
+   * caret; an input submits its form the way Enter would, through
+   * `requestSubmit` so the page's validation and submit listeners still run.
+   * `canAcceptLine` refuses an input with no form, so the key stays with the
+   * browser there instead of being swallowed for nothing.
+   */
+  acceptLine(textinput: TextField) {
+    if (textinput instanceof HTMLTextAreaElement) {
+      insertNewline(textinput, "after");
+      return;
+    }
+    textinput.form?.requestSubmit();
+  },
+  /**
+   * Emacs' open-line: a newline goes in at the caret and the caret stays
+   * before it. Only a textarea can hold one, and `canOpenLine` leaves the key
+   * to the browser everywhere else.
+   */
+  openLine(textinput: TextField) {
+    insertNewline(textinput, "before");
+  },
 };
+
+/**
+ * Writes a newline over the selection through the native insert path, and
+ * parks the caret on the side of it the caller asked for.
+ */
+function insertNewline(textinput: TextField, caret: "before" | "after"): void {
+  if (textinput.readOnly || textinput.disabled) return;
+  const start = textinput.selectionStart;
+  const end = textinput.selectionEnd;
+  if (start == null || end == null) return;
+  replaceRangeNatively(textinput, start, end, "\n");
+  const rest = caret === "before" ? start : start + 1;
+  textinput.setSelectionRange(rest, rest);
+}
 
 /**
  * Applies a computed edit to a field, writing only when the text really changes.
@@ -342,6 +390,25 @@ export function canYank(field: TextField | HTMLElement): boolean {
     if (field.readOnly || field.disabled) return false;
   }
   return newestEntry() !== undefined;
+}
+
+/**
+ * Whether accept-line has somewhere to go: a writable textarea, or an input
+ * that belongs to a form. An input with no form has nothing to submit, and a
+ * binding that would do nothing must not swallow the key it shadows.
+ */
+export function canAcceptLine(field: TextField | HTMLElement): boolean {
+  if (field instanceof HTMLTextAreaElement) return !field.readOnly && !field.disabled;
+  if (field instanceof HTMLInputElement) {
+    return !field.readOnly && !field.disabled && field.form !== null;
+  }
+  return false;
+}
+
+/** Whether open-line can insert anything: only a writable textarea holds a newline. */
+export function canOpenLine(field: TextField | HTMLElement): boolean {
+  if (!(field instanceof HTMLTextAreaElement)) return false;
+  return !field.readOnly && !field.disabled;
 }
 
 /**

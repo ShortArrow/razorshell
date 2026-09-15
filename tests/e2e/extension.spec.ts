@@ -2853,6 +2853,89 @@ test.describe("the reclaimed chords route to the focused field @C1.18", () => {
  * Should this ever go red, Chrome's behaviour changed — reopen R1 and update
  * the mock in step rather than adjusting the number to make it pass.
  */
+test.describe("opt-in entries ship unassigned @C1.19", () => {
+  const input = () => page.locator('input[type="text"]').first();
+  const textarea = () => page.locator("textarea");
+
+  async function seedTextarea(value: string, caret: number): Promise<void> {
+    await textarea().evaluate((el: HTMLTextAreaElement, args: { value: string; caret: number }) => {
+      el.value = args.value;
+      el.focus();
+      el.setSelectionRange(args.caret, args.caret);
+    }, { value, caret });
+  }
+
+  async function assign(id: string, chord: string): Promise<void> {
+    await optionsPage.locator(`[data-testid="rebind-${id}"]`).click();
+    await optionsPage.keyboard.press(chord);
+    await optionsPage.waitForTimeout(500);
+    const stored = await storedOverrides();
+    expect(stored).toHaveProperty(id);
+    expect(stored).toHaveProperty(seededOverride);
+  }
+
+  /**
+   * The restart describe at the end of the file asserts the Ctrl+m override
+   * seeded by the export test, so every write here must leave it in place: an
+   * assignment or a reset that dropped a sibling override would only surface
+   * three describes later, as a restart failure with no obvious author.
+   */
+  const seededOverride = "move_cursor_to_the_beginning";
+
+  test.beforeAll(async () => {
+    await page.goto(`${origin}/`);
+    await page.waitForTimeout(1200);
+  });
+
+  test("an unassigned row reads as unassigned and its chord is left to the page", async () => {
+    expect(await storedOverrides()).toHaveProperty(seededOverride);
+    const current = optionsPage.locator('[data-testid="current-kill_whole_field"]');
+    await expect(current).toHaveText("—");
+    await expect(current.locator("xpath=..")).toHaveAttribute("aria-disabled", "true");
+    await expect(optionsPage.locator('[data-testid="reset-kill_whole_field"]')).toHaveClass(/invisible/);
+
+    await seedTextInput("hello world", 5);
+    await page.keyboard.press("Control+c");
+    expect((await fieldState(input())).value).toBe("hello world");
+    await expect(page.locator("#keyinfo")).toContainText("prevented=false");
+  });
+
+  test("assigning the suggested chord makes kill whole field reach the content page", async () => {
+    await assign("kill_whole_field", "Control+c");
+    await seedTextInput("hello world", 5);
+    await page.keyboard.press("Control+c");
+    expect(await fieldState(input())).toEqual({ value: "", start: 0, end: 0 });
+    await page.keyboard.press("Control+y");
+    expect((await fieldState(input())).value).toBe("hello world");
+  });
+
+  test("accept line and open line break a textarea line once assigned", async () => {
+    await assign("accept_line", "Control+j");
+    await seedTextarea("ab", 1);
+    await page.keyboard.press("Control+j");
+    expect(await fieldState(textarea())).toEqual({ value: "a\nb", start: 2, end: 2 });
+
+    await assign("open_line", "Control+o");
+    await seedTextarea("ab", 1);
+    await page.keyboard.press("Control+o");
+    expect(await fieldState(textarea())).toEqual({ value: "a\nb", start: 1, end: 1 });
+  });
+
+  test("reset returns each row to unassigned and the chord to the page", async () => {
+    for (const id of ["kill_whole_field", "accept_line", "open_line"]) {
+      await optionsPage.locator(`[data-testid="reset-${id}"]`).click();
+      await optionsPage.waitForTimeout(300);
+      await expect(optionsPage.locator(`[data-testid="current-${id}"]`)).toHaveText("—");
+      const stored = await storedOverrides();
+      expect(stored).not.toHaveProperty(id);
+      expect(stored).toHaveProperty(seededOverride);
+    }
+    await seedTextInput("hello world", 5);
+    await page.keyboard.press("Control+c");
+    expect((await fieldState(input())).value).toBe("hello world");
+  });
+});
+
 test.describe("storage.onChanged characterization", () => {
   test("a redundant write fires no event", async () => {
     const counts = await optionsPage.evaluate(async () => {

@@ -87,6 +87,18 @@
     "message": "Swap the words before and after the cursor",
     "description": "Swap the words before and after the cursor"
   },
+  "kill_whole_field": {
+    "message": "Delete the whole field onto the kill ring",
+    "description": "Delete the whole field onto the kill ring"
+  },
+  "accept_line": {
+    "message": "Accept the line: submit the form from an input, insert a newline in a textarea",
+    "description": "Accept the line: submit the form from an input, insert a newline in a textarea"
+  },
+  "open_line": {
+    "message": "Insert a newline after the cursor and stay before it",
+    "description": "Insert a newline after the cursor and stay before it"
+  },
   "tooltip_default_policy": {
     "message": "Applied when no rule matches",
     "description": "Applied when no rule matches"

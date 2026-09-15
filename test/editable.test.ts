@@ -19,6 +19,10 @@ import { mergeKeymap } from "../src/keymapmerge";
  * would overwrite cannot be pinned down the way it can in a field. A chord with
  * no counterpart is left to the page, which keeps the editor's own Alt+U working
  * instead of swallowing it for a binding that could not act.
+ *
+ * Accept-line and open-line (ADR-0012) stay off for a different reason: a
+ * rich-text editor owns Enter — paragraph splitting, list continuation — and a
+ * newline inserted from here would bypass all of it.
  */
 const withoutEditableCounterpart = new Set([
   "yank_pop",
@@ -26,6 +30,8 @@ const withoutEditableCounterpart = new Set([
   "downcase_word",
   "capitalize_word",
   "transpose_words",
+  "accept_line",
+  "open_line",
 ]);
 
 describe("editable operations", () => {

@@ -87,6 +87,18 @@
     "message": "Intercambiar las palabras antes y después del cursor",
     "description": "Intercambiar las palabras antes y después del cursor"
   },
+  "kill_whole_field": {
+    "message": "Borrar todo el campo y guardarlo en el kill ring",
+    "description": "Borrar todo el campo y guardarlo en el kill ring"
+  },
+  "accept_line": {
+    "message": "Aceptar la línea: enviar el formulario desde un input, insertar un salto de línea en un textarea",
+    "description": "Aceptar la línea: enviar el formulario desde un input, insertar un salto de línea en un textarea"
+  },
+  "open_line": {
+    "message": "Insertar un salto de línea después del cursor y permanecer antes de él",
+    "description": "Insertar un salto de línea después del cursor y permanecer antes de él"
+  },
   "tooltip_default_policy": {
     "message": "Se aplica cuando ninguna regla coincide",
     "description": "Applied when no rule matches"

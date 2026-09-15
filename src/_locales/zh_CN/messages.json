@@ -87,6 +87,18 @@
     "message": "交换光标前后的单词",
     "description": "交换光标前后的单词"
   },
+  "kill_whole_field": {
+    "message": "删除整个字段并放入 kill ring",
+    "description": "删除整个字段并放入 kill ring"
+  },
+  "accept_line": {
+    "message": "确认该行：在 input 中提交表单，在 textarea 中插入换行",
+    "description": "确认该行：在 input 中提交表单，在 textarea 中插入换行"
+  },
+  "open_line": {
+    "message": "在光标后插入换行，光标停留在换行之前",
+    "description": "在光标后插入换行，光标停留在换行之前"
+  },
   "tooltip_default_policy": {
     "message": "当没有任何规则匹配时应用",
     "description": "Applied when no rule matches"

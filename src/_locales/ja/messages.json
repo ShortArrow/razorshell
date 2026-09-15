@@ -87,6 +87,18 @@
     "message": "カーソルの前後の単語を入れ替える",
     "description": "カーソルの前後の単語を入れ替える"
   },
+  "kill_whole_field": {
+    "message": "フィールド全体を削除してキルリングに載せる",
+    "description": "フィールド全体を削除してキルリングに載せる"
+  },
+  "accept_line": {
+    "message": "行を確定: input ではフォームを送信、textarea では改行を挿入",
+    "description": "行を確定: input ではフォームを送信、textarea では改行を挿入"
+  },
+  "open_line": {
+    "message": "カーソルの後ろに改行を挿入し、カーソルはその前に留まる",
+    "description": "カーソルの後ろに改行を挿入し、カーソルはその前に留まる"
+  },
   "tooltip_default_policy": {
     "message": "どのルールにもマッチしないときに適用されます",
     "description": "Applied when no rule matches"

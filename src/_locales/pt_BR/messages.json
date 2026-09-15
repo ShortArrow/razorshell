@@ -87,6 +87,18 @@
     "message": "Trocar as palavras antes e depois do cursor",
     "description": "Trocar as palavras antes e depois do cursor"
   },
+  "kill_whole_field": {
+    "message": "Apagar o campo inteiro e guardá-lo no kill ring",
+    "description": "Apagar o campo inteiro e guardá-lo no kill ring"
+  },
+  "accept_line": {
+    "message": "Aceitar a linha: enviar o formulário a partir de um input, inserir uma quebra de linha em um textarea",
+    "description": "Aceitar a linha: enviar o formulário a partir de um input, inserir uma quebra de linha em um textarea"
+  },
+  "open_line": {
+    "message": "Inserir uma quebra de linha após o cursor e permanecer antes dela",
+    "description": "Inserir uma quebra de linha após o cursor e permanecer antes dela"
+  },
   "tooltip_default_policy": {
     "message": "Aplicado quando nenhuma regra corresponde",
     "description": "Applied when no rule matches"

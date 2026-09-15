@@ -87,6 +87,18 @@
     "message": "커서 앞뒤의 단어 바꾸기",
     "description": "커서 앞뒤의 단어 바꾸기"
   },
+  "kill_whole_field": {
+    "message": "필드 전체를 삭제하여 킬 링에 저장",
+    "description": "필드 전체를 삭제하여 킬 링에 저장"
+  },
+  "accept_line": {
+    "message": "행 확정: input에서는 폼을 제출하고, textarea에서는 줄바꿈을 삽입",
+    "description": "행 확정: input에서는 폼을 제출하고, textarea에서는 줄바꿈을 삽입"
+  },
+  "open_line": {
+    "message": "커서 뒤에 줄바꿈을 삽입하고 커서는 그 앞에 유지",
+    "description": "커서 뒤에 줄바꿈을 삽입하고 커서는 그 앞에 유지"
+  },
   "tooltip_default_policy": {
     "message": "어떤 규칙에도 일치하지 않을 때 적용됩니다",
     "description": "Applied when no rule matches"

@@ -79,6 +79,7 @@ file the importer refuses; a rendering readable in one theme only.
 | C1.15 | Killed text lands on a frame-local ring: chained kills concatenate in readline order, Ctrl+Y yanks the newest entry, Alt+Y rotates with verified replacement, a password kill is never stored, and an empty-ring Ctrl+Y leaves the native key untouched |
 | C1.16 | Word kills join the ring, character deletes remove whole graphemes without touching it, and both undo chords reach the native history |
 | C1.17 | Case operations recase exactly one word and land at its end, transpose-words drags the earlier word past the later, and Ctrl+K at a line end kills the newline joining the lines |
+| C1.19 | The opt-in entries ship unassigned: they match no keystroke, take no part in conflict detection, render grayed with `—` as current, bind through the row's capture and reach the content script, and return to unassigned on reset; kill whole field empties the field onto the ring, accept line submits an input's form and breaks a textarea line, open line breaks the line and keeps the caret before it |
 | C1.18 | The reclaimed chords route by focus: assigned Ctrl+W rubs out a whitespace word inside a field and still closes the tab outside one, Ctrl+T transposes graphemes inside and still opens a tab outside — interception itself rests on the recorded manual measurement. The keymap table carries a row per chord that reads its binding from `chrome.commands`, grays an unassigned one, and reaches Chrome's shortcuts page, which a link cannot |
 
 ## Traceability

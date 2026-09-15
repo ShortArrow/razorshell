@@ -156,6 +156,7 @@ function labelOf(id: string): string {
 
 function isOverridden(active: Keymap, fallback: Keymap): boolean {
   return (
+    (active.unassigned === true) !== (fallback.unassigned === true) ||
     active.key !== fallback.key ||
     (active.ctrl === true) !== (fallback.ctrl === true) ||
     (active.alt === true) !== (fallback.alt === true) ||
@@ -286,24 +287,36 @@ export function KeymapApp() {
           {keymap.map((entry, index) => {
             const fallback = defaultKeymap[index];
             const overridden = isOverridden(entry, fallback);
+            // An unassigned opt-in row (ADR-0012) reads like an unassigned
+            // browser-managed row: the three reading cells carry the marking,
+            // the cell holding the assign button does not.
+            const unassigned = entry.unassigned === true;
+            const cell = unassigned
+              ? { 'aria-disabled': 'true' as const, className: 'align-middle text-base-content/50' }
+              : { className: 'align-middle' };
+            const rebindLabel = capturing === entry.id
+              ? getMessage('keymap_press_key')()
+              : getMessage(unassigned ? 'keymap_assign' : 'keymap_rebind')();
             return (
               <tr key={entry.id}>
-                <td className='align-middle'>
+                <td {...cell}>
                   <span className='tooltip tooltip-top' data-tip={entry.description ? entry.description() : ""}>
                     {entry.label}
                   </span>
                 </td>
-                <td className='align-middle'><ChordView entry={fallback} /></td>
-                <td className='align-middle'>
-                  <ChordView entry={entry} testid={`current-${entry.id}`} overridden={overridden} />
+                <td {...cell}><ChordView entry={fallback} /></td>
+                <td {...cell}>
+                  {unassigned
+                    ? <span data-testid={`current-${entry.id}`}>{noShortcut}</span>
+                    : <ChordView entry={entry} testid={`current-${entry.id}`} overridden={overridden} />}
                 </td>
                 <td className='align-middle'>
                   <div className='flex items-center gap-2'>
                     <button
                       className='btn btn-sm btn-square'
                       data-testid={`rebind-${entry.id}`}
-                      aria-label={capturing === entry.id ? getMessage('keymap_press_key')() : getMessage('keymap_rebind')()}
-                      title={capturing === entry.id ? getMessage('keymap_press_key')() : getMessage('keymap_rebind')()}
+                      aria-label={rebindLabel}
+                      title={rebindLabel}
                       onClick={() => startCapture(entry.id)}
                     >
                       {capturing === entry.id
