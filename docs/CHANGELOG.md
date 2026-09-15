@@ -4,6 +4,18 @@ Notable changes to Razorshell. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Design rationale lives in [docs/decisions](decisions/README.md).
 
+## [Unreleased]
+
+### Fixed
+
+- A page could not take its own keydown listeners back out while the
+  extension was loaded: the page hook wrapped what `addEventListener`
+  received but left `removeEventListener` looking for the unwrapped
+  function, so a listener the page believed gone kept running until
+  reload. A site that cancels Ctrl+V only while a dialog is open lost
+  paste for good once the dialog closed. Removal now finds the wrapper,
+  and the inspector's listener count follows it.
+
 ## [0.0.5] - 2026-09-05
 
 ### Added
