@@ -1,5 +1,8 @@
 {
   "recommendations": [
-    "bradlc.vscode-tailwindcss"
+    "bradlc.vscode-tailwindcss",
+    "vitest.explorer",
+    "ms-playwright.playwright",
+    "davidanson.vscode-markdownlint"
   ]
 }
