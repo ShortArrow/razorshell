@@ -3,6 +3,7 @@ import { getMessage } from "./languages";
 import { canYank, canYankPopField, Keymap, operation } from "./operation";
 
 export function keymaching(event: KeyboardEvent, key: Keymap): boolean {
+  if (key.unassigned === true) return false;
   let result = true;
   if (key.ctrl === true) {
     result &&= event.ctrlKey == true;

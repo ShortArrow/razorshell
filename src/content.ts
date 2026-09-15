@@ -5,7 +5,7 @@ import { dispatchEditableKey, isEditableTarget, isTextField, keyEventHandling, r
 import { clearRing, noteForeignCommand } from "./killring";
 import { clearYankRecord } from "./yank";
 import { keyChord } from "./keychord";
-import { Chord } from "./keymapmerge";
+import { Chord, boundEntries } from "./keymapmerge";
 import { getActiveKeymap, initKeymap } from "./keymapstore";
 import { getMessage } from "./languages";
 import { Keymap, TextField, operation } from "./operation";
@@ -206,7 +206,7 @@ function buildLines(report: InspectReport, keymap: Keymap[]): string[] {
 
 async function inspectTarget(target: EventTarget): Promise<void> {
   const report = await queryPageWorld(target);
-  const lines = buildLines(report, getActiveKeymap());
+  const lines = buildLines(report, boundEntries(getActiveKeymap()));
   if (lines.length === 0) {
     console.log("razorshell inspect: no conflicts", []);
     showToast(getMessage("inspect_no_conflicts")(), []);

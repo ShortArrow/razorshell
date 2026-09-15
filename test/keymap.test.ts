@@ -45,3 +45,9 @@ test("shift and event match", () => {
   expect(keymaching(eventNoKey, targetHasKey)).not.toBeTruthy();
   expect(keymaching(eventHasKey, targetHasKey)).toBeTruthy();
 });
+
+test("an unassigned entry matches nothing, not even its suggested chord", () => {
+  const target: Keymap = { label: "", operation: () => { }, ctrl: true, key: "c", unassigned: true };
+  const suggested = new KeyboardEvent("", { key: "c", ctrlKey: true });
+  expect(keymaching(suggested, target)).toBe(false);
+});

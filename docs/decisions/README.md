@@ -28,3 +28,6 @@ record names the files it concerns and is frozen when written.
 - [ADR-0011](0011-reclaimed-reserved-chords.md) — Ctrl+W and Ctrl+T
   ship unassigned as commands the user opts into, and reproduce the
   browser action they displace outside a text field
+- [ADR-0012](0012-unassigned-keymap-entries.md) — bindings whose
+  readline chord is an everyday browser key ship unassigned in the
+  keymap itself, and bind through the row's own capture

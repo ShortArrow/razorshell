@@ -55,6 +55,13 @@ export interface Keymap {
    */
   ringRole?: "kill" | "yank";
   description?: () => string;
+  /**
+   * Whether the entry ships bound to nothing. The chord fields then hold the
+   * SUGGESTED chord — shown in the default column and documented in the README
+   * — and the entry matches no keystroke until an override binds it. Absent
+   * means bound. See ADR-0012.
+   */
+  unassigned?: boolean;
   key: string;
   alt?: boolean;
   ctrl?: boolean;

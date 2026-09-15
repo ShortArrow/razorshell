@@ -83,3 +83,40 @@ describe("defaultKeymap ids", () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 });
+
+describe("an unassigned entry", () => {
+  const withUnassigned: Keymap[] = [
+    ...defaults,
+    { id: "opt", label: "opt", operation: opOne, ctrl: true, key: "c", unassigned: true },
+  ];
+
+  test("stays unassigned with no override", () => {
+    const merged = mergeKeymap(withUnassigned);
+    expect(merged[2].unassigned).toBe(true);
+    expect(merged[2].key).toBe("c");
+  });
+
+  test("is bound by an override", () => {
+    const merged = mergeKeymap(withUnassigned, { opt: { key: "c", ctrl: true } });
+    expect(merged[2].unassigned).toBeFalsy();
+    expect(merged[2].key).toBe("c");
+    expect(merged[2].ctrl).toBe(true);
+  });
+
+  test("is unassigned again once the override is gone", () => {
+    const bound = mergeKeymap(withUnassigned, { opt: { key: "c", ctrl: true } });
+    expect(bound[2].unassigned).toBeFalsy();
+    const reset = mergeKeymap(withUnassigned, {});
+    expect(reset[2].unassigned).toBe(true);
+  });
+
+  test("does not conflict with a chord equal to its suggestion", () => {
+    const merged = mergeKeymap(withUnassigned);
+    expect(findConflict({ key: "c", ctrl: true }, merged, "one")).toBe(null);
+  });
+
+  test("conflicts once assigned", () => {
+    const merged = mergeKeymap(withUnassigned, { opt: { key: "c", ctrl: true } });
+    expect(findConflict({ key: "c", ctrl: true }, merged, "one")).toBe("opt");
+  });
+});

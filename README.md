@@ -49,6 +49,21 @@ These work today.
 
 <!-- keymap:implemented:end -->
 
+### Opt-in
+
+These ship unbound because the chord readline gives them is one the
+browser already uses inside a text field. The default column of the
+keymap table shows the suggested chord; press the rebind button on the
+row and type it to take it. Reset on the row gives the browser key back.
+See [ADR-0012](docs/decisions/0012-unassigned-keymap-entries.md).
+
+<!-- keymap:optin:start -->
+
+| Suggested shortcut      | Description                           |
+| ----------------------- | ------------------------------------- |
+
+<!-- keymap:optin:end -->
+
 Killed text goes onto a kill ring: consecutive kills join into one entry,
 `Ctrl` + `y` puts the newest entry back, and `Alt` + `y` immediately after a
 yank cycles to the entry before it. On Windows and Linux `Ctrl` + `y` is the

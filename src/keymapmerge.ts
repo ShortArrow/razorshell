@@ -13,14 +13,26 @@ export interface Chord {
   shift?: boolean;
 }
 
+/** An override binds the entry, so an unassigned one leaves that state here. */
 function applyChord(entry: Keymap, chord: Chord): Keymap {
   return {
     ...entry,
+    unassigned: false,
     key: chord.key,
     ctrl: chord.ctrl === true,
     alt: chord.alt === true,
     shift: chord.shift === true,
   };
+}
+
+/**
+ * @fn boundEntries
+ * @brief The entries that can match a keystroke.
+ * @param Keymap[] keymap - The composed keymap
+ * @return Keymap[] - The same order, minus entries still unassigned
+ */
+export function boundEntries(keymap: Keymap[]): Keymap[] {
+  return keymap.filter((entry) => entry.unassigned !== true);
 }
 
 function sameChord(left: Chord, right: Chord): boolean {
@@ -60,6 +72,6 @@ export function mergeKeymap(defaults: Keymap[], ...layers: Record<string, Chord>
  * @return string | null - The id of the conflicting entry, or null when the chord is free
  */
 export function findConflict(chord: Chord, keymap: Keymap[], excludeId: string): string | null {
-  const hit = keymap.find((entry) => entry.id !== excludeId && sameChord(chord, entry));
+  const hit = boundEntries(keymap).find((entry) => entry.id !== excludeId && sameChord(chord, entry));
   return hit ? hit.id : null;
 }
