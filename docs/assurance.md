@@ -36,27 +36,39 @@ the commit under assessment.
 
 ## Boundary
 
-Nothing is claimed about: the Google-account sync transport (the
-suites exercise `storage.sync` as persistence inside one profile;
-cross-device merge is never run), branded Chrome Stable/Beta 137 and
-later (no unpacked loading), browser or OS crashes, interference
-from other extensions, macOS in its entirety (A8), keyboard layouts
-whose AltGr raises both `ctrlKey` and `altKey`, fullscreen windows
-(Chrome's reserved-shortcut set inverts there), and the Storybook
-dev preview during manual story-to-story navigation (the preview
-reloads itself when a play function outlives a navigation; assurance
-rests on the vitest and CI runs, not on the panel). Fields the
-extension cannot reach — closed shadow roots, `email` and `number`
-inputs — are not out of scope but a claim of their own: C1.11 says
-they keep their native behavior.
+Nothing is claimed about:
+
+- the Google-account sync transport: the suites exercise
+  `storage.sync` as persistence inside one profile, and a cross-device
+  merge is never run;
+- branded Chrome Stable and Beta 137 and later, which removed the
+  `--load-extension` flag the suites launch with (A1);
+- browser or OS crashes;
+- interference from other extensions;
+- macOS in its entirety (A8);
+- keyboard layouts whose AltGr raises both `ctrlKey` and `altKey`;
+- fullscreen windows, where Chrome's reserved-shortcut set inverts;
+- the Storybook dev preview during manual story-to-story navigation.
+  The preview reloads itself when a play function outlives a
+  navigation; assurance rests on the vitest and CI runs, not on the
+  panel.
+
+Fields the extension cannot reach — closed shadow roots, `email` and
+`number` inputs — are not out of scope but a claim of their own: C1.11
+says they keep their native behavior.
 
 ## Hazards the suites are built against
 
-Write refused by storage while the GUI already shows the new value;
-an import applying some keys and not others; a rejected input
-dirtying storage; a policy change not reaching an open tab; the
-story-layer chrome mock diverging from the real API; an exported
-file the importer refuses; a rendering readable in one theme only.
+- A write refused by storage while the GUI already shows the new
+  value.
+- An import applying some keys and not others.
+- A rejected input dirtying storage.
+- A policy change not reaching an open tab.
+- The story-layer chrome mock diverging from the real API.
+- An exported file the importer refuses.
+- A rendering readable in one theme only.
+- A page listener the page can no longer remove because the hook
+  wrapped it.
 
 ## Sub-claims
 
@@ -79,8 +91,8 @@ file the importer refuses; a rendering readable in one theme only.
 | C1.15 | Killed text lands on a frame-local ring: chained kills concatenate in readline order, Ctrl+Y yanks the newest entry, Alt+Y rotates with verified replacement, a password kill is never stored, and an empty-ring Ctrl+Y leaves the native key untouched |
 | C1.16 | Word kills join the ring, character deletes remove whole graphemes without touching it, and both undo chords reach the native history |
 | C1.17 | Case operations recase exactly one word and land at its end, transpose-words drags the earlier word past the later, and Ctrl+K at a line end kills the newline joining the lines |
-| C1.19 | The opt-in entries ship unassigned: they match no keystroke, take no part in conflict detection, render grayed with `—` as current, bind through the row's capture and reach the content script, and return to unassigned on reset; kill whole field empties the field onto the ring, accept line submits an input's form and breaks a textarea line, open line breaks the line and keeps the caret before it |
 | C1.18 | The reclaimed chords route by focus: assigned Ctrl+W rubs out a whitespace word inside a field and still closes the tab outside one, Ctrl+T transposes graphemes inside and still opens a tab outside — interception itself rests on the recorded manual measurement. The keymap table carries a row per chord that reads its binding from `chrome.commands`, grays an unassigned one, and reaches Chrome's shortcuts page, which a link cannot |
+| C1.19 | The opt-in entries ship unassigned: they match no keystroke, take no part in conflict detection, render grayed with `—` as current, bind through the row's capture and reach the content script, and return to unassigned on reset; kill whole field empties the field onto the ring, accept line submits an input's form and breaks a textarea line, open line breaks the line and keeps the caret before it |
 
 ## Traceability
 
@@ -125,13 +137,6 @@ Frozen observations; each holds only for its date.
 - 2026-08-16, Ctrl+Shift+9 under Playwright's `press` reports
   `KeyboardEvent.key === "9"`, not `"("` — the stored-chord
   assertions depend on this.
-- 2026-09-05, a reserved chord can be reclaimed through the commands
-  API: in a real Chrome, chrome://extensions/shortcuts accepted a
-  manual `Ctrl+W` assignment for an extension command, and with a
-  text field focused the chord reached the command instead of
-  closing the tab (experiments/commands-probe, maintainer-observed,
-  badge evidence). The harness cannot reproduce this — CDP keys skip
-  the accelerator path — so it stays a manually measured fact.
 - 2026-08-17, the kill operations destroy their text unrecoverably:
   in Playwright Chromium with the built extension, type, Ctrl+A,
   Ctrl+K, then Ctrl+Z leaves the field empty, while a native
@@ -145,6 +150,13 @@ Frozen observations; each holds only for its date.
   `historyUndo`) and the deletion undoes. With an EMPTY selection,
   `delete` acts as Backspace and removes one character — any rework
   built on it must not call it with an empty kill region.
+- 2026-08-20, CDP-injected keys never reach Chrome's browser-
+  accelerator handling on Windows and Linux (the native-event
+  builder exists only for mac/ios, so injected events carry
+  `skip_if_unhandled`), so whether a page handler can cancel a
+  browser accelerator such as Alt+D is outside what this harness can
+  ever test; the existing green runs for Ctrl+U and Alt+F prove
+  nothing about interception, only real-browser use does.
 - 2026-08-27, mutation panel over the kill ring, run before and after
   the yank-pop remediation. M1, the password kill stored anyway:
   red in three unit tests. M2, the yank-pop text check forced true:
@@ -167,6 +179,13 @@ Frozen observations; each holds only for its date.
   `killring.ts` and `yank.ts` have NO behavioral test — garbage
   collection cannot be forced from a test, so no assertion can tell a
   weak reference from a strong one, and that fix rests on reading.
+- 2026-09-05, a reserved chord can be reclaimed through the commands
+  API: in a real Chrome, chrome://extensions/shortcuts accepted a
+  manual `Ctrl+W` assignment for an extension command, and with a
+  text field focused the chord reached the command instead of
+  closing the tab (experiments/commands-probe, maintainer-observed,
+  badge evidence). The harness cannot reproduce this — CDP keys skip
+  the accelerator path — so it stays a manually measured fact.
 - 2026-09-05, `event.key` for the chords v0.0.5 adds, read off
   `keydown` on a focused text input in Playwright Chromium
   (`channel: "chromium"`, headless): Alt+Backspace reports
@@ -235,18 +254,23 @@ Frozen observations; each holds only for its date.
   no error anywhere. Fixed by duplicating the two command-name
   strings and pinning them from a test instead; `dist/service.js` and
   `dist/content.js` hash identically to the pre-change build.
-- 2026-08-20, CDP-injected keys never reach Chrome's browser-
-  accelerator handling on Windows and Linux (the native-event
-  builder exists only for mac/ios, so injected events carry
-  `skip_if_unhandled`), so whether a page handler can cancel a
-  browser accelerator such as Alt+D is outside what this harness can
-  ever test; the existing green runs for Ctrl+U and Alt+F prove
-  nothing about interception, only real-browser use does.
+- 2026-09-09, the page hook made every page keydown listener
+  unremovable. Counted in Playwright Chromium with the built
+  extension: a listener registered on `document`, a `handleEvent`
+  object and a capture listener on an input each kept firing after
+  `removeEventListener` — invocations rose by one per press — while
+  the same probe without the extension stopped at the count before
+  removal. `once: true` was unaffected, since the platform removes the
+  wrapper itself. Cause: `addEventListener` was patched to register a
+  wrapper and `removeEventListener` was not, so the page's reference
+  matched nothing. A user-visible form: a page cancelling Ctrl+V only
+  while a dialog is open kept cancelling it after the dialog closed,
+  until reload.
 
 ## Verification and validation
 
 The table above verifies: built as decided. Whether the decisions
-are right — whether twenty bindings, first-match policy and a JSON
+are right — whether these bindings, first-match policy and a JSON
 file are what a vimmer wants — is validated only by use; the README's
 planned section is the current answer, not a test.
 
@@ -260,6 +284,6 @@ planned section is the current answer, not a test.
 | R4 | Test sensitivity outside the deliberate-violation checks the measurement records list: a test that cannot fail would count as evidence here without being any |
 | R5 | An orphaned content script after an extension update or reload: Chrome leaves the old script's DOM listeners in place, so a binding can run twice until the page reloads — reproducing an update in the harness is not automated |
 | R6 | The 102,400-byte total sync quota; only the 8 KB per-item limit is exercised |
-| R7 | Interception of browser accelerators (Alt+F today, Alt+D if adopted): Chromium's source lists them outside the reserved set, but the harness cannot exercise that path (see the 2026-08-20 record), so the claim rests on real-browser use, not on a test |
+| R7 | Interception of browser accelerators (Alt+F and Alt+D among the shipped chords): Chromium's source lists them outside the reserved set, but the harness cannot exercise that path (see the 2026-08-20 record), so the claim rests on real-browser use, not on a test |
 | R8 | Everything A8 excludes, silently: on macOS the Alt bindings never match and Cmd+key can reach a binding as if unmodified; on AltGr layouts a Ctrl+Alt chord reaches the matcher with both modifiers set. No macOS runner exists in CI |
 | R9 | Interception of the two reclaimed chords, and the browser-action arm that follows from it. C1.18's e2e evidence drives the MESSAGE path — the same run-operation message the command handler sends — because a reserved chord cannot be pressed under CDP (see R7 and the 2026-08-20 record). That the chord reaches the command at all, and that `tabs.remove`/`tabs.create` then run in its place, rests on the 2026-09-05 manual measurement, and the unfocused half of that measurement is itself unrecorded |

@@ -10,7 +10,8 @@ record names the files it concerns and is frozen when written.
 - [ADR-0003](0003-content-script-iife-build.md) — the content script
   is a separate IIFE build
 - [ADR-0004](0004-keymap-override-layers.md) — keymap overrides
-  layer as default < lua < gui; only the GUI rejects conflicts
+  layer as default < lua < gui; only the GUI rejects conflicts (the
+  Lua layer is dormant since ADR-0008)
 - [ADR-0005](0005-contenteditable-support.md) — contenteditable
   support is opt-in and Selection-based
 - [ADR-0006](0006-inspector-never-dispatches.md) — the inspector

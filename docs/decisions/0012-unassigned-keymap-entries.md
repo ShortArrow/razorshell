@@ -5,12 +5,13 @@ Status: accepted
 
 ## Context
 
-readline's line discard, accept-line and Emacs' open-line sit on
-Ctrl+C, Ctrl+J and Ctrl+O. In Chrome those chords are copy, the
-downloads page and the open-file dialog. None is a reserved chord:
-unlike Ctrl+W and Ctrl+T (ADR-0011) the keydown reaches the page,
-and a content script can cancel it the way Ctrl+D and Ctrl+H are
-already cancelled inside a text field. The commands API route is
+Three readline and Emacs operations sit on chords Chrome already
+uses: the line discard on Ctrl+C (copy), accept-line on Ctrl+J (the
+downloads page) and Emacs' open-line on Ctrl+O (the open-file
+dialog). None is a reserved chord: unlike Ctrl+W and Ctrl+T
+(ADR-0011) the keydown reaches the page, and a content script can
+cancel it the way Ctrl+D and Ctrl+H are already cancelled inside a
+text field. The commands API route is
 therefore not needed, and the two-arm "pay back the browser action"
 routing does not apply — outside a text field the extension never
 sees these keys as its own.
@@ -56,7 +57,7 @@ to nothing". Every entry carries a chord and matches it.
     inserted at the caret and the caret stays before it. In an input,
     which cannot hold a newline, nothing happens and the key is left
     to the browser.
-- Ctrl+Shift+O is not among them.
+- Ctrl+Shift+O is not among them (see the alternatives).
 
 ## Criteria
 
@@ -72,3 +73,32 @@ list so that the README, the default column and the assignment
 capture all read the same value, and `test/readmekeymap.test.ts`
 keeps the README in step with it exactly as it does for the bound
 defaults.
+
+## Alternatives rejected
+
+- Shipping the three bound by default, as Ctrl+D and Ctrl+H are:
+  those two shadow the bookmark and history shortcuts, which a user
+  rarely reaches for inside a text field. Copy is reached for
+  constantly, and the Ctrl+V probe showed how a taken chord reads.
+- Routing them through the commands API like Ctrl+W and Ctrl+T: the
+  keydown already reaches the page, so the route buys nothing, and
+  the shortcuts-page assignment is one Chrome keeps after an
+  uninstall.
+- An `open_line_above` on Ctrl+Shift+O, after vim's `O`: readline
+  and Emacs bind nothing there, and Ctrl+A then Ctrl+O already opens
+  a line above with the caret on it, as Ctrl+E then Ctrl+J opens one
+  below. A dedicated chord would save one keystroke.
+- Contenteditable counterparts for accept-line and open-line: a
+  rich-text editor owns Enter (paragraph splitting, list
+  continuation), and a newline inserted from outside bypasses all of
+  it. Kill whole field has a counterpart; the other two leave the
+  chord to the host editor.
+
+## Cost
+
+A fourth state for a keymap row. The table, the merge, the conflict
+check, the inspector and the README test each carry a branch for it,
+and a new entry has to decide which way it ships. An assigned opt-in
+chord travels in exports as an ordinary override, so a config applied
+on another machine takes copy away there too; that is the same trade
+the user made once, carried with the rest of their settings.

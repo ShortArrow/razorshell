@@ -50,3 +50,7 @@
   script ignores untrusted ones.
 - Why-decisions go to `docs/decisions/` as one-page ADRs; changes go
   to `docs/CHANGELOG.md` under Unreleased, in its terse style.
+- Commits split structure from behaviour (a structural commit keeps
+  every test green without editing one). The subject is an
+  imperative sentence, the body one or two sentences of why, naming
+  the ADR by title when one carries the decision.
