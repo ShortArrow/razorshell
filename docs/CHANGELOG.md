@@ -17,6 +17,14 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   the chord to take one; reset gives the browser key back. See
   [ADR-0012](decisions/0012-unassigned-keymap-entries.md).
 
+### Changed
+
+- The README is reorganised around what a reader does: install, the
+  bindings by how they ship (bound, opt-in, assigned in Chrome, not
+  implemented), the options page, the inspector and the limits. The
+  planned table drops Ctrl+C, which the opt-in kill whole field now
+  covers, and the rows that named no operation.
+
 ### Fixed
 
 - A page could not take its own keydown listeners back out while the
@@ -109,7 +117,6 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   the v0.0.4 plan measured — kills are unrecoverable today, what
   execCommand does and does not do, and why accelerator interception
   can only ever be verified in a real browser.
-
 - Every shipped PNG — the four extension icons and the README banner
   — regenerates from its committed SVG source through the asset
   generator, and image/promotion.svg is written from the same
@@ -125,7 +132,6 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   tripped through the importer so the file it hands out is one Apply
   accepts by construction.
 - The theme toggle sits centered at the top of the options page.
-
 - URL rules: each rule pairs a pattern (exact, glob or regex) with an
   allow or deny action. Rules apply in list order and unmatched pages
   follow a configurable default action (ADR-0001). The options page
