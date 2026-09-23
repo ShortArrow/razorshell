@@ -113,3 +113,54 @@ describe("the inspector report follows removal @C1.13", () => {
     target.remove();
   });
 });
+
+/**
+ * The registrations list holds its target and listener weakly so an element the
+ * page has discarded is not kept alive by the hook for the life of the frame.
+ * That fix has no behavioral test — garbage collection cannot be forced from a
+ * test, so no assertion can tell a weak reference from a strong one. Reviewers
+ * must check this one by reading it. What is testable is the other half: a
+ * registration the platform itself drops, which is what `{ once: true }` makes
+ * happen without waiting for a collection.
+ */
+describe("the hook holds no page element @C1.13", () => {
+  function reportSources(target: EventTarget): string[] {
+    let sources: string[] = [];
+    const onResult = (event: Event) => {
+      sources = (JSON.parse((event as CustomEvent<string>).detail) as { sources: string[] }).sources;
+    };
+    document.addEventListener("razorshell-inspect-result", onResult);
+    target.dispatchEvent(new CustomEvent("razorshell-inspect-query", { bubbles: true }));
+    document.removeEventListener("razorshell-inspect-result", onResult);
+    return sources;
+  }
+
+  test("a once listener drops out of the report after it fires", () => {
+    const target = document.createElement("input");
+    document.body.appendChild(target);
+    let calls = 0;
+    const listener = function markerListenerForOnceTest(): void {
+      calls += 1;
+    };
+    target.addEventListener("keydown", listener, { once: true });
+    expect(reportSources(target).some((s) => s.includes("markerListenerForOnceTest"))).toBe(true);
+    pressKey(target);
+    expect(calls).toBe(1);
+    expect(reportSources(target).some((s) => s.includes("markerListenerForOnceTest"))).toBe(false);
+    pressKey(target);
+    expect(calls).toBe(1);
+    target.remove();
+  });
+
+  test("a once listener removed before firing is gone from the report", () => {
+    const target = document.createElement("input");
+    document.body.appendChild(target);
+    const listener = function markerListenerForOnceRemovalTest(): void {};
+    target.addEventListener("keydown", listener, { once: true });
+    target.removeEventListener("keydown", listener);
+    expect(reportSources(target).some((s) => s.includes("markerListenerForOnceRemovalTest"))).toBe(
+      false,
+    );
+    target.remove();
+  });
+});

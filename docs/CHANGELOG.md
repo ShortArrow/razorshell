@@ -31,6 +31,12 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ### Fixed
 
+- The page hook held every element the page ever put a keydown
+  listener on, keeping it and its subtree alive for the life of the
+  document. Targets and listeners are now held through `WeakRef`, and
+  a `FinalizationRegistry` drops the record once the target is
+  collected; a `{ once: true }` listener drops out of the inspector's
+  report after it fires.
 - A page could not take its own keydown listeners back out while the
   extension was loaded: the page hook wrapped what `addEventListener`
   received but left `removeEventListener` looking for the unwrapped
