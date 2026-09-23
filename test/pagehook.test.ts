@@ -164,3 +164,53 @@ describe("the hook holds no page element @C1.13", () => {
     target.remove();
   });
 });
+
+/**
+ * The hook sits inside every `addEventListener` call a page makes, so a page
+ * shape the hook did not expect must not turn into an exception the page never
+ * threw before. Measured 2026-09-23 on the built hook: a listener whose
+ * `toString` throws made the page's `addEventListener` throw, and calling the
+ * method on a non-object raised "WeakRef: invalid target" where the platform
+ * raises its own TypeError.
+ */
+describe("the hook never throws where the platform would not @C1.13", () => {
+  test("a listener whose toString throws is registered and runs", () => {
+    const target = document.createElement("input");
+    let calls = 0;
+    const listener = function markerListenerForToStringTest(): void {
+      calls += 1;
+    };
+    listener.toString = () => {
+      throw new Error("no source for you");
+    };
+    expect(() => target.addEventListener("keydown", listener)).not.toThrow();
+    pressKey(target);
+    expect(calls).toBe(1);
+  });
+
+  test("a null or undefined receiver is the global object, as the platform reads it", () => {
+    const add = EventTarget.prototype.addEventListener;
+    const remove = EventTarget.prototype.removeEventListener;
+    for (const receiver of [null, undefined]) {
+      const listener = vi.fn();
+      expect(() => add.call(receiver, "keydown", listener)).not.toThrow();
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "x" }));
+      expect(listener).toHaveBeenCalledTimes(1);
+      remove.call(receiver, "keydown", listener);
+    }
+  });
+
+  test("a primitive receiver raises the platform's own error, not a WeakRef one", () => {
+    const add = EventTarget.prototype.addEventListener;
+    for (const receiver of [1, "x"]) {
+      let message = "";
+      try {
+        add.call(receiver, "keydown", () => {});
+      } catch (error) {
+        message = error instanceof Error ? error.message : String(error);
+      }
+      expect(message).not.toBe("");
+      expect(message).not.toContain("WeakRef");
+    }
+  });
+});
