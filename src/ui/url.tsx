@@ -2,29 +2,11 @@ import { useEffect, useState } from 'react';
 import { ChevronDownIcon, ChevronUpIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { getMessage } from '../languages';
 import { loadUrlPolicy, saveUrlPolicy, subscribeUrlPolicy } from '../urlpolicy';
-import { MatchType, RuleAction, UrlPolicy, UrlRule, defaultUrlPolicy, findMatchingRuleIndex } from '../urlrules';
+import { MatchType, RuleAction, UrlPolicy, UrlRule, defaultUrlPolicy, findMatchingRuleIndex, patternRejection } from '../urlrules';
 import { Select } from './select';
 
 const matchTypes: MatchType[] = ['exact', 'glob', 'regex'];
 const ruleActions: RuleAction[] = ['allow', 'deny'];
-
-/**
- * @fn patternRejection
- * @brief Judge a pattern about to be added, naming why it cannot become a rule.
- * @param string pattern - The pattern as typed
- * @param MatchType matchType - The match type selected beside it
- * @return The message to show, or '' when the pattern is acceptable
- */
-function patternRejection(pattern: string, matchType: MatchType): string {
-  if (pattern.trim() === '') return 'pattern is empty';
-  if (matchType !== 'regex') return '';
-  try {
-    new RegExp(pattern);
-    return '';
-  } catch {
-    return 'invalid regular expression';
-  }
-}
 
 function swapped(rules: UrlRule[], index: number, target: number): UrlRule[] {
   const next = [...rules];
@@ -77,8 +59,8 @@ export function UrlApp() {
 
   const addRule = () => {
     const rejection = patternRejection(pattern, matchType);
-    setPatternError(rejection);
-    if (rejection !== '') return;
+    setPatternError(rejection ?? '');
+    if (rejection !== null) return;
     applyPolicy({ ...policy, rules: [...policy.rules, { pattern, matchType, action }] });
     setPattern('');
   };
@@ -138,7 +120,7 @@ export function UrlApp() {
         </div>
         <button className='btn btn-primary join-item' onClick={addRule}>add rule</button>
       </div>
-      {patternError === '' ? null : <p className='text-error'>{patternError}</p>}
+      {patternError === '' ? null : <p className='text-error' data-testid='pattern-error'>{patternError}</p>}
       <div className='flex items-center gap-2'>
         <div className='tooltip tooltip-top grow' data-tip={getMessage('tooltip_url_probe')()}>
           <input
@@ -180,11 +162,15 @@ export function UrlApp() {
           {
             policy.rules.map((rule, index) => {
               const matched = index === probedIndex;
+              const warning = patternRejection(rule.pattern, rule.matchType);
               return <tr key={index} className={matched ? 'bg-base-200' : undefined} data-matched={matched ? 'true' : undefined}>
                 <td>{index + 1}</td>
                 <td><span className={actionBadgeClass(rule.action)}>{rule.action}</span></td>
                 <td><span className='badge badge-outline'>{rule.matchType}</span></td>
-                <td><code>{rule.pattern}</code></td>
+                <td>
+                  <code>{rule.pattern}</code>
+                  {warning === null ? null : <p className='text-warning text-sm m-0' data-testid={`rule-warning-${index}`}>{warning}</p>}
+                </td>
                 <td className='flex items-center gap-2'>
                   <button
                     className='btn btn-outline btn-xs'

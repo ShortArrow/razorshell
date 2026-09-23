@@ -31,6 +31,16 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ### Fixed
 
+- A regex URL rule that repeats a repeating group, `(x+x+)+y` being
+  the classic shape, could hang the frame it was tested against for
+  as long as the tab lived. Such a pattern is now refused with its
+  reason when it is typed and when an imported file carries it. A
+  rule already in storage from an older version keeps matching and is
+  flagged with the reason in the rules table. A repetition that ends
+  on a fixed separator the inner quantifiers cannot match, as in
+  `^https://(\w+\.)+example\.com/`, is accepted. A regex longer than
+  512 characters is refused the same way; glob and exact patterns
+  have no length cap.
 - The content script no longer answers a page asking for its state.
   The `razorshell-status` event told any script on the page whether
   razorshell was enabled there and whether contenteditable was opted

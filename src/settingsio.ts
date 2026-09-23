@@ -6,7 +6,7 @@
 import { availableLocales, normalizeLocale } from "./i18n";
 import { defaultKeymap } from "./keymap";
 import { Chord } from "./keymapmerge";
-import { MatchType, RuleAction, UrlPolicy, UrlRule } from "./urlrules";
+import { MatchType, RuleAction, UrlPolicy, UrlRule, patternRejection } from "./urlrules";
 
 export interface SettingsFile {
   version: 1;
@@ -76,9 +76,13 @@ function parseVersion(value: unknown): 1 {
 
 function parseRule(value: unknown, index: number): UrlRule {
   const rule = asRecord(value, `urlPolicy.rules[${index}]`);
+  const pattern = asString(rule.pattern, `urlPolicy.rules[${index}].pattern`);
+  const matchType = asMember(rule.matchType, matchTypes, `urlPolicy.rules[${index}].matchType`);
+  const rejection = patternRejection(pattern, matchType);
+  if (rejection !== null) reject(`urlPolicy.rules[${index}].pattern ${rejection}`);
   return {
-    pattern: asString(rule.pattern, `urlPolicy.rules[${index}].pattern`),
-    matchType: asMember(rule.matchType, matchTypes, `urlPolicy.rules[${index}].matchType`),
+    pattern,
+    matchType,
     action: asMember(rule.action, ruleActions, `urlPolicy.rules[${index}].action`),
   };
 }

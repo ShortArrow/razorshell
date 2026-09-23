@@ -100,6 +100,46 @@ export const InvalidPattern: Story = {
   },
 };
 
+export const CatastrophicPattern: Story = {
+  tags: ['@C1.7'],
+  decorators: [seededStory({})],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.selectOptions(
+      await canvas.findByLabelText(getMessage('tooltip_match_type')()), 'regex');
+    await userEvent.type(canvas.getByPlaceholderText('pattern'), '(x+x+)+y');
+    await userEvent.click(canvas.getByRole('button', { name: 'add rule' }));
+
+    await expect(await canvas.findByTestId('pattern-error')).toHaveTextContent('repeats a group');
+    // A pattern that can hang the matcher must not reach storage, where the
+    // content script would compile it on every navigation.
+    await expect(storedValue<UrlPolicy>('urlPolicy')).toBeUndefined();
+    (document.activeElement as HTMLElement | null)?.blur();
+  },
+};
+
+export const StoredRuleWarned: Story = {
+  tags: ['@C1.7'],
+  decorators: [seededStory({
+    urlPolicy: {
+      defaultAction: 'allow',
+      rules: [{ pattern: '(x+x+)+y', matchType: 'regex', action: 'deny' }],
+    } satisfies UrlPolicy,
+  })],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(await canvas.findByTestId('rule-warning-0')).toHaveTextContent('repeats a group');
+    // An earlier version stored the rule, and it keeps running; the warning
+    // only tells the user why import or retyping would now refuse it.
+    await expect(canvas.getByText('(x+x+)+y')).toBeInTheDocument();
+    await expect(storedValue<UrlPolicy>('urlPolicy')?.rules)
+      .toEqual([{ pattern: '(x+x+)+y', matchType: 'regex', action: 'deny' }]);
+    (document.activeElement as HTMLElement | null)?.blur();
+  },
+};
+
 const oneRule: UrlPolicy = {
   defaultAction: 'allow',
   rules: [{ pattern: 'https://example.com/secret', matchType: 'exact', action: 'deny' }],

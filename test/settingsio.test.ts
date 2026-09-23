@@ -111,6 +111,12 @@ describe("parseSettings rejects @C1.7", () => {
   test("a non-boolean enableContentEditable", () => {
     expectError('{"version":1,"enableContentEditable":"yes"}', "enableContentEditable");
   });
+  test("a regex rule that repeats a repeating group, naming the rule", () => {
+    expectError(
+      '{"version":1,"urlPolicy":{"defaultAction":"allow","rules":[{"pattern":"(x+x+)+y","matchType":"regex","action":"deny"}]}}',
+      "urlPolicy.rules[0].pattern",
+    );
+  });
 });
 
 describe("parseSettings accepts", () => {
@@ -121,5 +127,35 @@ describe("parseSettings accepts", () => {
   test("auto as a language", () => {
     const result = parseSettings('{"version":1,"language":"auto"}');
     expect(result.ok).toBe(true);
+  });
+  test("the same text as a glob pattern, which is not a regular expression", () => {
+    const result = parseSettings(
+      '{"version":1,"urlPolicy":{"defaultAction":"allow","rules":[{"pattern":"(x+x+)+y","matchType":"glob","action":"deny"}]}}',
+    );
+    expect(result.ok).toBe(true);
+  });
+  test("a legacy exact rule longer than 512 characters is accepted", () => {
+    const pattern = "https://example.com/" + "a".repeat(580);
+    const result = parseSettings(JSON.stringify({
+      version: 1,
+      urlPolicy: { defaultAction: "allow", rules: [{ pattern, matchType: "exact", action: "deny" }] },
+    }));
+    expect(pattern).toHaveLength(600);
+    expect(result.ok).toBe(true);
+  });
+  test("a subdomain regex ending on a dot is accepted", () => {
+    const result = parseSettings(
+      '{"version":1,"urlPolicy":{"defaultAction":"allow","rules":[{"pattern":"^https://(\\\\w+\\\\.)+example\\\\.com/","matchType":"regex","action":"deny"}]}}',
+    );
+    expect(result).toEqual({
+      ok: true,
+      settings: {
+        version: 1,
+        urlPolicy: {
+          defaultAction: "allow",
+          rules: [{ pattern: "^https://(\\w+\\.)+example\\.com/", matchType: "regex", action: "deny" }],
+        },
+      },
+    });
   });
 });

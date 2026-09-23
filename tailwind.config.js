@@ -6,6 +6,8 @@ const lightStatusColors = {
   'success-content': 'oklch(96% 0.03 150)',
   error: 'oklch(49.12% 0.19 27)',
   'error-content': 'oklch(89.82% 0.04 27)',
+  warning: 'oklch(49.12% 0.12 70)',
+  'warning-content': 'oklch(96% 0.03 70)',
   '--tooltip-color': 'oklch(94% 0.005 260)',
   '--tooltip-text-color': 'oklch(25% 0.02 260)',
 }

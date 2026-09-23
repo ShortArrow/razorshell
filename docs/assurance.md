@@ -69,6 +69,8 @@ says they keep their native behavior.
 - A rendering readable in one theme only.
 - A page listener the page can no longer remove because the hook
   wrapped it.
+- A shared settings file carrying a catastrophic regex or a
+  typing-key chord.
 
 ## Sub-claims
 
@@ -80,7 +82,7 @@ says they keep their native behavior.
 | C1.4 | Same-document navigations re-evaluate the policy |
 | C1.5 | A rebind reaches storage in full chord form, open tabs, and a restarted browser; a conflict is refused without touching storage; per-row reset clears only its row; reset-all empties storage and unbinds the chord in an open tab |
 | C1.6 | An import is atomic: a refused write applies none of its keys, in the mock and in real Chrome |
-| C1.7 | Malformed or invalid input is rejected with the reason, leaves storage identical, and a corrected apply then succeeds |
+| C1.7 | Malformed or invalid input is rejected with the reason, leaves storage identical, and a corrected apply then succeeds; a regex pattern that repeats a repeating group, `(x+x+)+y` in its classic shape, unless each repetition ends on a fixed separator, or a regex over 512 characters, is refused when typed and when imported; one already in storage is flagged in the rules table, not disabled |
 | C1.8 | Every export re-parses through the importer |
 | C1.9 | A refused write is shown beside the control and the view rolls back to what storage kept, in every settings section |
 | C1.10 | The options page renders both themes with zero axe violations and zero undecided results |
@@ -287,4 +289,5 @@ planned section is the current answer, not a test.
 | R7 | Interception of browser accelerators (Alt+F and Alt+D among the shipped chords): Chromium's source lists them outside the reserved set, but the harness cannot exercise that path (see the 2026-08-20 record), so the claim rests on real-browser use, not on a test |
 | R8 | Everything A8 excludes, silently: on macOS the Alt bindings never match and Cmd+key can reach a binding as if unmodified; on AltGr layouts a Ctrl+Alt chord reaches the matcher with both modifiers set. No macOS runner exists in CI |
 | R9 | Interception of the two reclaimed chords, and the browser-action arm that follows from it. C1.18's e2e evidence drives the MESSAGE path — the same run-operation message the command handler sends — because a reserved chord cannot be pressed under CDP (see R7 and the 2026-08-20 record). That the chord reaches the command at all, and that `tabs.remove`/`tabs.create` then run in its place, rests on the 2026-09-05 manual measurement, and the unfocused half of that measurement is itself unrecorded |
+| R10 | Regex patterns whose backtracking blows up through alternation rather than a nested quantifier. The guard is a shape heuristic: it reads a group holding a quantifier and repeated without an upper bound, so `(a\|aa)+` and its relatives pass it and can still take the frame away. The separator rule is syntactic too: it accepts a repeated group only when the body ends on an unquantified separator that no quantified atom in the body can match, and reads no further into what the pattern matches. A stored rule the guard would refuse, from an older version or written into storage directly, still runs and can take the frame away; the rules table flags it. The 512-character cap bounds how large such a pattern can be, not how long it runs |
 | R11 | The page hook's prototype patches and `razorshell-inspect-*` events stay installed on pages the URL policy denies, so a page can detect the extension by them even where no binding will ever run. Taking the hook off those pages needs dynamic content-script registration, which is not decided |

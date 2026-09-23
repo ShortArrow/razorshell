@@ -4,6 +4,7 @@ import {
   resolveAction,
   findMatchingRuleIndex,
   migrateLegacyUrls,
+  patternRejection,
   defaultUrlPolicy,
   UrlPolicy,
 } from "../src/urlrules";
@@ -130,5 +131,71 @@ describe("defaultUrlPolicy", () => {
   test("is allow-everything with no rules", () => {
     expect(defaultUrlPolicy).toEqual({ defaultAction: "allow", rules: [] });
     expect(resolveAction("https://anything.example/", defaultUrlPolicy)).toBe("allow");
+  });
+});
+
+describe("patternRejection guards what a rule may compile @C1.7", () => {
+  const repeatedGroup = "regular expression repeats a group that itself repeats, which can take forever to evaluate; end each repetition on a fixed separator such as `\\.` or write it without the inner quantifier";
+  const tooLong = "pattern is longer than 512 characters";
+
+  test.each([
+    ["a repeated group whose body repeats", "(x+x+)+y", repeatedGroup],
+    ["a starred group around a quantified body", "^(\\w+\\s?)*$", repeatedGroup],
+    ["subdomain labels each ending on a dot", "^https://(\\w+\\.)+example\\.com/", null],
+    ["a starred label class ending on a dot", "^https://([a-z0-9-]+\\.)*example\\.com/", null],
+    ["a non-capturing group ending on a dot", "^https://(?:www\\.)+example\\.com/", null],
+    ["digits each ending on a comma", "(\\d+,)+", null],
+    ["words each ending on a slash", "(\\w+/)+", null],
+    ["a negated class that can match the separator", "([^/]+\\.)+", repeatedGroup],
+    ["a class that contains the separator", "([a-z.]+\\.)+", repeatedGroup],
+    ["a dot that matches anything", "(.+\\.)+", repeatedGroup],
+    ["a body that does not end on a separator", "(a\\w+)+", repeatedGroup],
+    ["a separator that is itself quantified", "(\\w+\\.?)+", repeatedGroup],
+    ["a named group ending on a dot", "(?<host>\\w+\\.)+", null],
+    ["a bounded outer quantifier", "(a+){2}", null],
+    ["a repeated group with no inner quantifier", "(ab)+c", null],
+  ])("%s: %s", (_, pattern, expected) => {
+    expect(patternRejection(pattern, "regex")).toBe(expected);
+  });
+
+  test("an inner quantifier with no outer one is allowed", () => {
+    expect(patternRejection("(a+)b", "regex")).toBe(null);
+  });
+  test("a plus inside a character class is a literal", () => {
+    expect(patternRejection("[a+]+", "regex")).toBe(null);
+  });
+  test("escaped parentheses do not open a group", () => {
+    expect(patternRejection("\\(a+\\)+", "regex")).toBe(null);
+  });
+  test("the sample configuration's rule is allowed", () => {
+    expect(patternRejection("^https://[^/]*\\.example\\.com/", "regex")).toBe(null);
+  });
+  test("a regex that does not compile is refused", () => {
+    expect(patternRejection("(", "regex")).toBe("invalid regular expression");
+  });
+  test("a regex longer than 512 characters is refused", () => {
+    expect(patternRejection("a".repeat(513), "regex")).toBe(tooLong);
+  });
+  test("a regex of exactly 512 characters is allowed", () => {
+    expect(patternRejection("a".repeat(512), "regex")).toBe(null);
+  });
+  test("a glob longer than 512 characters is allowed", () => {
+    expect(patternRejection("a".repeat(513), "glob")).toBe(null);
+  });
+  test("an exact pattern longer than 512 characters is allowed", () => {
+    expect(patternRejection("https://example.com/" + "a".repeat(600), "exact")).toBe(null);
+  });
+  test("a blank pattern is refused", () => {
+    expect(patternRejection("   ", "exact")).toBe("pattern is empty");
+  });
+  test("glob text is not read as a regular expression", () => {
+    expect(patternRejection("(x+x+)+y", "glob")).toBe(null);
+  });
+  test("matchesRule runs a stored regex the guard would refuse", () => {
+    const refused = { pattern: "(x+x+)+y", matchType: "regex", action: "deny" } as const;
+    expect(matchesRule("https://a.b.c", refused)).toBe(false);
+    const subdomains = { pattern: "^https://([^/]+\\.)+example\\.com/", matchType: "regex", action: "deny" } as const;
+    expect(patternRejection(subdomains.pattern, "regex")).not.toBe(null);
+    expect(matchesRule("https://mail.example.com/", subdomains)).toBe(true);
   });
 });

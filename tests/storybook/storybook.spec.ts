@@ -92,6 +92,7 @@ const storyIds = [
   "options-urlapp--invalid-pattern",
   "options-urlapp--save-failure",
   "options-urlapp--empty-pattern",
+  "options-urlapp--stored-rule-warned",
   "inspect-toast--conflicts",
   "inspect-toast--no-conflicts",
   "inspect-toast--inspect-mode",
@@ -104,6 +105,8 @@ const excludedStoryIds = [
   "options-urlapp--move-rule-up",
   "options-urlapp--add-rule",
   "options-urlapp--remove-rule",
+  // ends as InvalidPattern, a refused pattern line
+  "options-urlapp--catastrophic-pattern",
   // ends as ProbeDefault with the other action
   "options-urlapp--default-action-change",
   // ends as the Default table, every opt-in row unassigned again
