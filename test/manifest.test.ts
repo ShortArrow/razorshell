@@ -15,11 +15,19 @@ import { describe, expect, test } from "vitest";
 
 const manifest = JSON.parse(
   readFileSync(join(__dirname, "..", "src", "manifest.json"), "utf8"),
-) as { permissions: string[]; host_permissions: string[] };
+) as { version: string; permissions: string[]; host_permissions: string[] };
+
+const packageJson = JSON.parse(
+  readFileSync(join(__dirname, "..", "package.json"), "utf8"),
+) as { version: string };
 
 describe("the shipped manifest", () => {
   test("the manifest asks for storage and hosts and nothing else", () => {
     expect(manifest.permissions).toEqual(["storage"]);
     expect(manifest.host_permissions).toEqual(["*://*/*"]);
+  });
+
+  test("package.json and the manifest carry the same version", () => {
+    expect(manifest.version).toBe(packageJson.version);
   });
 });

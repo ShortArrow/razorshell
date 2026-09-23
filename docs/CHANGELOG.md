@@ -6,6 +6,8 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ## [Unreleased]
 
+## [0.0.6] - 2026-09-23
+
 ### Added
 
 - Three opt-in bindings that ship UNASSIGNED, because their readline

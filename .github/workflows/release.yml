@@ -35,6 +35,13 @@ jobs:
 
       - run: pnpm test:e2e
 
+      - name: Check the tag matches the manifest
+        run: |
+          manifest="v$(node -p "require('./src/manifest.json').version")"
+          echo "tag: ${GITHUB_REF_NAME}"
+          echo "manifest: ${manifest}"
+          test "${GITHUB_REF_NAME}" = "${manifest}"
+
       - name: Package dist
         run: |
           cd dist
