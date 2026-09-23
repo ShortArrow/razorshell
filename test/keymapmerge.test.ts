@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { defaultKeymap } from "../src/keymap";
-import { mergeKeymap, findConflict } from "../src/keymapmerge";
+import { Chord, mergeKeymap, findConflict, typingKeyRefusal } from "../src/keymapmerge";
 import { Keymap } from "../src/operation";
 
 const opOne = () => {};
@@ -118,5 +118,37 @@ describe("an unassigned entry", () => {
   test("conflicts once assigned", () => {
     const merged = mergeKeymap(withUnassigned, { opt: { key: "c", ctrl: true } });
     expect(findConflict({ key: "c", ctrl: true }, merged, "one")).toBe("opt");
+  });
+});
+
+describe("typingKeyRefusal @C1.5", () => {
+  const refused: [string, Chord][] = [
+    ["a bare letter", { key: "e" }],
+    ["a shifted letter", { key: "E", shift: true }],
+    ["space", { key: " " }],
+    ["Enter", { key: "Enter" }],
+    ["Tab", { key: "Tab" }],
+    ["Backspace", { key: "Backspace" }],
+    ["Delete", { key: "Delete" }],
+    ["a digit", { key: "9" }],
+  ];
+  const allowed: [string, Chord][] = [
+    ["a navigation key", { key: "Home" }],
+    ["a function key", { key: "F2" }],
+    ["Escape", { key: "Escape" }],
+    ["a letter held with Ctrl", { key: "e", ctrl: true }],
+    ["a letter held with Alt", { key: "e", alt: true }],
+    ["Backspace held with Alt", { key: "Backspace", alt: true }],
+    ["punctuation held with Ctrl and Shift", { key: "_", ctrl: true, shift: true }],
+  ];
+
+  test.each(refused)("refuses %s", (_name, chord) => {
+    const reason = typingKeyRefusal(chord);
+    expect(reason).toContain("shadow typing");
+    expect(reason).toContain(chord.key);
+  });
+
+  test.each(allowed)("allows %s", (_name, chord) => {
+    expect(typingKeyRefusal(chord)).toBe(null);
   });
 });

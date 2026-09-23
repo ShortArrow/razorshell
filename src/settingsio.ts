@@ -5,7 +5,7 @@
 
 import { availableLocales, normalizeLocale } from "./i18n";
 import { defaultKeymap } from "./keymap";
-import { Chord } from "./keymapmerge";
+import { Chord, typingKeyRefusal } from "./keymapmerge";
 import { MatchType, RuleAction, UrlPolicy, UrlRule, patternRejection } from "./urlrules";
 
 export interface SettingsFile {
@@ -108,6 +108,8 @@ function parseChord(value: unknown, id: string): Chord {
       `keymapOverrides.${id}.${modifier}`,
     );
   }
+  const refusal = typingKeyRefusal(chord);
+  if (refusal !== null) reject(`keymapOverrides.${id} ${refusal}`);
   return chord;
 }
 

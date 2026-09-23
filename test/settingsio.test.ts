@@ -117,6 +117,18 @@ describe("parseSettings rejects @C1.7", () => {
       "urlPolicy.rules[0].pattern",
     );
   });
+  test("an override on a plain typing key, naming the id", () => {
+    expectError(
+      '{"version":1,"keymapOverrides":{"move_cursor_to_the_beginning":{"key":"e"}}}',
+      "keymapOverrides.move_cursor_to_the_beginning",
+    );
+  });
+  test("an override on a plain typing key, saying it would shadow typing", () => {
+    expectError(
+      '{"version":1,"keymapOverrides":{"move_cursor_to_the_beginning":{"key":"e"}}}',
+      "shadow typing",
+    );
+  });
 });
 
 describe("parseSettings accepts", () => {
@@ -156,6 +168,15 @@ describe("parseSettings accepts", () => {
           rules: [{ pattern: "^https://(\\w+\\.)+example\\.com/", matchType: "regex", action: "deny" }],
         },
       },
+    });
+  });
+  test("an override on a key that does not type", () => {
+    const result = parseSettings(
+      '{"version":1,"keymapOverrides":{"move_cursor_to_the_beginning":{"key":"Home"}}}',
+    );
+    expect(result).toEqual({
+      ok: true,
+      settings: { version: 1, keymapOverrides: { move_cursor_to_the_beginning: { key: "Home" } } },
     });
   });
 });

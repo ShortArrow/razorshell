@@ -145,6 +145,102 @@ export const ConflictThenRecover: Story = {
   },
 };
 
+/**
+ * A chord with no Ctrl or Alt is refused before it reaches storage, because a
+ * bare letter bound to a cursor move would take over typing that letter in
+ * every field the content script watches.
+ */
+export const TypingKeyThenRecover: Story = {
+  tags: ['@C1.5'],
+  loaders: [() => loadOverrides({})],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.click(await canvas.findByTestId('rebind-move_cursor_to_the_beginning'));
+    await userEvent.keyboard('e');
+
+    await expect(await canvas.findByTestId('typing-move_cursor_to_the_beginning'))
+      .toHaveTextContent('shadow typing');
+    const current = canvas.getByTestId('current-move_cursor_to_the_beginning');
+    await expect(current).toHaveTextContent('Ctrl');
+    await expect(current).toHaveTextContent('a');
+    await expect(storedValue<Record<string, Chord>>('keymapOverrides')).toBeUndefined();
+
+    await userEvent.click(canvas.getByTestId('rebind-move_cursor_to_the_beginning'));
+    await userEvent.keyboard('{Control>}m{/Control}');
+
+    const rebound = canvas.getByTestId('current-move_cursor_to_the_beginning');
+    await waitFor(() => expect(rebound).toHaveTextContent('m'));
+    await expect(rebound).toHaveTextContent('Ctrl');
+    // A refusal that outlives the correction reads as though the held chord
+    // was refused too.
+    await expect(canvas.getByTestId('keymap-no-conflict')).toBeEmptyDOMElement();
+    await waitFor(() => expect(storedValue<Record<string, Chord>>('keymapOverrides')).toEqual({
+      move_cursor_to_the_beginning: { key: 'm', ctrl: true, alt: false, shift: false },
+    }));
+    (document.activeElement as HTMLElement | null)?.blur();
+  },
+};
+
+const endOverride: Record<string, Chord> = {
+  move_cursor_to_the_end: { key: 'p', ctrl: true, alt: false, shift: false },
+};
+
+/**
+ * A reset clears the refusal line along with the override.
+ *
+ * The line is the only thing naming a refused chord, so one left standing after
+ * an unrelated reset reads as a live problem with a row the user just fixed.
+ * The reset is clicked on a DIFFERENT row from the refused one, because a reset
+ * that only cleared the line for the row it touched would look right otherwise.
+ */
+export const TypingKeyClearedByReset: Story = {
+  tags: ['@C1.5'],
+  loaders: [() => loadOverrides(endOverride)],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.click(await canvas.findByTestId('rebind-move_cursor_to_the_beginning'));
+    await userEvent.keyboard('e');
+
+    await expect(await canvas.findByTestId('typing-move_cursor_to_the_beginning'))
+      .toHaveTextContent('shadow typing');
+
+    await userEvent.click(canvas.getByTestId('reset-move_cursor_to_the_end'));
+
+    await waitFor(() => expect(canvas.getByTestId('keymap-no-conflict')).toBeEmptyDOMElement());
+    const current = canvas.getByTestId('current-move_cursor_to_the_end');
+    await expect(current).toHaveTextContent('Ctrl');
+    await expect(current).toHaveTextContent('e');
+    await waitFor(() => expect(storedValue<Record<string, Chord>>('keymapOverrides')).toEqual({}));
+    (document.activeElement as HTMLElement | null)?.blur();
+  },
+};
+
+const storedTypingKey: Record<string, Chord> = {
+  move_cursor_to_the_beginning: { key: 'e', ctrl: false, alt: false, shift: false },
+};
+
+/**
+ * A bare-key chord an earlier version stored, before capture refused one.
+ *
+ * The binding keeps working, but Export now refuses it, so the row says why
+ * rather than leaving the refusal to surface only in the export error.
+ */
+export const StoredTypingKeyWarned: Story = {
+  tags: ['@C1.5'],
+  loaders: [() => loadOverrides(storedTypingKey)],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(await canvas.findByTestId('warning-move_cursor_to_the_beginning'))
+      .toHaveTextContent('shadow typing');
+    await expect(canvas.getByTestId('current-move_cursor_to_the_beginning')).toHaveTextContent('e');
+    await expect(storedValue<Record<string, Chord>>('keymapOverrides')).toEqual(storedTypingKey);
+    (document.activeElement as HTMLElement | null)?.blur();
+  },
+};
+
 export const SaveFailure: Story = {
   tags: ['@C1.9'],
   loaders: [() => loadOverrides({})],

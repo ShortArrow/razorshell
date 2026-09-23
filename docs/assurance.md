@@ -80,7 +80,7 @@ says they keep their native behavior.
 | C1.2 | Untrusted synthetic events and IME composition never trigger a binding |
 | C1.3 | URL rules apply first-match with the default action as fallback, and editing them through the real GUI — add, reorder, default-action change, delete — lands in real storage and flips the open tab's behavior and badge |
 | C1.4 | Same-document navigations re-evaluate the policy |
-| C1.5 | A rebind reaches storage in full chord form, open tabs, and a restarted browser; a conflict is refused without touching storage; per-row reset clears only its row; reset-all empties storage and unbinds the chord in an open tab |
+| C1.5 | A rebind reaches storage in full chord form, open tabs, and a restarted browser; a conflict is refused without touching storage; a chord that would shadow typing — a bare `e`, with or without Shift, and the editing keys — is refused the same way, at the capture and at the importer, and one stored by an earlier version keeps working and is flagged on its row, with Export naming it until the row is reset or rebound; per-row reset clears only its row; reset-all empties storage and unbinds the chord in an open tab |
 | C1.6 | An import is atomic: a refused write applies none of its keys, in the mock and in real Chrome |
 | C1.7 | Malformed or invalid input is rejected with the reason, leaves storage identical, and a corrected apply then succeeds; a regex pattern that repeats a repeating group, `(x+x+)+y` in its classic shape, unless each repetition ends on a fixed separator, or a regex over 512 characters, is refused when typed and when imported; one already in storage is flagged in the rules table, not disabled |
 | C1.8 | Every export re-parses through the importer |

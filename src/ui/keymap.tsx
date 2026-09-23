@@ -7,7 +7,7 @@ import {
 import { browserChords } from "../browserchords";
 import { keyChord } from "../keychord";
 import { defaultKeymap } from "../keymap";
-import { Chord, findConflict } from "../keymapmerge";
+import { Chord, findConflict, typingKeyRefusal } from "../keymapmerge";
 import {
   clearAllKeymapOverrides,
   clearKeymapOverride,
@@ -164,11 +164,28 @@ function isOverridden(active: Keymap, fallback: Keymap): boolean {
   );
 }
 
+/**
+ * @fn refusalTestid
+ * @brief Name the one refusal line after whichever refusal it is carrying.
+ * @param conflict - The chord already held by another row, or null
+ * @param typingKey - The chord that would shadow typing, or null
+ * @return string - The testid the line renders under
+ */
+function refusalTestid(
+  conflict: { id: string } | null,
+  typingKey: { id: string } | null,
+): string {
+  if (conflict) return `conflict-${conflict.id}`;
+  if (typingKey) return `typing-${typingKey.id}`;
+  return 'keymap-no-conflict';
+}
+
 export function KeymapApp() {
   const [keymap, setKeymap] = useState<Keymap[]>(() => getActiveKeymap());
   const [overrides, setOverrides] = useState<Record<string, Chord>>(() => getKeymapOverrides());
   const [capturing, setCapturing] = useState<string | null>(null);
   const [conflict, setConflict] = useState<{ id: string; withId: string } | null>(null);
+  const [typingKey, setTypingKey] = useState<{ id: string; reason: string } | null>(null);
   const [saveError, setSaveError] = useState<string>('');
   const [assigned, setAssigned] = useState<Record<string, string>>({});
 
@@ -231,6 +248,11 @@ export function KeymapApp() {
         alt: event.altKey,
         shift: event.shiftKey,
       };
+      const refusal = typingKeyRefusal(chord);
+      if (refusal !== null) {
+        setTypingKey({ id: capturing, reason: refusal });
+        return;
+      }
       const collision = findConflict(chord, getActiveKeymap(), capturing);
       if (collision) {
         setConflict({ id: capturing, withId: collision });
@@ -244,16 +266,19 @@ export function KeymapApp() {
 
   const startCapture = (id: string) => {
     setConflict(null);
+    setTypingKey(null);
     setCapturing(id);
   };
 
   const resetOne = (id: string) => {
     setConflict(null);
+    setTypingKey(null);
     applyMutation(clearKeymapOverride(id));
   };
 
   const resetAll = () => {
     setConflict(null);
+    setTypingKey(null);
     applyMutation(clearAllKeymapOverrides());
   };
 
@@ -294,6 +319,7 @@ export function KeymapApp() {
             const cell = unassigned
               ? { 'aria-disabled': 'true' as const, className: 'align-middle text-base-content/50' }
               : { className: 'align-middle' };
+            const warning = unassigned ? null : typingKeyRefusal(entry);
             const rebindLabel = capturing === entry.id
               ? getMessage('keymap_press_key')()
               : getMessage(unassigned ? 'keymap_assign' : 'keymap_rebind')();
@@ -309,6 +335,7 @@ export function KeymapApp() {
                   {unassigned
                     ? <span data-testid={`current-${entry.id}`}>{noShortcut}</span>
                     : <ChordView entry={entry} testid={`current-${entry.id}`} overridden={overridden} />}
+                  {warning === null ? null : <p className='text-warning text-sm m-0' data-testid={`warning-${entry.id}`}>{warning}</p>}
                 </td>
                 <td className='align-middle'>
                   <div className='flex items-center gap-2'>
@@ -400,11 +427,13 @@ export function KeymapApp() {
       </div>
       <p
         className='text-error min-h-6 m-0'
-        data-testid={conflict ? `conflict-${conflict.id}` : 'keymap-no-conflict'}
+        data-testid={refusalTestid(conflict, typingKey)}
       >
         {conflict
           ? `${labelOf(conflict.id)} — conflicts with: ${labelOf(conflict.withId)}`
-          : ''}
+          : typingKey
+            ? `${labelOf(typingKey.id)} — ${typingKey.reason}`
+            : ''}
       </p>
     </div>
   );

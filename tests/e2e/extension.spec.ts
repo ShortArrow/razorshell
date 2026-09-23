@@ -641,6 +641,21 @@ test.describe("keymap rebinding @C1.5", () => {
     expect(await storedOverrides()).not.toHaveProperty("move_cursor_to_the_end");
   });
 
+  test("a plain typing key is refused", async () => {
+    await optionsPage.locator('[data-testid="rebind-move_cursor_to_the_end"]').click();
+    await optionsPage.keyboard.press("e");
+    await optionsPage.waitForTimeout(300);
+
+    await expect(
+      optionsPage.locator('[data-testid="typing-move_cursor_to_the_end"]'),
+    ).toContainText("shadow typing");
+    expect(await currentChord("move_cursor_to_the_end")).toBe("Ctrl+e");
+
+    // A chord with no Ctrl or Alt would swallow the letter in every field the
+    // content script watches, so it must never reach storage.
+    expect(await storedOverrides()).not.toHaveProperty("move_cursor_to_the_end");
+  });
+
   test("rebinding the rejected row to a free chord clears the conflict", async () => {
     await optionsPage.locator('[data-testid="rebind-move_cursor_to_the_end"]').click();
     await optionsPage.keyboard.press("Control+Shift+9");

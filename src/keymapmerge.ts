@@ -63,6 +63,25 @@ export function mergeKeymap(defaults: Keymap[], ...layers: Record<string, Chord>
   });
 }
 
+/** The keys that insert or remove text when nothing is held down. */
+const editingKeys = ["Enter", "Tab", "Backspace", "Delete"];
+
+/**
+ * @fn typingKeyRefusal
+ * @brief Judge a chord about to be bound, naming the reason a plain key cannot be one.
+ * @details A chord the content script claims is consumed in every field it watches, so a
+ *          key that types bound without Ctrl or Alt takes that character away from the
+ *          user everywhere. Shift does not rescue it: shifted letters and punctuation type
+ *          too. Navigation and function keys carry no character, so they stay bindable.
+ * @param Chord chord - The chord as captured or as read from a settings document
+ * @return string | null - The reason to show, or null when the chord is bindable
+ */
+export function typingKeyRefusal(chord: Chord): string | null {
+  if (chord.ctrl === true || chord.alt === true) return null;
+  const types = chord.key.length === 1 || editingKeys.includes(chord.key);
+  return types ? `"${chord.key}" alone would shadow typing; hold Ctrl or Alt` : null;
+}
+
 /**
  * @fn findConflict
  * @brief Look for another entry already holding the chord.

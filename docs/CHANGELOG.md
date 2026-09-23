@@ -41,6 +41,16 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   `^https://(\w+\.)+example\.com/`, is accepted. A regex longer than
   512 characters is refused the same way; glob and exact patterns
   have no length cap.
+- A chord with neither Ctrl nor Alt could be bound, so a bare `e`
+  taken as a binding stole that letter from every field the extension
+  watches, in every tab, with no way back except the options page.
+  Shift does not rescue it, and `Enter`, `Tab`, `Backspace` and
+  `Delete` count as typing. The capture now refuses such a chord
+  beside its row without writing, and an import carrying one is
+  rejected. `Home`, `F2` and the like stay bindable. A chord stored
+  by an earlier version keeps working and is flagged with the reason
+  in the keymap table; Export names it until the row is reset or
+  rebound.
 - The content script no longer answers a page asking for its state.
   The `razorshell-status` event told any script on the page whether
   razorshell was enabled there and whether contenteditable was opted

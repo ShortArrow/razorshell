@@ -76,6 +76,7 @@ const storyIds = [
   "options-keymapapp--reclaimed-unassigned",
   "options-keymapapp--reclaimed-assigned",
   "options-keymapapp--opt-in-assign",
+  "options-keymapapp--stored-typing-key-warned",
   "options-langapp--auto",
   "options-langapp--overridden",
   "options-langapp--no-browser-languages",
@@ -113,10 +114,12 @@ const excludedStoryIds = [
   "options-keymapapp--opt-in-reset",
   // end as an override row like WithOverride
   "options-keymapapp--conflict-then-recover",
+  "options-keymapapp--typing-key-then-recover",
   "options-keymapapp--reset-row",
   "options-keymapapp--rebind-by-keyboard",
   // end as the Default table
   "options-keymapapp--escape-cancels-capture",
+  "options-keymapapp--typing-key-cleared-by-reset",
   "options-keymapapp--modifier-only-keeps-capturing",
   // end as the ImportError/AppliedBadge result line
   "options-configapp--import-recovery",
