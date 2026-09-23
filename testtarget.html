@@ -67,7 +67,6 @@ second line
 third</textarea>
   </label>
   <label>contenteditable
-    <span class="note" id="ce-status">razorshell status unknown</span>
     <div contenteditable="true" class="editable">first line
 second line
 third</div>
@@ -83,17 +82,6 @@ third</div>
           `start=${field.selectionStart} end=${field.selectionEnd} len=${field.value.length}`;
       }, 100);
     });
-
-    const ceStatus = document.getElementById("ce-status");
-    document.addEventListener("razorshell-status", (e) => {
-      const status = JSON.parse(e.detail);
-      ceStatus.textContent = status.contentEditable
-        ? "enabled in options"
-        : "disabled in options: turn on 'Enable in rich text editors' to use shortcuts here";
-    });
-    setInterval(() => {
-      document.dispatchEvent(new CustomEvent("razorshell-status-query"));
-    }, 1000);
 
     document.addEventListener("keydown", (e) => {
       document.getElementById("keyinfo").textContent =

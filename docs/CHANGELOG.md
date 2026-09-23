@@ -31,6 +31,11 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ### Fixed
 
+- The content script no longer answers a page asking for its state.
+  The `razorshell-status` event told any script on the page whether
+  razorshell was enabled there and whether contenteditable was opted
+  in, which nothing but the test page used and which let a page
+  fingerprint the install.
 - The page hook held every element the page ever put a keydown
   listener on, keeping it and its subtree alive for the life of the
   document. Targets and listeners are now held through `WeakRef`, and

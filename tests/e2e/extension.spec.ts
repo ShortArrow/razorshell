@@ -1336,7 +1336,6 @@ test.describe("rich text editors @C1.1", () => {
     await expect(optionsPage.locator('[data-testid="richtext-toggle"]')).toBeChecked();
 
     await page.waitForTimeout(500);
-    await expect(page.locator("#ce-status")).toContainText("enabled in options");
     await page.locator('[contenteditable="true"]').click();
     await setCaret(3);
     await page.keyboard.press("Control+a");
@@ -1355,14 +1354,11 @@ test.describe("rich text editors @C1.1", () => {
     await setCaret(3);
     await page.keyboard.press("Alt+f");
     expect((await selectionState()).offset).toBe(3);
-
-    await expect(page.locator("#ce-status")).toContainText("disabled in options");
   });
 
   test("the editor takes the keybindings once enabled", async () => {
     await optionsPage.evaluate(() => chrome.storage.sync.set({ enableContentEditable: true }));
     await page.waitForTimeout(500);
-    await expect(page.locator("#ce-status")).toContainText("enabled in options");
 
     await setCaret(3);
     await page.keyboard.press("Control+e");
@@ -2166,7 +2162,6 @@ test.describe("killed text can be yanked back @C1.15", () => {
     await freshFrame();
     await optionsPage.evaluate(() => chrome.storage.sync.set({ enableContentEditable: true }));
     await page.waitForTimeout(500);
-    await expect(page.locator("#ce-status")).toContainText("enabled in options");
 
     const editorText = () =>
       page.evaluate(() => document.querySelector('[contenteditable="true"]')!.textContent ?? "");

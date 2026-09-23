@@ -323,11 +323,3 @@ chrome.runtime.onMessage.addListener(
     return true;
   },
 );
-
-document.addEventListener("razorshell-status-query", () => {
-  document.dispatchEvent(
-    new CustomEvent("razorshell-status", {
-      detail: JSON.stringify({ enabled, contentEditable: editableEnabled }),
-    }),
-  );
-});
