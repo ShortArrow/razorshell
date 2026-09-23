@@ -5,8 +5,6 @@
   "description": "__MSG_description__",
   "default_locale": "en",
   "permissions": [
-    "activeTab",
-    "scripting",
     "storage"
   ],
   "content_scripts": [

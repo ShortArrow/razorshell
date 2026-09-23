@@ -24,6 +24,10 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   implemented), the options page, the inspector and the limits. The
   planned table drops Ctrl+C, which the opt-in kill whole field now
   covers, and the rows that named no operation.
+- The manifest asks for `storage` alone. `activeTab` and `scripting`
+  were never called: the content script is declared in the manifest
+  and the options page reads and writes storage, so both permissions
+  bought nothing and widened what an install grants.
 
 ### Fixed
 
