@@ -6,15 +6,6 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ## [Unreleased]
 
-### Fixed
-
-- The page hook could make a page's own `addEventListener` throw: a
-  listener whose `toString` throws, or a Proxy around a function,
-  broke on the source read the inspector keeps, and a null receiver
-  raised a `WeakRef` error where the platform reads it as the window.
-  The platform call now goes first and an unreadable source is kept
-  as empty, which the inspector already reports as unanalyzable.
-
 ## [0.0.6] - 2026-09-23
 
 ### Added
@@ -42,6 +33,12 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ### Fixed
 
+- The page hook could make a page's own `addEventListener` throw: a
+  listener whose `toString` throws, or a Proxy around a function,
+  broke on the source read the inspector keeps, and a null receiver
+  raised a `WeakRef` error where the platform reads it as the window.
+  The platform call now goes first and an unreadable source is kept
+  as empty, which the inspector already reports as unanalyzable.
 - A regex URL rule that repeats a repeating group, `(x+x+)+y` being
   the classic shape, could hang the frame it was tested against for
   as long as the tab lived. Such a pattern is now refused with its
