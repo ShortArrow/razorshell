@@ -16,10 +16,15 @@ export default defineConfig({
   expect: {
     toHaveScreenshot: {
       animations: "disabled",
-      // The windows CI runner renders fonts a dozen-odd pixels differently
-      // from the machine that captured the baselines (measured 14-16px).
-      // Real regressions move far more: the select-arrow swap alone was
-      // ~72px per select and color changes reach thousands.
+      // The windows CI runner antialiases differently from the machine that
+      // captured the baselines. On 2026-09-23 the 25-row keymap table differed
+      // in ~47,000 pixels, every one by at most 60 of 255 in a channel; the
+      // default per-pixel threshold of 0.2 counted 45 of them, so the count
+      // grew with the number of rows until it crossed the budget. At 0.25 the
+      // same CI images count zero. Real regressions move far more: the
+      // select-arrow swap alone was ~72px per select and color changes reach
+      // thousands, so the pixel budget stays where it was.
+      threshold: 0.25,
       maxDiffPixels: 40,
     },
   },
