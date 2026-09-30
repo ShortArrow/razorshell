@@ -20,16 +20,20 @@ leaves the rest of the page to the browser.
 
 ## Install
 
-Every `v*` tag publishes a zip of the built extension on the
-[Releases page](https://github.com/ShortArrow/razorshell/releases).
-Chrome loads it unpacked:
+Install it from the
+[Chrome Web Store](https://chromewebstore.google.com/detail/razorshell/ahokbhndbjckeejighhkldiohmokpclb).
+Then focus any text field and press `Ctrl` + `a`. The caret jumps to
+the start of the line.
 
-1. Download `razorshell-<version>.zip` from the latest release and
-   unzip it.
+To run a build the store does not carry yet, load it unpacked. Every
+`v*` tag publishes a zip of the built extension on the
+[Releases page](https://github.com/ShortArrow/razorshell/releases):
+
+1. Download `razorshell-<version>.zip` from the release and unzip it.
 2. Open `chrome://extensions`, turn on Developer mode, and choose
    "Load unpacked". The folder is the one holding `manifest.json`.
-3. Focus any text field and press `Ctrl` + `a`. The caret jumps to the
-   start of the line.
+3. Disable the store copy while the unpacked one is on, or both will
+   act on every keystroke.
 
 To build from a checkout instead, run `pnpm install` and `pnpm build`;
 `dist/` is the folder to load.
