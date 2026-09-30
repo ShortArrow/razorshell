@@ -263,17 +263,27 @@ export const operation = {
   },
   /**
    * readline's accept-line, which is Enter. A textarea takes a newline at the
-   * caret; an input submits its form the way Enter would, through
-   * `requestSubmit` so the page's validation and submit listeners still run.
-   * `canAcceptLine` refuses an input with no form, so the key stays with the
-   * browser there instead of being swallowed for nothing.
+   * caret. An input takes the path Enter takes, HTML's implicit submission: the
+   * form's default button receives a click and the click submits, so a page
+   * that submits from its button's click handler sees the same events it sees
+   * for Enter; with no submit button the form is submitted directly through
+   * `requestSubmit`, which still runs the page's validation and submit
+   * listeners. `canAcceptLine` refuses every case where Enter would do
+   * nothing, so the key stays with the browser there.
    */
   acceptLine(textinput: TextField) {
     if (textinput instanceof HTMLTextAreaElement) {
       insertNewline(textinput, "after");
       return;
     }
-    textinput.form?.requestSubmit();
+    const form = textinput.form;
+    if (form === null) return;
+    const button = defaultButton(form);
+    if (button !== null) {
+      button.click();
+      return;
+    }
+    form.requestSubmit();
   },
   /**
    * Emacs' open-line: a newline goes in at the caret and the caret stays
@@ -399,10 +409,38 @@ export function canYank(field: TextField | HTMLElement): boolean {
  */
 export function canAcceptLine(field: TextField | HTMLElement): boolean {
   if (field instanceof HTMLTextAreaElement) return !field.readOnly && !field.disabled;
-  if (field instanceof HTMLInputElement) {
-    return !field.readOnly && !field.disabled && field.form !== null;
+  if (!(field instanceof HTMLInputElement)) return false;
+  if (field.readOnly || field.disabled || field.form === null) return false;
+  const button = defaultButton(field.form);
+  if (button !== null) return !button.disabled;
+  return blockingFieldCount(field.form) <= 1;
+}
+
+/** Input types whose presence, more than once, stops a form without a submit button from submitting on Enter. */
+const blocksImplicitSubmission = new Set([
+  "text", "search", "url", "tel", "email", "password",
+  "date", "month", "week", "time", "datetime-local", "number",
+]);
+
+/**
+ * The form's default button as HTML defines it: the first submit button among
+ * the form's elements in tree order, which includes controls tied to the form
+ * through their `form` attribute. Null when the form has none.
+ */
+function defaultButton(form: HTMLFormElement): HTMLButtonElement | HTMLInputElement | null {
+  for (const element of Array.from(form.elements)) {
+    if (element instanceof HTMLButtonElement && element.type === "submit") return element;
+    if (element instanceof HTMLInputElement && (element.type === "submit" || element.type === "image")) {
+      return element;
+    }
   }
-  return false;
+  return null;
+}
+
+function blockingFieldCount(form: HTMLFormElement): number {
+  return Array.from(form.elements).filter(
+    (element) => element instanceof HTMLInputElement && blocksImplicitSubmission.has(element.type),
+  ).length;
 }
 
 /** Whether open-line can insert anything: only a writable textarea holds a newline. */

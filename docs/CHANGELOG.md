@@ -6,6 +6,15 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ## [Unreleased]
 
+### Fixed
+
+- Accept line (Ctrl+J) in an input now takes the path Enter takes:
+  the form's default button receives a click and the click submits,
+  where it used to submit the form directly and skip that click, so a
+  page submitting from its button's click handler saw nothing. A
+  disabled default button, or two text fields with no submit button,
+  leave the key to the browser, as Enter would do nothing there.
+
 ## [0.0.6] - 2026-09-23
 
 ### Added

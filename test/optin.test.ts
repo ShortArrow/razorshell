@@ -110,6 +110,91 @@ describe("accept line @C1.19", () => {
   });
 });
 
+/**
+ * Accept line in an input follows HTML's implicit submission, which is what
+ * Enter does: the form's default button, the first submit button among the
+ * form's elements, receives a click and the click submits; a disabled default
+ * button means nothing happens; with no submit button the form submits only
+ * when at most one of its fields blocks implicit submission. Measured
+ * 2026-09-30 against real Chromium: Enter fired the default button's click
+ * listener and then submit, while the first accept line fired submit alone,
+ * so a page that submits from its button's click handler saw nothing.
+ */
+describe("accept line takes the path Enter takes @C1.19", () => {
+  function buildForm(markup: string): { form: HTMLFormElement; field: HTMLInputElement; log: string[] } {
+    document.body.innerHTML = markup;
+    const form = document.querySelector("form")!;
+    const field = document.querySelector<HTMLInputElement>("#field")!;
+    const log: string[] = [];
+    for (const button of document.querySelectorAll("button, input[type=submit]")) {
+      button.addEventListener("click", () => log.push(`click ${button.id}`));
+    }
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      log.push("submit");
+    });
+    field.focus();
+    return { form, field, log };
+  }
+
+  test("the default button is clicked, and the click submits", () => {
+    const { field, log } = buildForm('<form><input id="field"><button id="go">go</button></form>');
+    expect(canAcceptLine(field)).toBe(true);
+    operation.acceptLine(field);
+    expect(log).toEqual(["click go", "submit"]);
+  });
+
+  test("an input of type submit is a default button too", () => {
+    const { field, log } = buildForm('<form><input id="field"><input type="submit" id="go"></form>');
+    operation.acceptLine(field);
+    expect(log).toEqual(["click go", "submit"]);
+  });
+
+  test("only the first submit button is clicked", () => {
+    const { field, log } = buildForm(
+      '<form><input id="field"><button id="first">a</button><button id="second">b</button></form>',
+    );
+    operation.acceptLine(field);
+    expect(log).toEqual(["click first", "submit"]);
+  });
+
+  test("a type=button control is not a submit button", () => {
+    const { field, log } = buildForm(
+      '<form><input id="field"><button type="button" id="plain">x</button><button id="go">go</button></form>',
+    );
+    operation.acceptLine(field);
+    expect(log).toEqual(["click go", "submit"]);
+  });
+
+  test("a submit button owned through the form attribute counts", () => {
+    const { field, log } = buildForm(
+      '<form id="f"><input id="field"></form><button form="f" id="outside">go</button>',
+    );
+    operation.acceptLine(field);
+    expect(log).toEqual(["click outside", "submit"]);
+  });
+
+  test("a disabled default button leaves the key to the browser", () => {
+    const { field, log } = buildForm(
+      '<form><input id="field"><button id="go" disabled>go</button><button id="later">later</button></form>',
+    );
+    expect(canAcceptLine(field)).toBe(false);
+    expect(log).toEqual([]);
+  });
+
+  test("with no submit button a lone text field submits without any click", () => {
+    const { field, log } = buildForm('<form><input id="field"><input type="checkbox"></form>');
+    expect(canAcceptLine(field)).toBe(true);
+    operation.acceptLine(field);
+    expect(log).toEqual(["submit"]);
+  });
+
+  test("with no submit button two text fields block submission", () => {
+    const { field } = buildForm('<form><input id="field"><input type="password"></form>');
+    expect(canAcceptLine(field)).toBe(false);
+  });
+});
+
 describe("open line @C1.19", () => {
   test("inserts a newline at the caret and leaves the caret before it", () => {
     const el = makeTextarea("ab", 1);
