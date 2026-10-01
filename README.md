@@ -23,7 +23,8 @@ leaves the rest of the page to the browser.
 Install it from the
 [Chrome Web Store](https://chromewebstore.google.com/detail/razorshell/ahokbhndbjckeejighhkldiohmokpclb).
 Then focus any text field and press `Ctrl` + `a`. The caret jumps to
-the start of the line.
+the start of the line. The options page has a test area that shows each
+chord's effect and the full keymap table.
 
 To run a build the store does not carry yet, load it unpacked. Every
 `v*` tag publishes a zip of the built extension on the
@@ -84,7 +85,9 @@ and consecutive kills at one caret join into a single entry in the
 order readline keeps. `Ctrl` + `y` puts the newest entry back, and
 `Alt` + `y` straight after a yank cycles to the entry before it. The
 ring is per frame, holds ten entries, is never written to storage, and
-never keeps text killed in a password field.
+never keeps text killed in a password field. It is separate from the
+clipboard: a kill never replaces what you copied, and `Ctrl` + `v`
+does not paste a kill.
 
 `Ctrl` + `k` at the end of a line takes the newline and joins the next
 line onto it. Three presses from the start of a line put the line, the
@@ -201,6 +204,10 @@ something a text field does not have, such as a command history.
 | `Ctrl` + `@`     | set-mark                              |
 | `Alt` + `p`      | non-incremental-reverse-search-history |
 | `Alt` + `.`      | yank-last-arg                         |
+| `Alt` + `r`      | revert-line                           |
+| `Alt` + `\`      | delete-horizontal-space               |
+| `Alt` + digit    | digit-argument (also tab switching on Linux) |
+| `Ctrl` + `x` `Ctrl` + `x` | exchange-point-and-mark      |
 
 `bind -p | grep -E '^"\\(e|C)'` in bash lists the full set.
 
@@ -244,7 +251,10 @@ kills there follow the visual line the browser renders. Editors and
 fields inside open shadow roots are reached as well. The default is
 off because rich editors ship their own shortcuts, and `Ctrl` + `k` as
 "insert link" is common; the inspector below shows what a page already
-handles.
+handles. Inside a rich editor the case operations, transpose words,
+yank pop, accept line and open line do nothing and leave the key to
+the editor, and an assigned `Ctrl` + `w` or `Ctrl` + `t` does
+nothing there rather than close or open a tab.
 
 ### Import and export
 
@@ -279,12 +289,20 @@ inside them.
 
 ## Limits
 
-- macOS is not supported. Option composes glyphs, so `event.key` for
-  Option+F is `ƒ` and the `Alt` bindings never match.
+- macOS is not supported or tested. Option composes characters, so
+  `event.key` for Option+F is `ƒ` and the `Alt` + letter bindings cannot
+  match. Matching the physical key instead would take characters such
+  as `@` (Option+L on a German layout) away from typing.
 - `email` and `number` inputs keep their native behaviour. The
   selection API the operations rely on does not exist on those types.
 - Fields inside closed shadow roots are out of reach by platform
   design.
+- Edits Razorshell makes raise `input` but not `beforeinput`, so a
+  page that checks input only from `beforeinput` does not see them.
+- URL rules switch Razorshell on or off for a whole site. To give one
+  chord back to a site, rebind it on the keymap table or deny the site.
+- After an extension update, tabs that were already open keep the
+  previous keymap until you reload them.
 - Chrome's [reserved shortcuts](https://developer.chrome.com/docs/extensions/reference/api/commands#key-combinations)
   cannot be taken by an extension; only the two above are offered,
   and only through Chrome's own assignment.

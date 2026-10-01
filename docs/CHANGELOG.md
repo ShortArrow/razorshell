@@ -8,6 +8,11 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ### Changed
 
+- The README states what stays inert in rich text editors, that kills
+  never touch the clipboard, that open tabs keep the old keymap until
+  reloaded after an update, the `beforeinput` limit, how to give one
+  chord back to a site, and four more readline chords it does not
+  implement.
 - Word motions and kills follow readline's words: a run of letters,
   digits and combining marks. Alt+F, Alt+B, Alt+D, Alt+Backspace and
   the case and transpose operations now stop inside `foo-bar` and at
