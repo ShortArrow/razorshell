@@ -6,6 +6,8 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ## [Unreleased]
 
+## [0.0.7] - 2026-10-01
+
 ### Fixed
 
 - An assigned Ctrl+W could close the tab while the user typed. The
