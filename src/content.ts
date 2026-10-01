@@ -281,6 +281,19 @@ const reclaimedOperations: Record<string, { run: (field: TextField) => void; kil
 };
 
 /**
+ * Whether this frame is the innermost focused document: its document has focus
+ * and its active element is not a child frame. A parent whose child frame holds
+ * focus still reports `hasFocus()` true, with that frame element as its
+ * `activeElement`, so the second test is what leaves exactly one frame per tab
+ * answering a tab-wide message.
+ */
+function ownsFocus(): boolean {
+  if (!document.hasFocus()) return false;
+  const active = document.activeElement;
+  return !(active instanceof HTMLIFrameElement || active instanceof HTMLFrameElement);
+}
+
+/**
  * The frame's half of the reclaimed-chord protocol: a focus query and a request
  * to run an operation.
  *
@@ -295,19 +308,26 @@ const reclaimedOperations: Record<string, { run: (field: TextField) => void; kil
  * policy-denied frame as no field at all, which is what keeps Ctrl+W closing the
  * tab on a page the user turned razorshell off for.
  *
- * Every arm that answers returns true, keeping the message channel open for a
- * `sendResponse` that Chrome must not treat as skipped; an arm that fell through
- * would answer `undefined` and the worker would read it as an unfocused frame.
- * A message of neither type returns undefined on purpose, leaving it to the
- * other listeners in this file.
+ * The worker sends both messages to the whole tab, so every frame hears them
+ * and the first `sendResponse` wins. Only the frame that `ownsFocus()` answers;
+ * any other frame returns undefined without calling `sendResponse` and takes no
+ * part in that race. When no frame answers, the worker's catch in `askFocus`
+ * reads the closed channel as "no field focused", which reproduces the browser
+ * action.
+ *
+ * The owning frame's arms return true, keeping the message channel open for a
+ * `sendResponse` that Chrome must not treat as skipped. A message of neither
+ * type returns undefined on purpose, leaving it to the other listeners in this
+ * file.
  */
 chrome.runtime.onMessage.addListener(
   (message: { type?: string; operation?: string }, _sender, sendResponse) => {
+    if (message.type !== focusQueryMessage && message.type !== runOperationMessage) return;
+    if (!ownsFocus()) return;
     if (message.type === focusQueryMessage) {
       sendResponse({ textFieldFocused: focusedField() !== null, enabled });
       return true;
     }
-    if (message.type !== runOperationMessage) return;
     const entry = message.operation === undefined ? undefined : reclaimedOperations[message.operation];
     const field = focusedField();
     // A contenteditable root has no `value` to slice, so these two decline it

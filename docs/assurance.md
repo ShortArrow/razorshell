@@ -93,7 +93,7 @@ says they keep their native behavior.
 | C1.15 | Killed text lands on a frame-local ring: chained kills concatenate in readline order, Ctrl+Y yanks the newest entry, Alt+Y rotates with verified replacement, a password kill is never stored, and an empty-ring Ctrl+Y leaves the native key untouched |
 | C1.16 | Word kills join the ring, character deletes remove whole graphemes without touching it, and both undo chords reach the native history |
 | C1.17 | Case operations recase exactly one word and land at its end, transpose-words drags the earlier word past the later, and Ctrl+K at a line end kills the newline joining the lines |
-| C1.18 | The reclaimed chords route by focus: assigned Ctrl+W rubs out a whitespace word inside a field and still closes the tab outside one, Ctrl+T transposes graphemes inside and still opens a tab outside — interception itself rests on the recorded manual measurement. The keymap table carries a row per chord that reads its binding from `chrome.commands`, grays an unassigned one, and reaches Chrome's shortcuts page, which a link cannot |
+| C1.18 | The reclaimed chords route by focus, and only the frame that owns focus answers, so a page holding an iframe routes the same as one without: assigned Ctrl+W rubs out a whitespace word inside a field and still closes the tab outside one, Ctrl+T transposes graphemes inside and still opens a tab outside — interception itself rests on the recorded manual measurement. The keymap table carries a row per chord that reads its binding from `chrome.commands`, grays an unassigned one, and reaches Chrome's shortcuts page, which a link cannot |
 | C1.19 | The opt-in entries ship unassigned: they match no keystroke, take no part in conflict detection, render grayed with `—` as current, bind through the row's capture and reach the content script, and return to unassigned on reset; kill whole field empties the field onto the ring, accept line takes Enter's implicit-submission path in an input (the default button's click, then submit, and nothing where Enter would do nothing) and breaks a textarea line, open line breaks the line and keeps the caret before it |
 
 ## Traceability
@@ -268,6 +268,15 @@ Frozen observations; each holds only for its date.
   matched nothing. A user-visible form: a page cancelling Ctrl+V only
   while a dialog is open kept cancelling it after the dialog closed,
   until reload.
+- 2026-10-01, the reclaimed-chord focus query was answered by every
+  frame and the first answer won. In Playwright Chromium with the
+  built extension, a text field focused in the top frame of a page
+  holding one same-origin iframe was reported unfocused on 20 of 20
+  queries (on a page without the iframe, 20 of 20 focused), so an
+  assigned Ctrl+W would have closed the tab mid-typing. After the fix
+  the same probe read 20 of 20 focused with the field in either frame,
+  and 0 of 20 with nothing focused. The e2e page had no iframe, which
+  is why C1.18's evidence never saw it; it now adds one.
 
 ## Verification and validation
 

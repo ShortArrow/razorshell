@@ -8,6 +8,11 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ### Fixed
 
+- An assigned Ctrl+W could close the tab while the user typed. The
+  worker asks the tab whether a text field has focus, and every frame
+  answered; on a page holding any iframe, the iframe's "nothing
+  focused" usually won, so the chord fell back to closing the tab (or,
+  for Ctrl+T, opening one). Only the frame that owns focus answers now.
 - Accept line (Ctrl+J) in an input now takes the path Enter takes:
   the form's default button receives a click and the click submits,
   where it used to submit the form directly and skip that click, so a

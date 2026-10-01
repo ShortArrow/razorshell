@@ -2730,6 +2730,75 @@ test.describe("the reclaimed chords route to the focused field @C1.18", () => {
     expect(await askFocus()).toEqual({ textFieldFocused: false, enabled: true });
   });
 
+  /**
+   * Appends an iframe to the test page and runs `body` with it present,
+   * removing it afterwards. The server answers every path with the test
+   * target, so the frame carries the same fields and its own content script,
+   * whose answer to a tab-wide message races the top frame's.
+   */
+  async function withFrame(body: () => Promise<void>): Promise<void> {
+    await page.evaluate(async (src: string) => {
+      const frame = document.createElement("iframe");
+      frame.id = "probe-frame";
+      frame.src = src;
+      const loaded = new Promise((resolve) => frame.addEventListener("load", resolve, { once: true }));
+      document.body.append(frame);
+      await loaded;
+    }, `${origin}/frame`);
+    await page.waitForTimeout(800);
+    try {
+      await body();
+    } finally {
+      await page.evaluate(() => document.getElementById("probe-frame")?.remove());
+    }
+  }
+
+  const frameInput = () => page.frameLocator("#probe-frame").locator('input[type="text"]').first();
+
+  test("a field in the top frame is reported focused while an iframe is present", async () => {
+    await freshFrame();
+    await withFrame(async () => {
+      await typeFresh("foo bar");
+      for (let i = 0; i < 10; i++) {
+        expect(await askFocus()).toEqual({ textFieldFocused: true, enabled: true });
+      }
+    });
+  });
+
+  test("a field inside the iframe is reported focused", async () => {
+    await freshFrame();
+    await withFrame(async () => {
+      await frameInput().click();
+      await frameInput().evaluate((el: HTMLInputElement) => {
+        el.setSelectionRange(0, el.value.length);
+      });
+      await page.keyboard.press("Delete");
+      await page.keyboard.type("foo bar");
+      expect((await fieldState(frameInput())).value).toBe("foo bar");
+      for (let i = 0; i < 10; i++) {
+        expect(await askFocus()).toEqual({ textFieldFocused: true, enabled: true });
+      }
+    });
+  });
+
+  test("the rubout runs in the frame that owns focus and nowhere else", async () => {
+    await freshFrame();
+    await withFrame(async () => {
+      await typeFresh("foo bar");
+      await frameInput().evaluate((el: HTMLInputElement) => {
+        el.value = "keep this";
+      });
+      await input().evaluate((el: HTMLInputElement) => {
+        el.focus();
+        el.setSelectionRange(el.value.length, el.value.length);
+      });
+
+      expect(await runOperation("unix_word_rubout")).toEqual({ ran: true });
+      expect((await fieldState(input())).value).toBe("foo ");
+      expect((await fieldState(frameInput())).value).toBe("keep this");
+    });
+  });
+
   test("the rubout kills a whitespace word onto the ring and Ctrl+Y gives it back", async () => {
     await freshFrame();
     await typeFresh("foo bar-baz");
