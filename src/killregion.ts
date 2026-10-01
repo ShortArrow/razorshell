@@ -62,10 +62,10 @@ export function topOfLineRegion(
  * The region a kill-word removes: from the selection's end to the end of the
  * word ahead of it, separators included.
  *
- * The boundary is the one the Alt+f motion already uses, so Alt+d removes
- * exactly what Alt+f moves over. A caret sitting on a separator run takes that
- * run together with the word after it, which is readline's M-d and this
- * extension's own motion agreeing.
+ * The boundary is the one the Alt+f motion already uses, readline's
+ * alphanumeric word, so Alt+d removes exactly what Alt+f moves over. A caret
+ * sitting on a non-word run takes that run together with the word after it,
+ * which is readline's M-d.
  */
 export function forwardWordRegion(
   value: string,

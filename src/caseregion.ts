@@ -19,11 +19,10 @@
  *
  * The word boundary is `cursor.getEndOfWord`, the same one Alt+F moves over and
  * Alt+D kills, so a case operation covers exactly the span its own motion does.
- * Where that flavor differs from readline's `rl_forward_word` it is this
- * extension's own motion that wins, for the reason the word kills already give:
- * a binding disagreeing with its own motion would be the worse defect.
+ * That boundary is readline's `rl_forward_word` over alphanumeric words
+ * (ADR-0013), and `isWordCharacter` is the one predicate both sides read.
  */
-import { cursor } from "./cursor";
+import { cursor, isWordCharacter } from "./cursor";
 
 /**
  * A span of the value, the text that replaces it, and where the caret ends.
@@ -91,17 +90,16 @@ function caseEdit(value: string, caret: number, transform: (slice: string) => st
 /**
  * Upper-cases the first alphanumeric of each run and lower-cases the rest of it.
  *
- * `isAlphanumeric` is the JavaScript reading of readline's `isalnum`: a
- * character that changes under either case mapping is a letter, and `\p{N}`
- * covers the digits, which case mapping leaves alone. Written this way rather
- * than as `/[a-z0-9]/i` so that a precomposed `é` is a word character and
- * capitalizes to `É`, which an ASCII class would refuse.
+ * The run is `isWordCharacter`'s, the Unicode reading of readline's `isalnum`
+ * rather than `/[a-z0-9]/i`, so that a precomposed `é` is a word character and
+ * capitalizes to `É`, which an ASCII class would refuse, and a combining mark
+ * continues its run instead of restarting it.
  */
 function capitalizeRuns(slice: string): string {
   let inWord = false;
   let result = "";
   for (const character of slice) {
-    if (!isAlphanumeric(character)) {
+    if (!isWordCharacter(character)) {
       inWord = false;
       result += character;
       continue;
@@ -110,11 +108,6 @@ function capitalizeRuns(slice: string): string {
     inWord = true;
   }
   return result;
-}
-
-/** A word constituent in readline's sense: a letter or a digit. */
-function isAlphanumeric(character: string): boolean {
-  return /[\p{L}\p{N}]/u.test(character);
 }
 
 /**
@@ -169,12 +162,12 @@ export function transposeWordsEdit(value: string, caret: number): CaseEdit | nul
  */
 function endOfWordAt(value: string, start: number): number {
   let end = start;
-  while (end < value.length && !isSeparator(value[end])) end += 1;
+  while (end < value.length) {
+    const point = String.fromCodePoint(value.codePointAt(end) ?? 0);
+    if (!isWordCharacter(point)) break;
+    end += point.length;
+  }
   return end;
-}
-
-function isSeparator(character: string): boolean {
-  return character === " " || character === "\n" || character === "\t" || character === "\r";
 }
 
 function clamp(position: number, length: number): number {

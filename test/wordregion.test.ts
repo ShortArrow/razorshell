@@ -3,15 +3,13 @@
  *
  * Two different claims live here, and they are kept apart deliberately.
  *
- * The word regions are a *characterization* of the word-boundary flavor the
- * caret motions already ship: `cursor.getEndOfWord` skips any separator run it
- * starts on and then consumes to the end of the following word, and
- * `cursor.getTopOfWord` walks back over separators and then to the start of the
- * preceding word. Alt+d and Alt+Backspace kill exactly what Alt+f and Alt+b
- * move over, so the expectations below are derived from that documented motion
- * rather than from readline's own (subtly different) word rules — a kill that
- * disagreed with its own motion binding would be the worse defect. Where this
- * flavor differs from readline it is marked.
+ * The word regions follow the caret motions, which follow readline's words
+ * (ADR-0013): `cursor.getEndOfWord` skips any non-word run it starts on and
+ * then consumes to the end of the following word, and `cursor.getTopOfWord`
+ * walks back over non-word characters and then to the start of the preceding
+ * word, a word being a run of letters, digits and combining marks. Alt+d and
+ * Alt+Backspace kill exactly what Alt+f and Alt+b move over — a kill that
+ * disagreed with its own motion binding would be the worse defect.
  *
  * The grapheme extents are a *specification*: a character delete must never
  * leave half of a surrogate pair or a piece of a ZWJ sequence in the field.
@@ -346,5 +344,22 @@ describe("a character delete never leaves half a character behind", () => {
         }
       }),
     );
+  });
+});
+
+/** The word kills cross the same alphanumeric words the motions do. */
+describe("the word kills follow readline's alphanumeric words @C1.16", () => {
+  test("backward kill word at the end of a hyphenated token removes only its last word", () => {
+    const value = "foo-bar";
+    const region = backwardWordRegion(value, 7, 7);
+    expect(killed(value, region)).toBe("bar");
+    expect(remaining(value, region)).toBe("foo-");
+  });
+
+  test("kill word at the start of a hyphenated token removes only its first word", () => {
+    const value = "foo-bar";
+    const region = forwardWordRegion(value, 0, 0);
+    expect(killed(value, region)).toBe("foo");
+    expect(remaining(value, region)).toBe("-bar");
   });
 });

@@ -47,3 +47,31 @@ describe("cursor.getEndOfWord", () => {
     expect(actual).toEqual("hello wor");
   });
 });
+
+/**
+ * Readline's word unit: a run of letters and digits (`rl_alphabetic`), with
+ * combining marks kept inside the word. Every other character separates words,
+ * so the motion stops at punctuation that a whitespace boundary would cross.
+ */
+describe("cursor.getEndOfWord stops at readline's alphanumeric word end @C1.16", () => {
+  const cases: [string, number, number][] = [
+    ["foo-bar baz", 0, 3],
+    ["foo-bar baz", 3, 7],
+    ["a.b/c d", 0, 1],
+    ["--foo", 0, 5],
+    ["日本語 テキスト", 0, 3],
+    ["café au", 0, 4],
+  ];
+
+  test.each(cases)("%j from %i ends at %i", (text, caret, expected) => {
+    expect(cursor.getEndOfWord(text, caret)).toBe(expected);
+  });
+
+  test("a combining mark stays inside its word", () => {
+    expect(cursor.getEndOfWord("café au", 0)).toBe(5);
+  });
+
+  test("a letter outside the BMP is one word character, not two separators", () => {
+    expect(cursor.getEndOfWord("\u{2000B}\u{2000B} x", 0)).toBe(4);
+  });
+});

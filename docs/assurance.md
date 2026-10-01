@@ -91,7 +91,7 @@ says they keep their native behavior.
 | C1.13 | A binding runs exactly once per keypress — settings churn, options-page remounts, same-document navigations and an abandoned rebind capture leave no duplicate or stale key handler behind — and the page's own keydown listeners stay removable through `removeEventListener` despite the page hook wrapping them |
 | C1.14 | A kill is undoable, fires one input event the page can see, does nothing at the end of the value where the region is empty, and leaves readonly fields alone |
 | C1.15 | Killed text lands on a frame-local ring: chained kills concatenate in readline order, Ctrl+Y yanks the newest entry, Alt+Y rotates with verified replacement, a password kill is never stored, and an empty-ring Ctrl+Y leaves the native key untouched |
-| C1.16 | Word kills join the ring, character deletes remove whole graphemes without touching it, and both undo chords reach the native history |
+| C1.16 | Word motions and kills stop at readline's word boundaries (letters, digits and combining marks) while Ctrl+W keeps whitespace, word kills join the ring, character deletes remove whole graphemes without touching it, and both undo chords reach the native history |
 | C1.17 | Case operations recase exactly one word and land at its end, transpose-words drags the earlier word past the later, and Ctrl+K at a line end kills the newline joining the lines |
 | C1.18 | The reclaimed chords route by focus, and only the frame that owns focus answers, so a page holding an iframe routes the same as one without: assigned Ctrl+W rubs out a whitespace word inside a field and still closes the tab outside one, Ctrl+T transposes graphemes inside and still opens a tab outside — interception itself rests on the recorded manual measurement. The keymap table carries a row per chord that reads its binding from `chrome.commands`, grays an unassigned one, and reaches Chrome's shortcuts page, which a link cannot |
 | C1.19 | The opt-in entries ship unassigned: they match no keystroke, take no part in conflict detection, render grayed with `—` as current, bind through the row's capture and reach the content script, and return to unassigned on reset; kill whole field empties the field onto the ring, accept line takes Enter's implicit-submission path in an input (the default button's click, then submit, and nothing where Enter would do nothing) and breaks a textarea line, open line breaks the line and keeps the caret before it |
@@ -277,6 +277,12 @@ Frozen observations; each holds only for its date.
   the same probe read 20 of 20 focused with the field in either frame,
   and 0 of 20 with nothing focused. The e2e page had no iframe, which
   is why C1.18's evidence never saw it; it now adds one.
+- 2026-10-01, word boundaries moved to readline's alphanumeric words
+  (ADR-0013). `cursor.getEndOfWord("foo-bar baz", 0)` now returns 3
+  where it returned 7, and the backward word kill and Ctrl+W, measured
+  equal on 2026-09-05, now differ on `foo bar-baz` at 11: the word kill
+  takes `baz`, the rubout `bar-baz`. test/reclaimedregion.test.ts pins
+  the difference.
 
 ## Verification and validation
 

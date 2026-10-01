@@ -6,6 +6,15 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ## [Unreleased]
 
+### Changed
+
+- Word motions and kills follow readline's words: a run of letters,
+  digits and combining marks. Alt+F, Alt+B, Alt+D, Alt+Backspace and
+  the case and transpose operations now stop inside `foo-bar` and at
+  each part of a URL, where they used to cross every non-blank run.
+  Ctrl+W still kills back to whitespace, as readline's does. See
+  [ADR-0013](decisions/0013-readline-word-boundaries.md).
+
 ## [0.0.7] - 2026-10-01
 
 ### Fixed

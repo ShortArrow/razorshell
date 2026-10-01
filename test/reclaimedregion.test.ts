@@ -8,27 +8,16 @@
  * `src/commandroute.ts`; the expectations here are traced from those sources by
  * hand, one case per branch of the C.
  *
- * ON THE DIVERGENCE THAT IS NOT ONE. In readline, C-w and M-DEL disagree:
- * `unix-word-rubout` is delimited by WHITESPACE while `backward-kill-word` walks
- * `rl_backward_word`, whose boundary is `rl_alphabetic` (isalnum), so
- * `"foo bar-baz|"` gives them different answers — the rubout takes `bar-baz`
- * whole, the word kill takes only `baz`.
- *
- * Razorshell's `backward_kill_word` does NOT have readline's boundary. It
- * deliberately mirrors this extension's own Alt+b motion (`cursor.getTopOfWord`),
- * whose separator set is space, tab, newline and carriage return — which is the
- * rubout's boundary. The two are therefore EXTENSIONALLY EQUAL here: an
- * exhaustive search over every string up to length six on the alphabet
- * `{a, space, newline}` finds no caret at which they differ, and the hyphen case
- * that separates them in readline does not separate them here.
- *
- * The case is kept below, asserting the equality rather than a difference,
- * because the fact is worth pinning: if `getTopOfWord` is ever moved to
- * readline's alphanumeric boundary — which would be the faithful thing for
- * M-DEL — that change must make this test red, so that the rubout is not
- * silently dragged along with it. The rubout's boundary is whitespace by
- * specification and is defined here in its own module rather than shared, so it
- * is immune to that edit.
+ * ON THE DIVERGENCE. C-w and M-DEL disagree in readline, and they disagree
+ * here: `unix-word-rubout` is delimited by WHITESPACE while
+ * `backward-kill-word` walks `rl_backward_word`, whose boundary is
+ * `rl_alphabetic` (letters and digits), so `"foo bar-baz|"` gives them
+ * different answers — the rubout takes `bar-baz` whole, the word kill takes
+ * only `baz`. Razorshell's word motions follow readline's alphanumeric words
+ * (ADR-0013); the rubout's boundary is whitespace by specification and is
+ * defined in its own module rather than shared with `cursor.ts`, so a change
+ * to the word unit cannot drag the rubout along with it. The case below pins
+ * that the two regions differ.
  */
 import { describe, expect, test } from "vitest";
 import { unixWordRuboutRegion, transposeCharsEdit } from "../src/reclaimedregion";
@@ -61,13 +50,11 @@ describe("unixWordRuboutRegion follows rl_unix_word_rubout", () => {
 
   /**
    * A hyphenated token goes whole: `-` is not whitespace, so neither loop stops
-   * at it. In readline this is where C-w parts company with M-DEL; here
-   * `backward_kill_word` reaches the same answer, because it follows Alt+b's
-   * whitespace boundary rather than readline's alphanumeric one. The second
-   * half of this test states that equality as the current fact — see the file
-   * docstring for why it is asserted rather than assumed away.
+   * at it. This is where C-w parts company with M-DEL, in readline and here:
+   * `backward_kill_word` stops at the hyphen and takes only `baz`. See the file
+   * docstring for why the difference is asserted.
    */
-  test("a hyphenated word goes whole, and backward_kill_word currently agrees", () => {
+  test("a hyphenated word goes whole, where backward_kill_word takes only its last word", () => {
     const value = "foo bar-baz";
     const caret = value.length;
 
@@ -75,7 +62,9 @@ describe("unixWordRuboutRegion follows rl_unix_word_rubout", () => {
     expect(killed(value, rubout)).toBe("bar-baz");
     expect(remaining(value, rubout)).toBe("foo ");
 
-    expect(backwardWordRegion(value, caret, caret)).toEqual(rubout);
+    const wordKill = backwardWordRegion(value, caret, caret);
+    expect(killed(value, wordKill)).toBe("baz");
+    expect(wordKill).not.toEqual(rubout);
   });
 
   /** Punctuation of every kind rides along, for the same reason the hyphen does. */

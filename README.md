@@ -103,6 +103,9 @@ field's own undo history, the same history `Ctrl` + `z` walks. Every
 edit Razorshell makes goes through that history, so `Ctrl` + `z` takes
 a kill or a recase back.
 
+A word is a run of letters and digits, as in readline, so `Alt` + `f`
+and `Alt` + `Backspace` stop at each part of `foo-bar` or of a URL.
+
 `Alt` + `u`, `Alt` + `l` and `Alt` + `c` recase the word ahead of the
 caret and leave the caret at its end. They measure from the caret, as
 readline does, so mid-word `Alt` + `u` uppercases only the tail. A word

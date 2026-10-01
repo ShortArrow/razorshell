@@ -33,10 +33,9 @@
  * partial edit — and it also fires at the very START of a line, where the
  * backward search finds the same word the forward search did.
  *
- * Where readline's word boundary and this extension's differ, the extension's
- * own `cursor.getEndOfWord` wins, for the reason the word kills already give:
- * a binding disagreeing with its own motion binding would be the worse defect.
- * Those places are marked as characterization.
+ * The word boundary is readline's too: a word is a run of letters and digits,
+ * so punctuation separates words for the case operations and transpose-words
+ * exactly as it does for the motions and kills (ADR-0013).
  */
 import { describe, expect, test } from "vitest";
 import fc from "fast-check";
@@ -93,13 +92,20 @@ describe("upcaseWordEdit covers the caret classes @C1.17", () => {
   });
 
   /**
-   * A word of non-letters cannot change, but the caret still moves to its end —
-   * the motion half of the operation happens regardless of the casing half.
+   * Punctuation is not a word, so like readline's forward-word the span crosses
+   * it and runs to the end of the word after it; the punctuation passes through
+   * unchanged.
    */
-  test("a word with no letters is unchanged and the caret still moves", () => {
+  test("a run of punctuation is crossed and the word after it uppercased", () => {
     const edit = upcaseWordEdit("--- rest", 0);
-    expect(applied("--- rest", edit)).toBe("--- rest");
-    expect(edit.text).toBe("---");
+    expect(applied("--- rest", edit)).toBe("--- REST");
+    expect(edit.text).toBe("--- REST");
+    expect(edit.caret).toBe(8);
+  });
+
+  test("a hyphen ends the word, so only the part before it is uppercased", () => {
+    const edit = upcaseWordEdit("foo-bar", 0);
+    expect(applied("foo-bar", edit)).toBe("FOO-bar");
     expect(edit.caret).toBe(3);
   });
 
@@ -214,13 +220,19 @@ describe("capitalizeWordEdit follows readline's alphanumeric rule @C1.17", () =>
   });
 
   /**
-   * A non-alphanumeric resets the run, so the letter after it rises too. This is
-   * the `inword = 0` branch, and it is why a hyphenated word capitalizes on both
-   * sides of the hyphen rather than only at its start.
+   * A hyphen is not a word character, so the span ends at it, as readline's
+   * forward-word does: only `well` is capitalized, and a second press would
+   * take `-known`.
    */
-  test("a separator inside the span restarts the run", () => {
+  test("a hyphen ends the span, so only the part before it is capitalized", () => {
     const edit = capitalizeWordEdit("well-known x", 0);
-    expect(applied("well-known x", edit)).toBe("Well-Known x");
+    expect(applied("well-known x", edit)).toBe("Well-known x");
+    expect(edit.caret).toBe(4);
+  });
+
+  test("a combining mark continues its word instead of restarting the run", () => {
+    const edit = capitalizeWordEdit("école x", 0);
+    expect(applied("école x", edit)).toBe("École x");
   });
 
   test("a precomposed e-acute capitalizes to its accented capital", () => {
@@ -267,15 +279,13 @@ describe("transposeWordsEdit drags the earlier word past the later @C1.17", () =
   });
 
   /**
-   * characterization — punctuation is not a separator for `cursor.getEndOfWord`,
-   * which splits on whitespace only, so "one," is one word here where readline
-   * would treat the comma as a boundary and transpose the bare words. The
-   * extension's own word flavor wins, as it does for the word kills.
+   * Punctuation is a separator in readline's word unit, so the comma stays
+   * between the two slots with the space and only the bare words move.
    */
-  test("punctuation travels with its word under this extension's boundary", () => {
+  test("punctuation stays in place as part of the separator", () => {
     const value = "one, two";
     const edit = transposeWordsEdit(value, 4);
-    expect(applied(value, edit!)).toBe("two one,");
+    expect(applied(value, edit!)).toBe("two, one");
   });
 
   test("a single word is refused outright", () => {

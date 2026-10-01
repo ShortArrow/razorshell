@@ -32,3 +32,6 @@ record names the files it concerns and is frozen when written.
 - [ADR-0012](0012-unassigned-keymap-entries.md) — bindings whose
   readline chord is an everyday browser key ship unassigned in the
   keymap itself, and bind through the row's own capture
+- [ADR-0013](0013-readline-word-boundaries.md) — word motions, kills
+  and case operations follow readline's alphanumeric words; Ctrl+W
+  keeps its whitespace boundary

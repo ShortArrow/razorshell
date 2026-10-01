@@ -98,9 +98,9 @@ describe("the case operations reach the field @C1.17", () => {
   });
 
   test("a word of non-letters is not written but the caret still moves", () => {
-    const el = makeInput("--- rest", 0);
+    const el = makeInput("123 rest", 0);
     operation.upcaseWord(el);
-    expect(el.value).toBe("--- rest");
+    expect(el.value).toBe("123 rest");
     expect(el.selectionStart).toBe(3);
   });
 

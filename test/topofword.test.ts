@@ -109,3 +109,27 @@ describe("a caret with no word behind it stops at the start of the value", () =>
     }
   });
 });
+/**
+ * The backward half of readline's alphanumeric word unit: back over any
+ * non-word run, then back to the start of the word before it.
+ */
+describe("cursor.getTopOfWord stops at readline's alphanumeric word start @C1.16", () => {
+  const cases: [string, number, number][] = [
+    ["foo-bar", 7, 4],
+    ["foo-bar", 4, 0],
+    ["https://ex.com/", 15, 11],
+    ["foo--", 5, 0],
+  ];
+
+  test.each(cases)("%j from %i starts at %i", (text, caret, expected) => {
+    expect(cursor.getTopOfWord(text, caret)).toBe(expected);
+  });
+
+  test("a combining mark stays inside its word", () => {
+    expect(cursor.getTopOfWord("x café", 7)).toBe(2);
+  });
+
+  test("a letter outside the BMP is one word character, not two separators", () => {
+    expect(cursor.getTopOfWord("x \u{2000B}\u{2000B}", 6)).toBe(2);
+  });
+});
