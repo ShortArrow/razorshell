@@ -1,0 +1,54 @@
+name: A chord does not work on a site
+description: A binding does nothing, does the wrong thing, or breaks something on a page.
+labels: ["site compatibility"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Issues are public. You do not have to share the site's address if it is internal; describe the kind of page instead (for example "a login form", "a rich text editor").
+  - type: input
+    id: chord
+    attributes:
+      label: Chord
+      placeholder: Ctrl+K
+    validations:
+      required: true
+  - type: input
+    id: site
+    attributes:
+      label: Site or kind of page
+      placeholder: https://example.com/settings, or "a Notion page"
+    validations:
+      required: true
+  - type: dropdown
+    id: field
+    attributes:
+      label: Where the caret was
+      options:
+        - A single-line text field
+        - A multi-line text area
+        - A rich text editor (contenteditable)
+        - Inside an embedded frame
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What you expected and what happened
+      placeholder: Expected the line after the caret to be deleted; instead the page opened its link dialog.
+    validations:
+      required: true
+  - type: textarea
+    id: inspector
+    attributes:
+      label: Inspector report (optional)
+      description: Click the Razorshell toolbar icon, then click the field. Paste the toast's text here.
+  - type: input
+    id: version
+    attributes:
+      label: Razorshell version, browser and OS
+      description: The version is shown on the Razorshell card in chrome://extensions.
+      placeholder: 0.0.7, Chrome 140, Windows 11
+    validations:
+      required: true

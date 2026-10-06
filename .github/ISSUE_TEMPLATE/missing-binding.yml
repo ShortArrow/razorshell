@@ -1,0 +1,23 @@
+name: A binding I want
+description: A readline or Emacs chord Razorshell does not have, or one that behaves differently from your shell.
+labels: ["binding request"]
+body:
+  - type: input
+    id: chord
+    attributes:
+      label: Chord and the operation it runs in your shell
+      placeholder: Alt+\ (delete-horizontal-space)
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Where you reach for it
+      description: What you are typing when you miss it, and how often.
+    validations:
+      required: true
+  - type: textarea
+    id: difference
+    attributes:
+      label: If it exists but behaves differently, what your shell does
+      placeholder: In bash, Alt+F on "foo-bar" stops after "foo".
