@@ -194,5 +194,13 @@
   "tooltip_reclaimed": {
     "message": "يحجز Chrome الاختصارين Ctrl+W و Ctrl+T، لذا لا يمكن شحنهما كإعداد افتراضي. عيّنهما مرة واحدة من صفحة الاختصارات؛ خارج حقل النص يظل التبويب يُغلق ويظل تبويب جديد يُفتح",
     "description": "يحجز Chrome الاختصارين Ctrl+W و Ctrl+T، لذا لا يمكن شحنهما كإعداد افتراضي. عيّنهما مرة واحدة من صفحة الاختصارات؛ خارج حقل النص يظل التبويب يُغلق ويظل تبويب جديد يُفتح"
+  },
+  "richtext_hint_title": {
+    "message": "Razorshell متوقف في محررات النص المنسق",
+    "description": "Razorshell is off in rich text editors"
+  },
+  "richtext_hint_body": {
+    "message": "فعّل \"Enable in rich text editors\" في صفحة الخيارات لاستخدام الاختصارات هنا. يظهر هذا التنبيه مرة واحدة فقط.",
+    "description": "Turn on \"Enable in rich text editors\" on the options page to use the keys here. This tip shows once."
   }
 }

@@ -6,6 +6,13 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ## [Unreleased]
 
+### Added
+
+- With rich text support off, the first chord pressed in a rich text
+  editor shows a one-time hint that names the "Enable in rich text
+  editors" setting. The key still goes to the page, and the hint does
+  not come back. See [ADR-0014](decisions/0014-rich-text-hint.md).
+
 ### Changed
 
 - The README states what stays inert in rich text editors, that kills

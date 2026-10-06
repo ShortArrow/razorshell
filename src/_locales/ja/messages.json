@@ -194,5 +194,13 @@
   "tooltip_reclaimed": {
     "message": "Ctrl+W と Ctrl+T は Chrome の予約キーのため既定では割り当てられません。ショートカットのページで一度割り当ててください。テキスト欄の外ではこれまで通りタブが閉じ、タブが開きます",
     "description": "Ctrl+W と Ctrl+T は Chrome の予約キーのため既定では割り当てられません。ショートカットのページで一度割り当ててください。テキスト欄の外ではこれまで通りタブが閉じ、タブが開きます"
+  },
+  "richtext_hint_title": {
+    "message": "リッチテキストエディタでは Razorshell が無効です",
+    "description": "Razorshell is off in rich text editors"
+  },
+  "richtext_hint_body": {
+    "message": "オプションページで「Enable in rich text editors」を有効にすると、ここでもキーが使えます。この案内は一度だけ表示されます。",
+    "description": "Turn on \"Enable in rich text editors\" on the options page to use the keys here. This tip shows once."
   }
 }

@@ -194,5 +194,13 @@
   "tooltip_reclaimed": {
     "message": "Chrome memesan Ctrl+W dan Ctrl+T, sehingga keduanya tidak bisa disertakan sebagai bawaan. Tetapkan sekali di halaman pintasan; di luar kolom teks, tab tetap tertutup dan tab baru tetap terbuka",
     "description": "Chrome memesan Ctrl+W dan Ctrl+T, sehingga keduanya tidak bisa disertakan sebagai bawaan. Tetapkan sekali di halaman pintasan; di luar kolom teks, tab tetap tertutup dan tab baru tetap terbuka"
+  },
+  "richtext_hint_title": {
+    "message": "Razorshell nonaktif di editor teks kaya",
+    "description": "Razorshell is off in rich text editors"
+  },
+  "richtext_hint_body": {
+    "message": "Aktifkan \"Enable in rich text editors\" di halaman opsi untuk memakai tombolnya di sini. Pesan ini hanya muncul sekali.",
+    "description": "Turn on \"Enable in rich text editors\" on the options page to use the keys here. This tip shows once."
   }
 }

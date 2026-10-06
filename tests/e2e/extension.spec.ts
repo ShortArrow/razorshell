@@ -1371,6 +1371,46 @@ test.describe("rich text editors @C1.1", () => {
     expect((await selectionState()).offset).toBe(3);
   });
 
+  test("the first chord in a rich editor with the setting off shows a one-time hint @C1.20", async () => {
+    const toast = () => page.locator("#razorshell-inspect-toast");
+    const recorded = () =>
+      optionsPage.evaluate(async () => {
+        const data = (await chrome.storage.local.get("richTextHintShown")) as Record<string, unknown>;
+        return data.richTextHintShown === true;
+      });
+    const pressInEditor = async () => {
+      await page.locator('[contenteditable="true"]').click();
+      await setCaret(3);
+      await page.keyboard.press("Alt+f");
+    };
+
+    // The previous test pressed a chord in the editor with the setting off, so
+    // that frame may still be writing the record. Leaving the page first and
+    // clearing the record after is what keeps a late write from undoing it.
+    await page.goto(`${origin}/`);
+    await page.waitForTimeout(1000);
+    await optionsPage.evaluate(() => chrome.storage.local.remove("richTextHintShown"));
+    await expect.poll(recorded).toBe(false);
+
+    await pressInEditor();
+    await expect(toast()).toContainText("Enable in rich text editors");
+    // The hint only watches: the chord reaches the page and moves nothing.
+    await expect(page.locator("#keyinfo")).toContainText("prevented=false");
+    expect((await selectionState()).offset).toBe(3);
+    await expect.poll(recorded).toBe(true);
+
+    await toast().evaluate((el) => el.remove());
+    await pressInEditor();
+    await page.waitForTimeout(300);
+    await expect(toast()).toHaveCount(0);
+
+    await page.goto(`${origin}/`);
+    await page.waitForTimeout(1000);
+    await pressInEditor();
+    await page.waitForTimeout(300);
+    await expect(toast()).toHaveCount(0);
+  });
+
   test("the editor takes the keybindings once enabled", async () => {
     await optionsPage.evaluate(() => chrome.storage.sync.set({ enableContentEditable: true }));
     await page.waitForTimeout(500);

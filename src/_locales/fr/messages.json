@@ -194,5 +194,13 @@
   "tooltip_reclaimed": {
     "message": "Chrome réserve Ctrl+W et Ctrl+T ; ces deux raccourcis ne peuvent donc pas être fournis par défaut. Attribuez-les une fois sur la page des raccourcis ; hors d'un champ de texte, l'onglet se ferme et un onglet s'ouvre comme avant",
     "description": "Chrome réserve Ctrl+W et Ctrl+T ; ces deux raccourcis ne peuvent donc pas être fournis par défaut. Attribuez-les une fois sur la page des raccourcis ; hors d'un champ de texte, l'onglet se ferme et un onglet s'ouvre comme avant"
+  },
+  "richtext_hint_title": {
+    "message": "Razorshell est désactivé dans les éditeurs de texte enrichi",
+    "description": "Razorshell is off in rich text editors"
+  },
+  "richtext_hint_body": {
+    "message": "Activez « Enable in rich text editors » dans la page d'options pour utiliser les raccourcis ici. Ce message ne s'affiche qu'une fois.",
+    "description": "Turn on \"Enable in rich text editors\" on the options page to use the keys here. This tip shows once."
   }
 }

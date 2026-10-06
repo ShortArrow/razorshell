@@ -35,3 +35,6 @@ record names the files it concerns and is frozen when written.
 - [ADR-0013](0013-readline-word-boundaries.md) — word motions, kills
   and case operations follow readline's alphanumeric words; Ctrl+W
   keeps its whitespace boundary
+- [ADR-0014](0014-rich-text-hint.md) — with rich text support off,
+  the first chord pressed in a rich editor shows a one-time hint naming
+  the setting, and never takes the key

@@ -194,5 +194,13 @@
   "tooltip_reclaimed": {
     "message": "Chrome reserva Ctrl+W y Ctrl+T, por lo que no pueden venir asignados de fábrica. Asígnalos una vez en la página de atajos; fuera de un campo de texto la pestaña se sigue cerrando y se sigue abriendo una pestaña",
     "description": "Chrome reserva Ctrl+W y Ctrl+T, por lo que no pueden venir asignados de fábrica. Asígnalos una vez en la página de atajos; fuera de un campo de texto la pestaña se sigue cerrando y se sigue abriendo una pestaña"
+  },
+  "richtext_hint_title": {
+    "message": "Razorshell está desactivado en los editores de texto enriquecido",
+    "description": "Razorshell is off in rich text editors"
+  },
+  "richtext_hint_body": {
+    "message": "Activa «Enable in rich text editors» en la página de opciones para usar las teclas aquí. Este aviso se muestra una sola vez.",
+    "description": "Turn on \"Enable in rich text editors\" on the options page to use the keys here. This tip shows once."
   }
 }

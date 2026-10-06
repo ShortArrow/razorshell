@@ -194,5 +194,13 @@
   "tooltip_reclaimed": {
     "message": "Chrome reserviert Strg+W und Strg+T, daher lassen sich beide nicht vorbelegen. Weise sie einmalig auf der Tastenkürzel-Seite zu; außerhalb eines Textfelds wird der Tab weiterhin geschlossen bzw. ein Tab geöffnet",
     "description": "Chrome reserviert Strg+W und Strg+T, daher lassen sich beide nicht vorbelegen. Weise sie einmalig auf der Tastenkürzel-Seite zu; außerhalb eines Textfelds wird der Tab weiterhin geschlossen bzw. ein Tab geöffnet"
+  },
+  "richtext_hint_title": {
+    "message": "Razorshell ist in Rich-Text-Editoren ausgeschaltet",
+    "description": "Razorshell is off in rich text editors"
+  },
+  "richtext_hint_body": {
+    "message": "Aktiviere „Enable in rich text editors“ auf der Optionsseite, um die Tasten hier zu nutzen. Dieser Hinweis erscheint nur einmal.",
+    "description": "Turn on \"Enable in rich text editors\" on the options page to use the keys here. This tip shows once."
   }
 }

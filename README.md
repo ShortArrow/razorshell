@@ -251,7 +251,8 @@ kills there follow the visual line the browser renders. Editors and
 fields inside open shadow roots are reached as well. The default is
 off because rich editors ship their own shortcuts, and `Ctrl` + `k` as
 "insert link" is common; the inspector below shows what a page already
-handles. Inside a rich editor the case operations, transpose words,
+handles. While it is off, the first chord you press in a rich editor
+shows a one-time hint pointing here. Inside a rich editor the case operations, transpose words,
 yank pop, accept line and open line do nothing and leave the key to
 the editor, and an assigned `Ctrl` + `w` or `Ctrl` + `t` does
 nothing there rather than close or open a tab.

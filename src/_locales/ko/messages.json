@@ -194,5 +194,13 @@
   "tooltip_reclaimed": {
     "message": "Ctrl+W와 Ctrl+T는 Chrome이 예약한 키라서 기본값으로 제공할 수 없습니다. 단축키 페이지에서 한 번 지정하세요. 텍스트 입력란 밖에서는 지금처럼 탭이 닫히고 새 탭이 열립니다",
     "description": "Ctrl+W와 Ctrl+T는 Chrome이 예약한 키라서 기본값으로 제공할 수 없습니다. 단축키 페이지에서 한 번 지정하세요. 텍스트 입력란 밖에서는 지금처럼 탭이 닫히고 새 탭이 열립니다"
+  },
+  "richtext_hint_title": {
+    "message": "리치 텍스트 편집기에서는 Razorshell이 꺼져 있습니다",
+    "description": "Razorshell is off in rich text editors"
+  },
+  "richtext_hint_body": {
+    "message": "옵션 페이지에서 \"Enable in rich text editors\"를 켜면 여기서도 단축키를 쓸 수 있습니다. 이 안내는 한 번만 표시됩니다.",
+    "description": "Turn on \"Enable in rich text editors\" on the options page to use the keys here. This tip shows once."
   }
 }

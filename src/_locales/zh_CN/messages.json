@@ -194,5 +194,13 @@
   "tooltip_reclaimed": {
     "message": "Chrome 保留了 Ctrl+W 和 Ctrl+T，因此无法作为默认快捷键提供。请在快捷键页面手动指定一次；在文本框之外，标签页仍会关闭，新标签页仍会打开",
     "description": "Chrome 保留了 Ctrl+W 和 Ctrl+T，因此无法作为默认快捷键提供。请在快捷键页面手动指定一次；在文本框之外，标签页仍会关闭，新标签页仍会打开"
+  },
+  "richtext_hint_title": {
+    "message": "Razorshell 在富文本编辑器中处于关闭状态",
+    "description": "Razorshell is off in rich text editors"
+  },
+  "richtext_hint_body": {
+    "message": "在选项页面开启“Enable in rich text editors”即可在此使用快捷键。此提示只显示一次。",
+    "description": "Turn on \"Enable in rich text editors\" on the options page to use the keys here. This tip shows once."
   }
 }

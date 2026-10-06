@@ -11,6 +11,7 @@ import { getMessage } from "./languages";
 import { Keymap, TextField, operation } from "./operation";
 import { loadUrlPolicy, subscribeUrlPolicy } from "./urlpolicy";
 import { UrlPolicy, resolveAction } from "./urlrules";
+import { createRichTextHint } from "./richtexthint";
 
 console.log("extension razorshell loaded");
 
@@ -69,6 +70,20 @@ loadContentEditableSetting().then(applyEditableSetting).catch(console.error);
 subscribeContentEditableSetting(applyEditableSetting);
 initKeymap().catch(console.error);
 
+const richTextHintKey = "richTextHintShown";
+
+// The record lives in `local`, not `sync`: the hint is about this browser not
+// having been told, and it is not a setting the user exports or carries.
+const richTextHint = createRichTextHint({
+  read: async () => {
+    const data = (await chrome.storage.local.get(richTextHintKey)) as Record<string, unknown>;
+    return data[richTextHintKey] === true;
+  },
+  write: () => chrome.storage.local.set({ [richTextHintKey]: true }),
+  show: () => showToast(getMessage("richtext_hint_title")(), [getMessage("richtext_hint_body")()]),
+  keymap: getActiveKeymap,
+});
+
 // Delegate at document level so text fields added after page load are
 // also covered, unlike per-element listeners bound once at injection.
 document.addEventListener(
@@ -81,7 +96,11 @@ document.addEventListener(
       keyEventHandling(event, target);
       return;
     }
-    if (!editableEnabled || !isEditableTarget(target)) return;
+    if (!isEditableTarget(target)) return;
+    if (!editableEnabled) {
+      richTextHint.offer(event).catch(console.error);
+      return;
+    }
     dispatchEditableKey(event, target, getActiveKeymap());
   },
   { capture: true },

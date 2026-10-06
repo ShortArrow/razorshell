@@ -194,5 +194,13 @@
   "tooltip_reclaimed": {
     "message": "O Chrome reserva Ctrl+W e Ctrl+T, então os dois não podem vir atribuídos por padrão. Atribua-os uma vez na página de atalhos; fora de um campo de texto a aba continua fechando e uma aba continua abrindo",
     "description": "O Chrome reserva Ctrl+W e Ctrl+T, então os dois não podem vir atribuídos por padrão. Atribua-os uma vez na página de atalhos; fora de um campo de texto a aba continua fechando e uma aba continua abrindo"
+  },
+  "richtext_hint_title": {
+    "message": "O Razorshell está desativado em editores de texto rico",
+    "description": "Razorshell is off in rich text editors"
+  },
+  "richtext_hint_body": {
+    "message": "Ative \"Enable in rich text editors\" na página de opções para usar os atalhos aqui. Este aviso aparece só uma vez.",
+    "description": "Turn on \"Enable in rich text editors\" on the options page to use the keys here. This tip shows once."
   }
 }

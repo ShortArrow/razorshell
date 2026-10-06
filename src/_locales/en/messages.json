@@ -194,5 +194,13 @@
   "tooltip_reclaimed": {
     "message": "Chrome reserves Ctrl+W and Ctrl+T, so these two cannot ship as defaults. Assign them once on the shortcuts page; outside a text field the tab still closes and a tab still opens",
     "description": "Chrome reserves Ctrl+W and Ctrl+T, so these two cannot ship as defaults. Assign them once on the shortcuts page; outside a text field the tab still closes and a tab still opens"
+  },
+  "richtext_hint_title": {
+    "message": "Razorshell is off in rich text editors",
+    "description": "Razorshell is off in rich text editors"
+  },
+  "richtext_hint_body": {
+    "message": "Turn on \"Enable in rich text editors\" on the options page to use the keys here. This tip shows once.",
+    "description": "Turn on \"Enable in rich text editors\" on the options page to use the keys here. This tip shows once."
   }
 }
