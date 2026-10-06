@@ -4,7 +4,7 @@
     "description": "Extension name"
   },
   "description": {
-    "message": "这个浏览器扩展为文本框添加类似 bash shell 的键盘快捷键。 ",
+    "message": "这个浏览器扩展为文本框添加类似 bash shell 的键盘快捷键。",
     "description": "Extension description"
   },
   "move_cursor_to_the_beginning": {

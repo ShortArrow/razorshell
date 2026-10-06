@@ -4,7 +4,7 @@
     "description": "Extension name"
   },
   "description": {
-    "message": "Это расширение браузера добавляет в текстовые поля сочетания клавиш в стиле оболочки bash. ",
+    "message": "Это расширение браузера добавляет в текстовые поля сочетания клавиш в стиле оболочки bash.",
     "description": "Extension description"
   },
   "move_cursor_to_the_beginning": {

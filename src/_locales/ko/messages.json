@@ -4,7 +4,7 @@
     "description": "Extension name"
   },
   "description": {
-    "message": "이 브라우저 확장 프로그램은 텍스트 상자에 bash 셸과 비슷한 키보드 단축키를 추가합니다. ",
+    "message": "이 브라우저 확장 프로그램은 텍스트 상자에 bash 셸과 비슷한 키보드 단축키를 추가합니다.",
     "description": "Extension description"
   },
   "move_cursor_to_the_beginning": {

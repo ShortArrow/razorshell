@@ -4,7 +4,7 @@
     "description": "Extension name"
   },
   "description": {
-    "message": "يضيف امتداد المتصفح هذا اختصارات لوحة مفاتيح شبيهة بصدفة bash إلى مربعات النص. ",
+    "message": "يضيف امتداد المتصفح هذا اختصارات لوحة مفاتيح شبيهة بصدفة bash إلى مربعات النص.",
     "description": "Extension description"
   },
   "move_cursor_to_the_beginning": {

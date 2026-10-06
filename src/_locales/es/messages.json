@@ -4,7 +4,7 @@
     "description": "Extension name"
   },
   "description": {
-    "message": "Esta extensión del navegador añade a los cuadros de texto atajos de teclado similares a los del intérprete bash. ",
+    "message": "Esta extensión del navegador añade a los cuadros de texto atajos de teclado similares a los del intérprete bash.",
     "description": "Extension description"
   },
   "move_cursor_to_the_beginning": {

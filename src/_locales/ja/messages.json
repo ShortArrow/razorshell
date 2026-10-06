@@ -4,7 +4,7 @@
     "description": "Extension name"
   },
   "description": {
-    "message": "このブラウザ拡張機能は、テキストボックスにbashシェルのようなキーボードショートカットを追加します。 ",
+    "message": "Web のテキスト欄で bash や Emacs の readline キーが使えます。Ctrl+A/E で行頭と行末、Ctrl+K で切り取り、Ctrl+Y で貼り戻し、Alt+F/B で単語移動。",
     "description": "Extension description"
   },
   "move_cursor_to_the_beginning": {

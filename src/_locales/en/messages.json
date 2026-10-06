@@ -4,7 +4,7 @@
     "description": "Extension name"
   },
   "description": {
-    "message": "This is a browser extension that adds bash shell-like keyboard shortcuts to textboxes. ",
+    "message": "Bash and Emacs readline keys in web text fields: Ctrl+A/E to line ends, Ctrl+K to kill, Ctrl+Y to yank, Alt+F/B by word.",
     "description": "Extension description"
   },
   "move_cursor_to_the_beginning": {

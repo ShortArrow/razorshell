@@ -4,7 +4,7 @@
     "description": "Extension name"
   },
   "description": {
-    "message": "Esta extensão de navegador adiciona aos campos de texto atalhos de teclado semelhantes aos do shell bash. ",
+    "message": "Esta extensão de navegador adiciona aos campos de texto atalhos de teclado semelhantes aos do shell bash.",
     "description": "Extension description"
   },
   "move_cursor_to_the_beginning": {

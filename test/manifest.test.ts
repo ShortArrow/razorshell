@@ -9,7 +9,7 @@
  * than the absence of two names is what makes a silently re-added permission go
  * red.
  */
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 
@@ -29,5 +29,23 @@ describe("the shipped manifest", () => {
 
   test("package.json and the manifest carry the same version", () => {
     expect(manifest.version).toBe(packageJson.version);
+  });
+});
+
+/**
+ * The store takes the listing's short description from the manifest's
+ * `description`, resolved per locale, and refuses an upload whose text is
+ * longer than 132 characters. The rejection arrives only at upload time, so
+ * the limit is held here instead.
+ */
+describe("the store's short description", () => {
+  const localesDir = join(__dirname, "..", "src", "_locales");
+  test.each(readdirSync(localesDir))("%s fits the store's 132 characters", (locale) => {
+    const messages = JSON.parse(
+      readFileSync(join(localesDir, locale, "messages.json"), "utf8"),
+    ) as { description: { message: string } };
+    const text = messages.description.message;
+    expect(text).toBe(text.trim());
+    expect([...text].length).toBeLessThanOrEqual(132);
   });
 });

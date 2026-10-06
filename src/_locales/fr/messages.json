@@ -4,7 +4,7 @@
     "description": "Extension name"
   },
   "description": {
-    "message": "Cette extension de navigateur ajoute aux champs de texte des raccourcis clavier inspirés du shell bash. ",
+    "message": "Cette extension de navigateur ajoute aux champs de texte des raccourcis clavier inspirés du shell bash.",
     "description": "Extension description"
   },
   "move_cursor_to_the_beginning": {
