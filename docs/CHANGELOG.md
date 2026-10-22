@@ -6,6 +6,8 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ## [Unreleased]
 
+## [0.0.8] - 2026-10-22
+
 ### Added
 
 - After an uninstall, Chrome opens a short anonymous form asking why,
