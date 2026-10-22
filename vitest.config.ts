@@ -11,6 +11,7 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
+import { playwright } from "@vitest/browser-playwright";
 import { defineConfig, mergeConfig } from "vite";
 import viteConfig from "./vite.config";
 
@@ -51,7 +52,7 @@ export default defineConfig(async () => ({
           browser: {
             enabled: true,
             headless: true,
-            provider: "playwright",
+            provider: playwright(),
             instances: [{ browser: "chromium" }],
           },
         },
