@@ -148,6 +148,9 @@ const localArea = {
  * @param seed - The sync storage contents the story starts from
  * @return void
  */
+/** The version the mock's `runtime.getManifest()` reports, fixed so stories render the same text. */
+export const mockManifestVersion = '0.0.0-story';
+
 export function resetStorage(seed: Record<string, unknown> = {}): void {
   syncStore = clone(seed);
   localStore = {};
@@ -259,6 +262,7 @@ export function installChromeMock(): void {
     },
     runtime: {
       getURL: (path: string) => path,
+      getManifest: () => ({ version: mockManifestVersion }),
     },
     tabs: {
       create: async (properties: { url?: string }) => {

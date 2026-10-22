@@ -69,6 +69,7 @@ const storyIds = [
   "options-configapp--import-error",
   "options-configapp--applied-badge",
   "options-configapp--choose-file",
+  "options-footerapp--default",
   "options-keymapapp--default",
   "options-keymapapp--with-override",
   "options-keymapapp--two-modifier-override",

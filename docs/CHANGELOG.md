@@ -8,6 +8,11 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ### Added
 
+- The options page footer links "Report a problem", "Request a
+  binding" and "Ideas and questions" by name. A problem report opens
+  the site form with the running version already filled in. The footer
+  used to carry one unlabelled icon pointing at the issue list, and its
+  icons were dark on a dark background.
 - With rich text support off, the first chord pressed in a rich text
   editor shows a one-time hint that names the "Enable in rich text
   editors" setting. The key still goes to the page, and the hint does
