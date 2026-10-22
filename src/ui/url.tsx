@@ -82,7 +82,7 @@ export function UrlApp() {
         </div>
       </div>
       <div className='join w-full'>
-        <label className='input input-bordered join-item flex justify-center items-center grow'>
+        <label className='input join-item flex justify-center items-center grow'>
           <input
             type='text'
             id='pattern'
@@ -127,7 +127,7 @@ export function UrlApp() {
             type='url'
             data-testid='url-probe-input'
             aria-label={getMessage('tooltip_url_probe')()}
-            className='input input-bordered input-sm w-full'
+            className='input input-sm w-full'
             placeholder='URL to check'
             value={probe}
             onChange={(e) => setProbe(e.target.value)}

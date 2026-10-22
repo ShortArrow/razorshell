@@ -9,14 +9,15 @@ import { ChevronDownIcon } from '@heroicons/react/24/outline';
  * select came back as an undecided `color-contrast` result (`bgGradient`).
  * Suppressing the gradient (`select-arrowless`, defined in `css/options.css`)
  * and drawing the arrow as an absolutely positioned icon leaves the control
- * with a flat background axe can measure.
+ * with a flat background axe can measure. The width follows the options, and
+ * the end padding keeps the selected text clear of the icon.
  *
  * Every `<select>` attribute is forwarded, so callers keep their own `id`,
  * `data-testid`, `aria-label`, sizing modifiers and change handler. `className`
  * is appended to the base classes rather than replacing them.
  */
 export function Select({ className, children, ...rest }: SelectHTMLAttributes<HTMLSelectElement>) {
-  const classes = ['select', 'select-bordered', 'select-arrowless', className]
+  const classes = ['select', 'select-arrowless', 'w-auto', 'pe-9', className]
     .filter((entry) => entry !== undefined && entry !== '')
     .join(' ');
   return (

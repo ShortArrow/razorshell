@@ -9,7 +9,7 @@ const storeUrl = "https://chromewebstore.google.com/detail/razorshell/ahokbhndbj
 export function FooterApp() {
   const links = feedbackLinks(chrome.runtime.getManifest().version);
   return <>
-    <footer className="footer footer-center bg-neutral text-neutral-content p-10">
+    <footer className="footer footer-center grid-flow-row bg-neutral text-neutral-content p-10">
       <aside>
         <img src={IconImge} alt="" className="w-16 h-16" />
         <p className="font-bold">

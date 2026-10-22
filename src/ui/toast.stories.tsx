@@ -75,7 +75,7 @@ export const InspectMode: Story = {
     (Story) => (
       <div style={{ cursor: 'crosshair' }} className='flex flex-col gap-3'>
         <Story />
-        <label className='input input-bordered flex items-center'>
+        <label className='input flex items-center'>
           <input
             type='text'
             className='grow'

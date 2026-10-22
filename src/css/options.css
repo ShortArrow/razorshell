@@ -1,6 +1,47 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@plugin "daisyui" {
+  themes: light --default, dark;
+}
+
+/*
+ * Primary, success, error and warning shift between the themes: dark hues
+ * with near-white content in light, light hues with near-black content in
+ * dark. The stock dark primary is too dark to read as text on base-200
+ * (3.59:1), and the stock status colours keep one pastel set in both.
+ */
+@plugin "daisyui/theme" {
+  name: "light";
+  default: true;
+  --color-success: oklch(49.12% 0.16 150);
+  --color-success-content: oklch(96% 0.03 150);
+  --color-error: oklch(49.12% 0.19 27);
+  --color-error-content: oklch(89.82% 0.04 27);
+  --color-warning: oklch(49.12% 0.12 70);
+  --color-warning-content: oklch(96% 0.03 70);
+}
+
+@plugin "daisyui/theme" {
+  name: "dark";
+  --color-primary: oklch(65.69% 0.196 275.75);
+  --color-primary-content: oklch(13.14% 0.04 275.75);
+  --color-success: oklch(65.69% 0.18 150);
+  --color-success-content: oklch(13.14% 0.04 150);
+  --color-error: oklch(65.69% 0.2 27);
+  --color-error-content: oklch(13.14% 0.03 27);
+}
+
+/*
+ * The tooltip takes neutral, which is dark in both themes; the light theme
+ * gets a light gray pair instead.
+ */
+[data-theme="light"] .tooltip {
+  --tt-bg: oklch(94% 0.005 260);
+}
+
+[data-theme="light"] .tooltip[data-tip]:before {
+  color: oklch(25% 0.02 260);
+}
 
 /**
  * Two daisyUI paint tricks leave axe unable to decide a `color-contrast`
@@ -13,13 +54,23 @@
  * daisyUI draws a select's arrow with two `linear-gradient` backgrounds, and
  * axe reports `bgGradient` on any element painted that way. `src/ui/select.tsx`
  * draws the arrow as a real icon instead; this rule takes the gradient away.
- * The declaration is in `utilities`, which the cascade places after daisyUI's
- * `components`, so it wins without `!important`.
+ * As a utility it sits directly in the `utilities` layer, which the cascade
+ * places after the sublayers daisyUI nests there, so it wins without
+ * `!important`.
  */
-@layer utilities {
-  .select-arrowless {
-    background-image: none;
-  }
+@utility select-arrowless {
+  background-image: none;
+}
+
+/*
+ * daisyUI layers a noise texture over buttons and badges as a second
+ * `background-image`, sized to zero while the theme's `--noise` is 0. axe
+ * reports `bgImage` for any value other than a single `none`, and the themes
+ * here keep `--noise` at 0, so the declaration is replaced outright.
+ */
+.btn,
+.badge {
+  background-image: none;
 }
 
 /*

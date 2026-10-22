@@ -6,6 +6,11 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ## [Unreleased]
 
+### Changed
+
+- The options page is restyled on Tailwind CSS 4 and daisyUI 5:
+  flatter controls, a darker footer and new theme palettes.
+
 ## [0.0.8] - 2026-10-22
 
 ### Added

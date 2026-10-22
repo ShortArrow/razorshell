@@ -126,7 +126,7 @@ export function ConfigApp() {
       <div className='tooltip tooltip-top' data-tip={getMessage('tooltip_config_import')()}>
         <textarea
           data-testid='config-text'
-          className='textarea textarea-bordered w-full font-mono'
+          className='textarea w-full font-mono'
           rows={6}
           placeholder='{"version": 1, ...}'
           value={text}

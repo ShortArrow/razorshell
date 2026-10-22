@@ -62,7 +62,7 @@ export function TestApp() {
       </h2>
       <div className="card bg-base-200">
         <div className="card-body gap-3">
-          <label className="input input-bordered flex items-center">
+          <label className="input flex items-center">
             <input
               type="text"
               data-testid="test-input"
@@ -79,7 +79,7 @@ export function TestApp() {
           <textarea
             data-testid="test-textarea"
             aria-label={`${getMessage("tooltip_test_area")()} (multiple lines)`}
-            className="textarea textarea-bordered w-full"
+            className="textarea w-full"
             rows={3}
             defaultValue={textareaText}
             onKeyDown={(e) => handleKeyDown(e, setTextareaSelection)}
