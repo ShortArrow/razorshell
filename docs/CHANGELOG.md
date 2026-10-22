@@ -8,6 +8,10 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ### Added
 
+- After an uninstall, Chrome opens a short anonymous form asking why,
+  with the version already filled in. Every question is optional and
+  no sign-in is needed. See
+  [ADR-0015](decisions/0015-anonymous-uninstall-survey.md).
 - The options page footer links "Report a problem", "Request a
   binding" and "Ideas and questions" by name. A problem report opens
   the site form with the running version already filled in. The footer

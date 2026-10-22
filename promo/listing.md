@@ -95,4 +95,7 @@ No. All code is packaged in the extension.
 
 Check none of the data types. Razorshell collects and transmits no user data:
 keystrokes are handled inside the page, killed text stays in memory in that
-frame, and settings stay in the user's own Chrome sync storage.
+frame, and settings stay in the user's own Chrome sync storage. After an
+uninstall Chrome opens an optional anonymous Google form asking why; the
+address carries only the extension version, and nothing is sent unless
+the user submits the form.

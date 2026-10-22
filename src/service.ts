@@ -7,6 +7,7 @@
  */
 
 import { commandAction, type FocusState } from "./commandroute";
+import { registerUninstallSurvey } from "./uninstall";
 
 const inspectMessage = "razorshell-inspect";
 const stateMessage = "razorshell-state";
@@ -14,6 +15,8 @@ const focusQueryMessage = "razorshell-focus-query";
 const runOperationMessage = "razorshell-run-operation";
 const disabledBadgeText = "✕";
 const disabledBadgeColor = "#b91c1c";
+
+void registerUninstallSurvey(chrome.runtime).catch(() => {});
 
 chrome.action.onClicked.addListener((tab) => {
   if (tab.id === undefined) return;

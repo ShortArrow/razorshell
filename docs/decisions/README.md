@@ -38,3 +38,5 @@ record names the files it concerns and is frozen when written.
 - [ADR-0014](0014-rich-text-hint.md) — with rich text support off,
   the first chord pressed in a rich editor shows a one-time hint naming
   the setting, and never takes the key
+- [ADR-0015](0015-anonymous-uninstall-survey.md) — after an uninstall,
+  Chrome opens an anonymous form asking why, with the version prefilled
