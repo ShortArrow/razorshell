@@ -26,10 +26,14 @@
  */
 
 import { beginYank, recordKill } from "./killring";
+import { isRuboutWhitespace, transposeWithinTextNode } from "./reclaimedregion";
 
 interface ModifiableSelection extends Selection {
   modify(alter: string, direction: string, granularity: string): void;
 }
+
+/** The two members of a Selection the character walks use. */
+export type CharacterStepper = Pick<ModifiableSelection, "modify" | "toString">;
 
 function selection(): ModifiableSelection | null {
   const current = window.getSelection();
@@ -79,14 +83,7 @@ function deleteToBoundary(
   }
   const text = current.toString();
   document.execCommand("delete");
-  recordKill({
-    direction: direction === "forward" ? "forward" : "backward",
-    text,
-    elementToken: root,
-    caretBefore: editableCaret,
-    caretAfter: editableCaret,
-    storable: true,
-  });
+  recordEditableKill(root, direction === "forward" ? "forward" : "backward", text);
 }
 
 /**
@@ -134,35 +131,150 @@ function deleteHorizontalSpaceInto(): void {
   const current = selection();
   if (!current) return;
   current.collapseToEnd();
-  extendOverBlanks(current, "forward", "backward");
+  extendWhile(current, "forward", "backward", isBlankRun);
   current.collapseToEnd();
-  extendOverBlanks(current, "backward", "forward");
+  extendWhile(current, "backward", "forward", isBlankRun);
   if (current.isCollapsed) return;
   document.execCommand("delete");
 }
 
+function isBlankRun(text: string): boolean {
+  return /^[ \t]+$/.test(text);
+}
+
 /**
- * Extends the selection a character at a time while what it holds is all
- * space and tab, stepping back once when a step takes in anything else. A
- * step that adds nothing is the edge of the editable content, and ends the
- * walk.
+ * Extends the selection a character at a time while what it holds satisfies
+ * `holds`, stepping back once when a step makes it fail. A step that adds
+ * nothing is the edge of the editable content, and ends the walk.
  */
-function extendOverBlanks(
-  current: ModifiableSelection,
+function extendWhile(
+  current: CharacterStepper,
   direction: "forward" | "backward",
   opposite: "forward" | "backward",
+  holds: (text: string) => boolean,
 ): void {
   let held = current.toString().length;
   for (;;) {
     current.modify("extend", direction, "character");
     const text = current.toString();
     if (text.length <= held) return;
-    if (!/^[ \t]+$/.test(text)) {
+    if (!holds(text)) {
       current.modify("extend", opposite, "character");
       return;
     }
     held = text.length;
   }
+}
+
+/**
+ * Kills back over the whitespace behind the caret and the word before it,
+ * the counterpart of `operation.unixWordRubout`, and records the kill on the
+ * ring as the line and word kills do.
+ *
+ * A non-collapsed selection is collapsed to its start first, so the rubout
+ * takes what precedes the selection and the selected text survives, as the
+ * field version reads `selectionStart`. The selection itself does not: what
+ * is left is the caret where the deleted text began.
+ */
+function unixWordRuboutInto(root: HTMLElement): void {
+  const current = selection();
+  if (!current) return;
+  current.collapseToStart();
+  extendOverUnixWord(current);
+  if (current.isCollapsed) return;
+  const text = current.toString();
+  document.execCommand("delete");
+  recordEditableKill(root, "backward", text);
+}
+
+/**
+ * Extends a collapsed selection backward over what `unixWordRuboutRegion`
+ * would remove in a field: whitespace, then the non-whitespace before it,
+ * with whitespace as `isRuboutWhitespace` defines it.
+ *
+ * The text is read off the selection a rendered character at a time, so a
+ * block boundary is whatever the engine reports for it, which is a newline.
+ * A boundary is therefore whitespace here as a newline is in a textarea: at
+ * the start of a block the rubout takes the boundary and the previous block's
+ * last word, joining the two blocks, and mid-block it stops at the boundary.
+ * A no-break space is text, so a run an editor wrote as U+00A0 belongs to the
+ * word.
+ */
+export function extendOverUnixWord(current: CharacterStepper): void {
+  extendWhile(current, "backward", "forward", isWhitespaceRun);
+  extendWhile(current, "backward", "forward", isWordThenWhitespace);
+}
+
+function isWhitespaceRun(text: string): boolean {
+  return text !== "" && Array.from(text).every(isRuboutWhitespace);
+}
+
+function isWordThenWhitespace(text: string): boolean {
+  let end = text.length;
+  while (end > 0 && isRuboutWhitespace(text[end - 1])) end -= 1;
+  return end > 0 && !Array.from(text.slice(0, end)).some(isRuboutWhitespace);
+}
+
+/**
+ * Swaps the two graphemes at the caret, the counterpart of
+ * `operation.transposeChars`, inside one text node or not at all.
+ *
+ * The caret must be collapsed and resolve to a Text node in the root; the
+ * swap is `transposeWithinTextNode` on that node's data, which refuses a swap
+ * that would move a character across a node boundary and so out of its
+ * formatting. A refusal changes nothing. The edit selects the two graphemes
+ * inside the node and replaces them through `execCommand("insertText")`, so
+ * the text keeps the node's formatting, the host editor sees the input and
+ * Ctrl+Z takes it back; the caret lands after both.
+ *
+ * Whether the caret ends the line is asked only at the node's end, where it
+ * decides between the end-of-line swap and a refusal; `endsLine` measures it.
+ */
+function transposeCharsInto(root: HTMLElement): void {
+  const current = selection();
+  if (!current || !current.isCollapsed) return;
+  const caret = textCaret(current);
+  if (!caret || !root.contains(caret.node)) return;
+  const { node, offset } = caret;
+  const atLineEnd = offset >= node.data.length && endsLine(current, node, offset);
+  const edit = transposeWithinTextNode(node.data, offset, atLineEnd);
+  if (!edit) return;
+  current.setBaseAndExtent(node, edit.start, node, edit.end);
+  document.execCommand("insertText", false, edit.text);
+}
+
+/**
+ * The Text node and offset a collapsed caret sits at. A caret the engine
+ * placed between an element's children resolves to the end of a Text node
+ * before it or the start of one after it; anywhere else there is none.
+ */
+function textCaret(current: Selection): { node: Text; offset: number } | null {
+  const { focusNode, focusOffset } = current;
+  if (focusNode instanceof Text) return { node: focusNode, offset: focusOffset };
+  if (!focusNode) return null;
+  const before = focusNode.childNodes[focusOffset - 1];
+  if (before instanceof Text) return { node: before, offset: before.data.length };
+  const after = focusNode.childNodes[focusOffset];
+  if (after instanceof Text) return { node: after, offset: 0 };
+  return null;
+}
+
+/**
+ * Whether the caret at the end of `node` also ends its line, probed by
+ * extending one rendered character forward and reading what that takes in,
+ * then putting the caret back where it was.
+ *
+ * Nothing taken in is the end of the root, so the end of its last line. A
+ * newline is a line break: a `<br>`, a block boundary or a newline in
+ * preformatted text, which the engine all reads back as `"\n"`. Anything else
+ * is more of the line in another node. A soft wrap is not a line end, since
+ * readline's line is the logical one.
+ */
+function endsLine(current: ModifiableSelection, node: Text, offset: number): boolean {
+  current.modify("extend", "forward", "character");
+  const ahead = current.toString();
+  current.collapse(node, offset);
+  return ahead === "" || /^[\r\n]+$/.test(ahead);
 }
 
 /**
@@ -200,8 +312,13 @@ function killAllInto(root: HTMLElement): void {
   const text = current.toString();
   if (text === "") return;
   document.execCommand("delete");
+  recordEditableKill(root, "backward", text);
+}
+
+/** Reports a rich text kill to the ring, under the chain rules the file header describes. */
+function recordEditableKill(root: HTMLElement, direction: "forward" | "backward", text: string): void {
   recordKill({
-    direction: "backward",
+    direction,
     text,
     elementToken: root,
     caretBefore: editableCaret,
@@ -235,4 +352,10 @@ export const editableOperation: Record<string, (root: HTMLElement) => void> = {
   undo: (root) => undoInto(root),
   yank: (root) => yankInto(root),
   kill_whole_field: (root) => killAllInto(root),
+};
+
+/** The rich text counterparts of the two reclaimed chords' operations (ADR-0017). */
+export const editableReclaimedOperation = {
+  unixWordRubout: unixWordRuboutInto,
+  transposeChars: transposeCharsInto,
 };

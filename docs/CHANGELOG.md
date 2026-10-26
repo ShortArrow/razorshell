@@ -16,6 +16,12 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   holding that value, a password field and rich text editors leave the
   key to the page. See [ADR-0016](decisions/0016-revert-line.md),
   "revert-line restores the value a field held when it gained focus".
+- An assigned Ctrl+W or Ctrl+T works in rich text editors, where it
+  used to do nothing. Ctrl+T swaps only two characters with the same
+  formatting and otherwise changes nothing. See
+  [ADR-0017](decisions/0017-reclaimed-chords-in-rich-text.md), "the
+  reclaimed chords act in rich text editors, and Ctrl+T refuses to
+  cross a formatting boundary".
 
 ### Changed
 

@@ -46,8 +46,8 @@ export function unixWordRuboutRegion(
 ): KillRegion {
   const end = clamp(selectionStart, value.length);
   let start = end;
-  while (start > 0 && isWhitespace(value[start - 1])) start -= 1;
-  while (start > 0 && !isWhitespace(value[start - 1])) start -= 1;
+  while (start > 0 && isRuboutWhitespace(value[start - 1])) start -= 1;
+  while (start > 0 && !isRuboutWhitespace(value[start - 1])) start -= 1;
   return { start, end };
 }
 
@@ -104,6 +104,34 @@ export function transposeCharsEdit(value: string, caret: number): CaseEdit | nul
   return { start, end, text: right + left, caret: end };
 }
 
+/**
+ * The transpose a rich text root allows at a caret in one text node: the
+ * readline transpose of `transposeCharsEdit` on that node's `data`, or null
+ * when either grapheme it would swap lies outside the node.
+ *
+ * Formatting in a rich text root lives on elements, so a swap across a node
+ * boundary moves a character from one format into the other — the bold one
+ * lands plain. Refusing keeps every character in the node it was typed into,
+ * at the price of a no-op wherever readline would have reached across. Two
+ * cases reach outside:
+ *
+ * - The caret at the node's start: the grapheme before it is in another node,
+ *   or there is none because the line starts there. `transposeCharsEdit`
+ *   already returns null for a caret at 0.
+ * - The caret at the node's end with more of the line after it
+ *   (`atLineEnd` false): the grapheme at the caret starts the next node.
+ *   Only at the end of the LINE does readline step back and swap the two
+ *   before the caret, and then both must be in this node, which
+ *   `transposeCharsEdit` checks by needing two clusters.
+ *
+ * `atLineEnd` is the caller's measurement and only matters at the node's end;
+ * mid-node the grapheme at the caret is in the node, whatever follows it.
+ */
+export function transposeWithinTextNode(data: string, offset: number, atLineEnd: boolean): CaseEdit | null {
+  if (offset >= data.length && !atLineEnd) return null;
+  return transposeCharsEdit(data, offset);
+}
+
 /** The value split into grapheme clusters, or into code points where
  * `Intl.Segmenter` is missing — a smaller unit is a degradation, but a split
  * surrogate pair would be a defect, so the fallback still never returns half a
@@ -157,7 +185,7 @@ function offsetOf(clusters: string[], index: number): number {
  * that treated `\n` as a word constituent would reach across a line boundary and
  * swallow the previous line's last word along with the break.
  */
-function isWhitespace(character: string | undefined): boolean {
+export function isRuboutWhitespace(character: string | undefined): boolean {
   return character === " " || character === "\t" || character === "\n" || character === "\r";
 }
 

@@ -3237,6 +3237,132 @@ test.describe("the reclaimed chords route to the focused field @C1.18", () => {
     expect(await runOperation("not_an_operation")).toEqual({ ran: false });
     expect((await fieldState(input())).value).toBe("foo bar");
   });
+
+  /**
+   * The same message path into a contenteditable root with the rich text
+   * option on (ADR-0017). The option is read at the start and written back at
+   * the end, so the blocks after this one see the setting they saw before.
+   *
+   * The tab-count assertions follow the worker's route as far as the harness
+   * can: the focus query must answer "focused", which is what sends the worker
+   * down the run arm instead of `tabs.create`, and the run must leave the tab
+   * set as it was.
+   */
+  test.describe("in a rich text root", () => {
+    const editor = () => page.locator('[contenteditable="true"]');
+
+    /**
+     * Replaces the root's markup and parks a collapsed caret at `offset` in
+     * its `textIndex`-th text node, in document order.
+     */
+    async function seedEditor(html: string, textIndex: number, offset: number): Promise<void> {
+      await editor().evaluate(
+        (div: HTMLElement, [markup, index, at]: [string, number, number]) => {
+          div.innerHTML = markup;
+          div.focus();
+          const walker = document.createTreeWalker(div, NodeFilter.SHOW_TEXT);
+          let node = walker.nextNode();
+          for (let i = 0; i < index; i++) node = walker.nextNode();
+          const range = document.createRange();
+          range.setStart(node!, at);
+          range.collapse(true);
+          const sel = window.getSelection()!;
+          sel.removeAllRanges();
+          sel.addRange(range);
+        },
+        [html, textIndex, offset] as [string, number, number],
+      );
+    }
+
+    const editorState = () =>
+      page.evaluate(() => {
+        const div = document.querySelector('[contenteditable="true"]')!;
+        const sel = window.getSelection()!;
+        return {
+          html: div.innerHTML,
+          caretText: sel.focusNode?.textContent ?? null,
+          offset: sel.focusOffset,
+          collapsed: sel.isCollapsed,
+        };
+      });
+
+    let editableWasEnabled = false;
+
+    test.beforeAll(async () => {
+      editableWasEnabled = await optionsPage.evaluate(async () => {
+        const data = (await chrome.storage.sync.get("enableContentEditable")) as {
+          enableContentEditable?: boolean;
+        };
+        return data.enableContentEditable === true;
+      });
+      await optionsPage.evaluate(() => chrome.storage.sync.set({ enableContentEditable: true }));
+      await page.waitForTimeout(500);
+    });
+
+    test.afterAll(async () => {
+      await optionsPage.evaluate(
+        (value) => chrome.storage.sync.set({ enableContentEditable: value }),
+        editableWasEnabled,
+      );
+      await page.waitForTimeout(500);
+    });
+
+    test("the rubout kills a whitespace word onto the ring and Ctrl+Y gives it back", async () => {
+      await freshFrame();
+      await seedEditor("foo bar-baz", 0, 11);
+
+      expect(await askFocus()).toEqual({ textFieldFocused: true, enabled: true });
+      expect(await runOperation("unix_word_rubout")).toEqual({ ran: true });
+      expect((await editorState()).html).toBe("foo ");
+
+      await page.keyboard.press("Control+y");
+      expect((await editorState()).html).toBe("foo bar-baz");
+    });
+
+    test("transpose swaps the two graphemes around a caret inside a text node, keeping its format", async () => {
+      await freshFrame();
+      await seedEditor("x<b>abcd</b>y", 1, 2);
+
+      expect(await runOperation("transpose_chars")).toEqual({ ran: true });
+      expect(await editorState()).toEqual({
+        html: "x<b>acbd</b>y",
+        caretText: "acbd",
+        offset: 3,
+        collapsed: true,
+      });
+    });
+
+    test("transpose at a bold and plain boundary changes nothing and opens no tab", async () => {
+      await freshFrame();
+      const tabs = context.pages().length;
+      for (const [textIndex, offset] of [
+        [0, 2],
+        [1, 0],
+      ] as const) {
+        await seedEditor("ab<b>cd</b>", textIndex, offset);
+
+        expect(await askFocus()).toEqual({ textFieldFocused: true, enabled: true });
+        expect(await runOperation("transpose_chars")).toEqual({ ran: true });
+        const state = await editorState();
+        expect(state.html).toBe("ab<b>cd</b>");
+        expect(state.collapsed).toBe(true);
+      }
+      expect(context.pages().length).toBe(tabs);
+    });
+
+    test("transpose at the end of a line swaps the two graphemes before the caret", async () => {
+      await freshFrame();
+      await seedEditor("<div>abc</div><div>de</div>", 0, 3);
+
+      expect(await runOperation("transpose_chars")).toEqual({ ran: true });
+      expect(await editorState()).toEqual({
+        html: "<div>acb</div><div>de</div>",
+        caretText: "acb",
+        offset: 3,
+        collapsed: true,
+      });
+    });
+  });
 });
 
 /**

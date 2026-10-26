@@ -13,6 +13,7 @@ import { Keymap, TextField, operation } from "./operation";
 import { loadUrlPolicy, subscribeUrlPolicy } from "./urlpolicy";
 import { UrlPolicy, resolveAction } from "./urlrules";
 import { createRichTextHint } from "./richtexthint";
+import { editableReclaimedOperation } from "./editableoperation";
 
 console.log("extension razorshell loaded");
 
@@ -307,7 +308,7 @@ chrome.runtime.onMessage.addListener((message: { type?: string }) => {
  * Reads `document.activeElement`, since these operations arrive as messages and
  * carry no event target. A text field qualifies always; a contenteditable root
  * qualifies only while the contenteditable setting is on, and is returned as a
- * plain `HTMLElement` so callers that need a value to slice can reject it.
+ * plain `HTMLElement`, which callers tell from a field with `isTextField`.
  */
 function focusedField(): TextField | HTMLElement | null {
   const active = document.activeElement;
@@ -322,10 +323,24 @@ function focusedField(): TextField | HTMLElement | null {
  * reports itself through `recordKill`; transpose is foreign to the ring and must
  * be announced, so that a transpose between two kills breaks their chain instead
  * of letting them splice across the text it rearranged.
+ *
+ * `run` acts on a text field and `editableRun` on a contenteditable root, the
+ * pair a `Keymap` entry carries as `operation` and `editableOperation`.
  */
-const reclaimedOperations: Record<string, { run: (field: TextField) => void; kill: boolean }> = {
-  unix_word_rubout: { run: operation.unixWordRubout, kill: true },
-  transpose_chars: { run: operation.transposeChars, kill: false },
+const reclaimedOperations: Record<
+  string,
+  { run: (field: TextField) => void; editableRun: (root: HTMLElement) => void; kill: boolean }
+> = {
+  unix_word_rubout: {
+    run: operation.unixWordRubout,
+    editableRun: editableReclaimedOperation.unixWordRubout,
+    kill: true,
+  },
+  transpose_chars: {
+    run: operation.transposeChars,
+    editableRun: editableReclaimedOperation.transposeChars,
+    kill: false,
+  },
 };
 
 /**
@@ -354,7 +369,12 @@ function ownsFocus(): boolean {
  * Both arms answer from `focusedField()` rather than an event target: there is
  * no event. `enabled` travels with the focus answer so the worker can treat a
  * policy-denied frame as no field at all, which is what keeps Ctrl+W closing the
- * tab on a page the user turned razorshell off for.
+ * tab on a page the user turned razorshell off for. The run arm acts on what
+ * `focusedField()` found: a text field through `run`, a contenteditable root
+ * through `editableRun` (ADR-0017). A rich-text refusal, such as a transpose
+ * that would cross a formatting boundary, still answers `ran: true`, because
+ * the field was focused and the chord is consumed; only the field is left
+ * alone.
  *
  * The worker sends both messages to the whole tab, so every frame hears them
  * and the first `sendResponse` wins. Only the frame that `ownsFocus()` answers;
@@ -378,15 +398,13 @@ chrome.runtime.onMessage.addListener(
     }
     const entry = message.operation === undefined ? undefined : reclaimedOperations[message.operation];
     const field = focusedField();
-    // A contenteditable root has no `value` to slice, so these two decline it
-    // rather than acting on the wrong thing — the same refusal the case
-    // operations make by shipping without an `editableOperation`.
-    if (!entry || !enabled || !isTextField(field)) {
+    if (!entry || !enabled || field === null) {
       sendResponse({ ran: false });
       return true;
     }
     if (!entry.kill) noteForeignCommand();
-    entry.run(field);
+    if (isTextField(field)) entry.run(field);
+    else entry.editableRun(field);
     sendResponse({ ran: true });
     return true;
   },

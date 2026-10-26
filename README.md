@@ -195,6 +195,14 @@ swallows a whole path or a hyphenated token in one press. It joins the
 kill ring like any other kill. `Ctrl` + `t` swaps the two graphemes
 around the cursor through the field's own undo history.
 
+With rich text editors turned on, both chords work there too.
+`Ctrl` + `w` treats a paragraph break like a line break: at the start
+of a paragraph it joins it to the one before and takes that one's last
+word. `Ctrl` + `t` swaps only two characters with the same formatting.
+Where the two would come from different formatting, such as the last
+plain letter before a bold one, it changes nothing, and the tab stays
+as it was.
+
 Outside a text field the browser behaviour is still there. Press
 `Ctrl` + `w` with nothing focused and the tab closes; `Ctrl` + `t`
 opens a tab. Razorshell reproduces the action it displaced rather than
@@ -265,8 +273,7 @@ off because rich editors ship their own shortcuts, and `Ctrl` + `k` as
 handles. While it is off, the first chord you press in a rich editor
 shows a one-time hint pointing here. Inside a rich editor the case operations, transpose words,
 yank pop, accept line and open line do nothing and leave the key to
-the editor, and an assigned `Ctrl` + `w` or `Ctrl` + `t` does
-nothing there rather than close or open a tab.
+the editor.
 
 ### Import and export
 
