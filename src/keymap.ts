@@ -163,6 +163,19 @@ export const defaultKeymap: Keymap[] = [
     key: "h",
   },
   /**
+   * A delete like the character deletes, and role-less for the same reason: a
+   * kill on either side of it stays its own ring entry.
+   */
+  {
+    id: "delete_horizontal_space",
+    label: "delete horizontal space",
+    description: getMessage("delete_horizontal_space"),
+    operation: operation.deleteHorizontalSpace,
+    editableOperation: editableOperation.delete_horizontal_space,
+    alt: true,
+    key: "\\",
+  },
+  /**
    * Undo reaches the same operation from two chords, so it is two entries with
    * two ids rather than one entry claiming both. Ids are the handle the rebind
    * GUI keys its rows by and the settings importer validates against, and

@@ -63,6 +63,10 @@
     "message": "Supprimer le caractère avant le curseur",
     "description": "Supprimer le caractère avant le curseur"
   },
+  "delete_horizontal_space": {
+    "message": "Supprimer les espaces et tabulations autour du curseur",
+    "description": "Supprimer les espaces et tabulations autour du curseur"
+  },
   "undo": {
     "message": "Annuler",
     "description": "Annuler"

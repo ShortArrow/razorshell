@@ -2523,6 +2523,146 @@ test.describe("word kills, character deletes and undo @C1.16", () => {
 });
 
 /**
+ * delete-horizontal-space in a field and in a rich text root.
+ *
+ * jsdom shows the region and the wiring; only an engine shows that the removal
+ * joined the field's undo history, that a caret with no blank beside it makes
+ * no edit while the key is still consumed, and that the Selection walk in a
+ * contenteditable root stops at the text and the line break around the run.
+ *
+ * Self-contained in the manner of the C1.15 block: it turns the rich text
+ * opt-in on, so the setting is read first and put back as found, and the
+ * denying policy and seeded text the later describes assert are restored.
+ */
+test.describe("delete horizontal space @C1.16", () => {
+  const input = () => page.locator('input[type="text"]').first();
+  const editor = () => page.locator('[contenteditable="true"]');
+
+  async function freshFrame(): Promise<void> {
+    await page.goto(`${origin}/`);
+    await page.waitForTimeout(1000);
+  }
+
+  /** Types into the field natively, so the field owns a real undo stack. */
+  async function typeFresh(text: string): Promise<void> {
+    await input().click();
+    await input().evaluate((el: HTMLInputElement) => {
+      el.focus();
+      el.setSelectionRange(0, el.value.length);
+    });
+    await page.keyboard.press("Delete");
+    await page.keyboard.type(text);
+    expect((await fieldState(input())).value).toBe(text);
+  }
+
+  async function caretTo(position: number): Promise<void> {
+    await input().evaluate((el: HTMLInputElement, at: number) => {
+      el.focus();
+      el.setSelectionRange(at, at);
+    }, position);
+  }
+
+  /** Replaces the root's text and parks a collapsed caret at an offset in it. */
+  async function seedEditor(text: string, offset: number): Promise<void> {
+    await editor().evaluate(
+      (div: HTMLElement, [content, at]: [string, number]) => {
+        div.textContent = content;
+        div.focus();
+        const range = document.createRange();
+        range.setStart(div.firstChild!, at);
+        range.collapse(true);
+        const sel = window.getSelection()!;
+        sel.removeAllRanges();
+        sel.addRange(range);
+      },
+      [text, offset] as [string, number],
+    );
+  }
+
+  const editorState = () =>
+    page.evaluate(() => {
+      const div = document.querySelector('[contenteditable="true"]')!;
+      const sel = window.getSelection()!;
+      return { text: div.textContent, offset: sel.focusOffset, collapsed: sel.isCollapsed };
+    });
+
+  let editableWasEnabled = false;
+
+  test.beforeAll(async () => {
+    await setPolicy({ defaultAction: "allow", rules: [] });
+    editableWasEnabled = await optionsPage.evaluate(async () => {
+      const data = (await chrome.storage.sync.get("enableContentEditable")) as {
+        enableContentEditable?: boolean;
+      };
+      return data.enableContentEditable === true;
+    });
+    await freshFrame();
+  });
+
+  test.afterAll(async () => {
+    await optionsPage.evaluate(
+      (value) => chrome.storage.sync.set({ enableContentEditable: value }),
+      editableWasEnabled,
+    );
+    await page.waitForTimeout(500);
+    await freshFrame();
+    await setPolicy({
+      defaultAction: "allow",
+      rules: [{ pattern: "https://example.com/**", matchType: "glob", action: "deny" }],
+    });
+    await seedTextInput("hello world new order", 0);
+  });
+
+  test("Alt+\\ removes the blanks on both sides of the caret, and Ctrl+Z restores them", async () => {
+    await typeFresh("one     two");
+    await caretTo(5);
+
+    await page.keyboard.press("Alt+Backslash");
+    expect(await fieldState(input())).toEqual({ value: "onetwo", start: 3, end: 3 });
+
+    await page.keyboard.press("Control+z");
+    expect((await fieldState(input())).value).toBe("one     two");
+  });
+
+  test("Alt+\\ with no blank at the caret makes no edit and still takes the key", async () => {
+    await typeFresh("onetwo");
+    await caretTo(3);
+    await input().evaluate((el: HTMLInputElement) => {
+      const seen = { inputs: 0, prevented: [] as boolean[] };
+      el.addEventListener("input", () => (seen.inputs += 1));
+      el.addEventListener("keydown", (event) => {
+        if (event.key === "\\") seen.prevented.push(event.defaultPrevented);
+      });
+      (el as unknown as { __seen: typeof seen }).__seen = seen;
+    });
+
+    await page.keyboard.press("Alt+Backslash");
+
+    expect(await fieldState(input())).toEqual({ value: "onetwo", start: 3, end: 3 });
+    const seen = await input().evaluate(
+      (el: HTMLInputElement) => (el as unknown as { __seen: unknown }).__seen,
+    );
+    expect(seen).toEqual({ inputs: 0, prevented: [true] });
+    await freshFrame();
+  });
+
+  test("Alt+\\ in a rich text root removes the run of spaces and tabs", async () => {
+    await optionsPage.evaluate(() => chrome.storage.sync.set({ enableContentEditable: true }));
+    await page.waitForTimeout(500);
+
+    await seedEditor("one \t  two", 5);
+    await page.keyboard.press("Alt+Backslash");
+    expect(await editorState()).toEqual({ text: "onetwo", offset: 3, collapsed: true });
+  });
+
+  test("Alt+\\ in a rich text root stops at the line break", async () => {
+    await seedEditor("one  \n  two", 7);
+    await page.keyboard.press("Alt+Backslash");
+    expect(await editorState()).toEqual({ text: "one  \ntwo", offset: 6, collapsed: true });
+  });
+});
+
+/**
  * The case operations, transpose-words, and Ctrl+K over a line boundary.
  *
  * Self-contained in the manner of the C1.14 and C1.16 blocks: it seeds the

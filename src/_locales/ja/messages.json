@@ -63,6 +63,10 @@
     "message": "カーソルの前の1文字を削除",
     "description": "カーソルの前の1文字を削除"
   },
+  "delete_horizontal_space": {
+    "message": "カーソルの前後の空白とタブを削除",
+    "description": "カーソルの前後の空白とタブを削除"
+  },
   "undo": {
     "message": "元に戻す",
     "description": "元に戻す"

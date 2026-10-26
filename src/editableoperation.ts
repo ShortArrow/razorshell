@@ -108,6 +108,64 @@ function deleteByGranularity(direction: string, granularity: string): void {
 }
 
 /**
+ * Removes the spaces and tabs around the caret without telling the ring, the
+ * counterpart of `operation.deleteHorizontalSpace`.
+ *
+ * There is no value to scan, so the run is measured by growing the selection
+ * one engine `character` at a time and reading it back: forward from the caret
+ * until the selected text stops being all blank, one step back, collapse to
+ * that end, then the same walk backward across the whole run. The selection
+ * then covers the run, and `execCommand("delete")` removes it through the
+ * host editor's own history, leaving the caret at its start. With nothing
+ * selected at the end there was no blank at the caret, and nothing is deleted.
+ *
+ * A non-collapsed selection is measured from its end, as the text-field side
+ * reads `selectionEnd`.
+ *
+ * Limits, all the engine's: a step is a rendered character, so under
+ * `white-space: normal` a run the engine collapses into one visible space is
+ * walked as that one space, and what the delete removes is what the engine
+ * says the selection covers. A no-break space is text here as on the field
+ * side, which includes the U+00A0 an editor writes when a user types two
+ * spaces in a row: such a run is removed only up to it. A block boundary reads
+ * back as a newline and ends the run like one.
+ */
+function deleteHorizontalSpaceInto(): void {
+  const current = selection();
+  if (!current) return;
+  current.collapseToEnd();
+  extendOverBlanks(current, "forward", "backward");
+  current.collapseToEnd();
+  extendOverBlanks(current, "backward", "forward");
+  if (current.isCollapsed) return;
+  document.execCommand("delete");
+}
+
+/**
+ * Extends the selection a character at a time while what it holds is all
+ * space and tab, stepping back once when a step takes in anything else. A
+ * step that adds nothing is the edge of the editable content, and ends the
+ * walk.
+ */
+function extendOverBlanks(
+  current: ModifiableSelection,
+  direction: "forward" | "backward",
+  opposite: "forward" | "backward",
+): void {
+  let held = current.toString().length;
+  for (;;) {
+    current.modify("extend", direction, "character");
+    const text = current.toString();
+    if (text.length <= held) return;
+    if (!/^[ \t]+$/.test(text)) {
+      current.modify("extend", opposite, "character");
+      return;
+    }
+    held = text.length;
+  }
+}
+
+/**
  * Steps the host editor's own undo history back one entry, the counterpart of
  * `operation.undo`. Nothing is spliced when the engine refuses — an undo stack
  * cannot be rebuilt from outside, least of all in markup the editor normalises.
@@ -173,6 +231,7 @@ export const editableOperation: Record<string, (root: HTMLElement) => void> = {
   backward_kill_word: (root) => deleteToBoundary(root, "backward", "word"),
   delete_char: () => deleteByGranularity("forward", "character"),
   backward_delete_char: () => deleteByGranularity("backward", "character"),
+  delete_horizontal_space: () => deleteHorizontalSpaceInto(),
   undo: (root) => undoInto(root),
   yank: (root) => yankInto(root),
   kill_whole_field: (root) => killAllInto(root),

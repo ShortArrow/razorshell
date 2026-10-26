@@ -136,6 +136,33 @@ export function previousGraphemeRegion(
   return { start: cluster.start, end: cluster.end };
 }
 
+/**
+ * The run of spaces and tabs around the caret, readline's
+ * `rl_delete_horizontal_space`: back from the caret while the character
+ * before is blank, forward while the character after is, with `start` where
+ * the caret lands once the run is gone.
+ *
+ * Blank is readline's `whitespace()`, space and tab only. A newline bounds the
+ * run, so a textarea's lines never join, and a no-break space counts as text.
+ * No blank on either side is an empty region at the caret, which
+ * `applyKillRegion` turns into no edit at all.
+ *
+ * The caret is one position, as in readline, which has no selection; callers
+ * pass the selection's end, the position the case operations read, and the
+ * selected text itself survives.
+ */
+export function horizontalSpaceRegion(value: string, caret: number): KillRegion {
+  let start = caret;
+  while (start > 0 && isHorizontalSpace(value[start - 1])) start -= 1;
+  let end = caret;
+  while (end < value.length && isHorizontalSpace(value[end])) end += 1;
+  return { start, end };
+}
+
+function isHorizontalSpace(character: string): boolean {
+  return character === " " || character === "\t";
+}
+
 function clamp(position: number, length: number): number {
   return Math.max(0, Math.min(position, length));
 }

@@ -63,6 +63,10 @@
     "message": "Zeichen vor dem Cursor löschen",
     "description": "Zeichen vor dem Cursor löschen"
   },
+  "delete_horizontal_space": {
+    "message": "Leerzeichen und Tabulatoren um den Cursor löschen",
+    "description": "Leerzeichen und Tabulatoren um den Cursor löschen"
+  },
   "undo": {
     "message": "Rückgängig",
     "description": "Rückgängig"

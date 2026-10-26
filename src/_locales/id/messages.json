@@ -63,6 +63,10 @@
     "message": "Hapus karakter sebelum kursor",
     "description": "Hapus karakter sebelum kursor"
   },
+  "delete_horizontal_space": {
+    "message": "Hapus spasi dan tab di sekitar kursor",
+    "description": "Hapus spasi dan tab di sekitar kursor"
+  },
   "undo": {
     "message": "Urungkan",
     "description": "Urungkan"

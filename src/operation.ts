@@ -11,6 +11,7 @@ import {
   backwardWordRegion,
   endOfLineRegion,
   forwardWordRegion,
+  horizontalSpaceRegion,
   nextGraphemeRegion,
   previousGraphemeRegion,
   topOfLineRegion,
@@ -156,6 +157,19 @@ export const operation = {
     const end = textinput.selectionEnd;
     if (start == null || end == null) return;
     applyKillRegion(textinput, previousGraphemeRegion(textinput.value, start, end));
+  },
+  /**
+   * Removes the spaces and tabs on both sides of the caret — readline's M-\.
+   *
+   * A delete like `deleteChar`, so nothing reaches the ring and a kill chain
+   * around it breaks. The removal goes through `applyKillRegion`, which joins
+   * the field's undo history, and with no blank at the caret makes no edit at
+   * all; the key is consumed either way.
+   */
+  deleteHorizontalSpace(textinput: TextField) {
+    const caret = textinput.selectionEnd;
+    if (caret == null) return;
+    applyKillRegion(textinput, horizontalSpaceRegion(textinput.value, caret));
   },
   /**
    * Steps the field's own undo history back one entry.

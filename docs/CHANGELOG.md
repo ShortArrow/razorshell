@@ -6,6 +6,12 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ## [Unreleased]
 
+### Added
+
+- Alt+\ deletes the spaces and tabs around the cursor, readline's
+  delete-horizontal-space, in text fields and rich text editors. It
+  stays off the kill ring.
+
 ### Changed
 
 - The options page is restyled on Tailwind CSS 4 and daisyUI 5:

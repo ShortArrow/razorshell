@@ -63,6 +63,10 @@
     "message": "Excluir o caractere antes do cursor",
     "description": "Excluir o caractere antes do cursor"
   },
+  "delete_horizontal_space": {
+    "message": "Excluir os espaços e tabulações ao redor do cursor",
+    "description": "Excluir os espaços e tabulações ao redor do cursor"
+  },
   "undo": {
     "message": "Desfazer",
     "description": "Desfazer"

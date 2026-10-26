@@ -63,6 +63,10 @@
     "message": "删除光标前的一个字符",
     "description": "删除光标前的一个字符"
   },
+  "delete_horizontal_space": {
+    "message": "删除光标前后的空格和制表符",
+    "description": "删除光标前后的空格和制表符"
+  },
   "undo": {
     "message": "撤销",
     "description": "撤销"

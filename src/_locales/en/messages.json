@@ -63,6 +63,10 @@
     "message": "Delete the character before the cursor",
     "description": "Delete the character before the cursor"
   },
+  "delete_horizontal_space": {
+    "message": "Delete the spaces and tabs around the cursor",
+    "description": "Delete the spaces and tabs around the cursor"
+  },
   "undo": {
     "message": "Undo",
     "description": "Undo"

@@ -75,6 +75,7 @@ that Razorshell does not implement.
 | `Alt` + `t`             | transpose words                       |
 | `Alt` + `u`             | upcase word                           |
 | `Alt` + `y`             | yank pop                              |
+| `Alt` + `\`             | delete horizontal space               |
 | `Alt` + `Backspace`     | backward kill word                    |
 
 <!-- keymap:implemented:end -->
@@ -100,6 +101,11 @@ ring, so a character delete between two kills keeps them apart instead
 of splicing them together. Both take a whole grapheme: an emoji built
 from a surrogate pair or joined by zero-width joiners goes in one press
 rather than leaving a fragment behind.
+
+`Alt` + `\` deletes the spaces and tabs on both sides of the cursor and
+stays off the ring the same way. It stops at a line break, so the lines
+of a textarea stay apart, and with no space or tab at the cursor it
+changes nothing.
 
 `Ctrl` + `/` and `Ctrl` + `Shift` + `_` both step back through the
 field's own undo history, the same history `Ctrl` + `z` walks. Every
@@ -205,7 +211,6 @@ something a text field does not have, such as a command history.
 | `Alt` + `p`      | non-incremental-reverse-search-history |
 | `Alt` + `.`      | yank-last-arg                         |
 | `Alt` + `r`      | revert-line                           |
-| `Alt` + `\`      | delete-horizontal-space               |
 | `Alt` + digit    | digit-argument (also tab switching on Linux) |
 | `Ctrl` + `x` `Ctrl` + `x` | exchange-point-and-mark      |
 
