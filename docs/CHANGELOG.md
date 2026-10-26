@@ -6,6 +6,8 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ## [Unreleased]
 
+## [0.0.9] - 2026-10-26
+
 ### Added
 
 - Alt+\ deletes the spaces and tabs around the cursor, readline's
