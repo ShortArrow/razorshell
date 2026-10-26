@@ -67,6 +67,10 @@
     "message": "Supprimer les espaces et tabulations autour du curseur",
     "description": "Supprimer les espaces et tabulations autour du curseur"
   },
+  "revert_line": {
+    "message": "Rétablir la valeur du champ au moment où il a reçu le focus",
+    "description": "Rétablir la valeur du champ au moment où il a reçu le focus"
+  },
   "undo": {
     "message": "Annuler",
     "description": "Annuler"

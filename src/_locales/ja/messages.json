@@ -67,6 +67,10 @@
     "message": "カーソルの前後の空白とタブを削除",
     "description": "カーソルの前後の空白とタブを削除"
   },
+  "revert_line": {
+    "message": "入力欄をフォーカスを得たときの内容に戻す",
+    "description": "入力欄をフォーカスを得たときの内容に戻す"
+  },
   "undo": {
     "message": "元に戻す",
     "description": "元に戻す"

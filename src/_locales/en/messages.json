@@ -67,6 +67,10 @@
     "message": "Delete the spaces and tabs around the cursor",
     "description": "Delete the spaces and tabs around the cursor"
   },
+  "revert_line": {
+    "message": "Restore the field to its value when it gained focus",
+    "description": "Restore the field to its value when it gained focus"
+  },
   "undo": {
     "message": "Undo",
     "description": "Undo"

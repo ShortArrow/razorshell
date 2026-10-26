@@ -72,6 +72,7 @@ that Razorshell does not implement.
 | `Alt` + `d`             | kill word                             |
 | `Alt` + `f`             | move cursor to the next word          |
 | `Alt` + `l`             | downcase word                         |
+| `Alt` + `r`             | revert line                           |
 | `Alt` + `t`             | transpose words                       |
 | `Alt` + `u`             | upcase word                           |
 | `Alt` + `y`             | yank pop                              |
@@ -106,6 +107,12 @@ rather than leaving a fragment behind.
 stays off the ring the same way. It stops at a line break, so the lines
 of a textarea stay apart, and with no space or tab at the cursor it
 changes nothing.
+
+`Alt` + `r` puts back the value the field held when it gained focus,
+readline's revert-line. In a textarea that is the whole value, not the
+cursor's line, and the cursor lands at its end. `Ctrl` + `z` takes the
+revert back. In a field that still holds that value, a password field
+or a rich text editor, the key is left to the page.
 
 `Ctrl` + `/` and `Ctrl` + `Shift` + `_` both step back through the
 field's own undo history, the same history `Ctrl` + `z` walks. Every
@@ -210,7 +217,6 @@ something a text field does not have, such as a command history.
 | `Ctrl` + `@`     | set-mark                              |
 | `Alt` + `p`      | non-incremental-reverse-search-history |
 | `Alt` + `.`      | yank-last-arg                         |
-| `Alt` + `r`      | revert-line                           |
 | `Alt` + digit    | digit-argument (also tab switching on Linux) |
 | `Ctrl` + `x` `Ctrl` + `x` | exchange-point-and-mark      |
 
@@ -303,6 +309,10 @@ inside them.
   selection API the operations rely on does not exist on those types.
 - Fields inside closed shadow roots are out of reach by platform
   design.
+- `Alt` + `r` restores the value a field held when it gained focus,
+  and a change the page makes by script does not move that point. A
+  chat box that clears itself after sending while you stay in it gets
+  the sent text back on `Alt` + `r`.
 - Edits Razorshell makes raise `input` but not `beforeinput`, so a
   page that checks input only from `beforeinput` does not see them.
 - URL rules switch Razorshell on or off for a whole site. To give one

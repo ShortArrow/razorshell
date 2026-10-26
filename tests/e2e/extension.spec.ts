@@ -2663,6 +2663,158 @@ test.describe("delete horizontal space @C1.16", () => {
 });
 
 /**
+ * revert-line against the focus-time snapshot (ADR-0016).
+ *
+ * jsdom shows the snapshot rules and the splice; only an engine shows that the
+ * content script's `focusin` wiring takes the snapshot, that the write joined
+ * the field's undo history and raised one `input` event, and that a field with
+ * nothing to restore, or a password field, keeps the key.
+ *
+ * Self-contained in the manner of the C1.16 block above: it seeds the allowing
+ * policy and restores the denying one, plus the seeded text, that the
+ * describes further down the file assert against.
+ */
+test.describe("revert line @C1.16", () => {
+  const input = () => page.locator('input[type="text"]').first();
+  const textarea = () => page.locator("textarea").first();
+  const password = () => page.locator('input[type="password"]').first();
+
+  async function freshFrame(): Promise<void> {
+    await page.goto(`${origin}/`);
+    await page.waitForTimeout(1000);
+  }
+
+  /** Counts the field's input events and records whether each Alt+R arrived cancelled. */
+  async function watch(field: ReturnType<Page["locator"]>): Promise<void> {
+    await field.evaluate((el: HTMLElement) => {
+      const seen = { inputs: 0, prevented: [] as boolean[] };
+      el.addEventListener("input", () => (seen.inputs += 1));
+      el.addEventListener("keydown", (event) => {
+        if (event.key === "r" && event.altKey) seen.prevented.push(event.defaultPrevented);
+      });
+      (el as unknown as { __seen: typeof seen }).__seen = seen;
+    });
+  }
+
+  function seen(field: ReturnType<Page["locator"]>): Promise<unknown> {
+    return field.evaluate((el: HTMLElement) => (el as unknown as { __seen: unknown }).__seen);
+  }
+
+  /** Focuses the field by a real click and types at the end of its value. */
+  async function clickAndAppend(field: ReturnType<Page["locator"]>, text: string): Promise<void> {
+    await field.click();
+    await page.keyboard.press("Control+End");
+    await page.keyboard.type(text);
+  }
+
+  test.beforeAll(async () => {
+    await setPolicy({ defaultAction: "allow", rules: [] });
+  });
+
+  test.beforeEach(async () => {
+    await freshFrame();
+  });
+
+  test.afterAll(async () => {
+    await freshFrame();
+    await setPolicy({
+      defaultAction: "allow",
+      rules: [{ pattern: "https://example.com/**", matchType: "glob", action: "deny" }],
+    });
+    await seedTextInput("hello world new order", 0);
+  });
+
+  test("Alt+R restores the value the field held at focus, and Ctrl+Z takes the revert back", async () => {
+    await clickAndAppend(input(), " extra");
+    await watch(input());
+
+    await page.keyboard.press("Alt+r");
+    expect(await fieldState(input())).toEqual({ value: "hello world new order", start: 21, end: 21 });
+    expect(await seen(input())).toEqual({ inputs: 1, prevented: [true] });
+
+    await page.keyboard.press("Control+z");
+    expect((await fieldState(input())).value).toBe("hello world new order extra");
+  });
+
+  test("Alt+R in a textarea restores every line, not the caret's", async () => {
+    await clickAndAppend(textarea(), "\nfourth");
+    await page.keyboard.press("Control+Home");
+    await page.keyboard.type("zeroth ");
+
+    await page.keyboard.press("Alt+r");
+    expect(await fieldState(textarea())).toEqual({
+      value: "first line\nsecond line\nthird",
+      start: 28,
+      end: 28,
+    });
+  });
+
+  test("a new focus moves the point Alt+R returns to", async () => {
+    await clickAndAppend(input(), " one");
+    await textarea().click();
+    await clickAndAppend(input(), " two");
+
+    await page.keyboard.press("Alt+r");
+    expect((await fieldState(input())).value).toBe("hello world new order one");
+  });
+
+  /**
+   * Playwright emulates focus per page, so a tab switch normally raises nothing.
+   * With the emulation off, `Page.bringToFront` makes Chrome fire a trusted
+   * window `blur` on the way out and a trusted `focusin` on the still-active
+   * field on the way back (observed 2026-10-26), the events a real tab switch
+   * raises.
+   */
+  test("switching tabs and back keeps the point Alt+R returns to", async () => {
+    const here = await context.newCDPSession(page);
+    const there = await context.newCDPSession(optionsPage);
+    try {
+      await here.send("Emulation.setFocusEmulationEnabled", { enabled: false });
+      await there.send("Emulation.setFocusEmulationEnabled", { enabled: false });
+      await here.send("Page.bringToFront");
+      await clickAndAppend(input(), " edited");
+      await page.evaluate(() => {
+        const w = window as unknown as { __returned: boolean };
+        w.__returned = false;
+        document.addEventListener("focusin", (e) => (w.__returned = e.isTrusted), true);
+      });
+
+      await there.send("Page.bringToFront");
+      await page.waitForTimeout(300);
+      await here.send("Page.bringToFront");
+      await page.waitForTimeout(300);
+      expect(await page.evaluate(() => (window as unknown as { __returned: boolean }).__returned)).toBe(true);
+
+      await page.keyboard.press("Alt+r");
+      expect((await fieldState(input())).value).toBe("hello world new order");
+    } finally {
+      await here.send("Emulation.setFocusEmulationEnabled", { enabled: true });
+      await there.send("Emulation.setFocusEmulationEnabled", { enabled: true });
+      await here.detach();
+      await there.detach();
+    }
+  });
+
+  test("Alt+R in a field that still holds its focus-time value is left to the page", async () => {
+    await input().click();
+    await watch(input());
+
+    await page.keyboard.press("Alt+r");
+    expect((await fieldState(input())).value).toBe("hello world new order");
+    expect(await seen(input())).toEqual({ inputs: 0, prevented: [false] });
+  });
+
+  test("Alt+R in a password field is left to the page and changes nothing", async () => {
+    await clickAndAppend(password(), "x");
+    await watch(password());
+
+    await page.keyboard.press("Alt+r");
+    expect((await fieldState(password())).value).toBe("hunter2 secret phrasex");
+    expect(await seen(password())).toEqual({ inputs: 0, prevented: [false] });
+  });
+});
+
+/**
  * The case operations, transpose-words, and Ctrl+K over a line boundary.
  *
  * Self-contained in the manner of the C1.14 and C1.16 blocks: it seeds the

@@ -4,6 +4,7 @@ import { showToast } from "./inspecttoast";
 import { dispatchEditableKey, isEditableTarget, isTextField, keyEventHandling, resolveEventTarget } from "./keyhandling";
 import { clearRing, noteForeignCommand } from "./killring";
 import { clearYankRecord } from "./yank";
+import { forgetFocusValues, noteFocus, noteFocusElsewhere, noteWindowBlur } from "./revertline";
 import { keyChord } from "./keychord";
 import { Chord, boundEntries } from "./keymapmerge";
 import { getActiveKeymap, initKeymap } from "./keymapstore";
@@ -39,13 +40,14 @@ let urlPolicy: UrlPolicy | null = null;
 // is denied on, so the ring goes when the frame does. The yank record describes
 // the same state and goes with it: entries without a record is a ring that
 // cannot be popped, but a record without entries is a pop that cancels the key
-// and does nothing.
+// and does nothing. The revert-line snapshots are text kept the same way.
 function applyUrlPolicy(policy: UrlPolicy) {
   urlPolicy = policy;
   enabled = resolveAction(location.href, policy) !== "deny";
   if (!enabled) {
     clearRing();
     clearYankRecord();
+    forgetFocusValues();
   }
   reportState();
 }
@@ -105,6 +107,33 @@ document.addEventListener(
   },
   { capture: true },
 );
+
+// revert-line's snapshot is taken as a field gains focus. `focusin` is
+// composed, so the path's first element is a field inside an open shadow root.
+// Chrome fires `focusin` again on the active element when the tab or window
+// regains focus; the window `blur` before it names that element, so the return
+// keeps the snapshot (ADR-0016).
+document.addEventListener(
+  "focusin",
+  (event) => {
+    if (!event.isTrusted || !enabled) return;
+    const target = resolveEventTarget(event);
+    if (isTextField(target)) noteFocus(target);
+    else noteFocusElsewhere();
+  },
+  { capture: true },
+);
+window.addEventListener("blur", (event) => {
+  if (!event.isTrusted || event.target !== window) return;
+  noteWindowBlur(deepActiveElement());
+});
+
+/** The focused element, looked up through open shadow roots to the field itself. */
+function deepActiveElement(): Element | null {
+  let active = document.activeElement;
+  while (active?.shadowRoot?.activeElement) active = active.shadowRoot.activeElement;
+  return active;
+}
 
 function chordLabel(entry: Keymap): string {
   return keyChord({

@@ -40,3 +40,6 @@ record names the files it concerns and is frozen when written.
   the setting, and never takes the key
 - [ADR-0015](0015-anonymous-uninstall-survey.md) — after an uninstall,
   Chrome opens an anonymous form asking why, with the version prefilled
+- [ADR-0016](0016-revert-line.md) — revert-line restores the whole
+  value a field held when it gained focus, and keeps none from a
+  password field

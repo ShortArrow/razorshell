@@ -11,6 +11,11 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 - Alt+\ deletes the spaces and tabs around the cursor, readline's
   delete-horizontal-space, in text fields and rich text editors. It
   stays off the kill ring.
+- Alt+R puts back the value a text field held when it gained focus,
+  readline's revert-line; in a textarea the whole value. A field still
+  holding that value, a password field and rich text editors leave the
+  key to the page. See [ADR-0016](decisions/0016-revert-line.md),
+  "revert-line restores the value a field held when it gained focus".
 
 ### Changed
 

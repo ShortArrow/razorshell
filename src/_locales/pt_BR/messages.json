@@ -67,6 +67,10 @@
     "message": "Excluir os espaços e tabulações ao redor do cursor",
     "description": "Excluir os espaços e tabulações ao redor do cursor"
   },
+  "revert_line": {
+    "message": "Restaurar o campo ao valor que tinha ao receber o foco",
+    "description": "Restaurar o campo ao valor que tinha ao receber o foco"
+  },
   "undo": {
     "message": "Desfazer",
     "description": "Desfazer"

@@ -23,6 +23,10 @@ import { mergeKeymap } from "../src/keymapmerge";
  * Accept-line and open-line (ADR-0012) stay off for a different reason: a
  * rich-text editor owns Enter — paragraph splitting, list continuation — and a
  * newline inserted from here would bypass all of it.
+ *
+ * `revert_line` (ADR-0016): a rich-text root's content is markup the host
+ * editor owns, and writing a focus-time snapshot back over it would bypass
+ * that editor's own model.
  */
 const withoutEditableCounterpart = new Set([
   "yank_pop",
@@ -32,6 +36,7 @@ const withoutEditableCounterpart = new Set([
   "transpose_words",
   "accept_line",
   "open_line",
+  "revert_line",
 ]);
 
 describe("editable operations", () => {

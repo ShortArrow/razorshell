@@ -67,6 +67,10 @@
     "message": "Borrar los espacios y tabulaciones alrededor del cursor",
     "description": "Borrar los espacios y tabulaciones alrededor del cursor"
   },
+  "revert_line": {
+    "message": "Restaurar el campo al valor que tenía al recibir el foco",
+    "description": "Restaurar el campo al valor que tenía al recibir el foco"
+  },
   "undo": {
     "message": "Deshacer",
     "description": "Deshacer"

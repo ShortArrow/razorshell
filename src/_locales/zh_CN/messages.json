@@ -67,6 +67,10 @@
     "message": "删除光标前后的空格和制表符",
     "description": "删除光标前后的空格和制表符"
   },
+  "revert_line": {
+    "message": "将输入框恢复为获得焦点时的内容",
+    "description": "将输入框恢复为获得焦点时的内容"
+  },
   "undo": {
     "message": "撤销",
     "description": "撤销"

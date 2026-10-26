@@ -3,6 +3,7 @@ import { getActiveKeymap } from "./keymapstore";
 import { debug } from "./debug";
 import { noteForeignCommand } from "./killring";
 import { Keymap, TextField } from "./operation";
+import { noteKeydown } from "./revertline";
 
 const targetInputTypes = ["text", "search", "url", "tel", "password"];
 
@@ -70,10 +71,12 @@ export function dispatchKey(event: KeyboardEvent, textinput: TextField, keymap: 
 }
 
 /**
- * Dispatches the event against the keymap currently in force.
+ * Dispatches the event against the keymap currently in force, first giving a
+ * field that took focus unseen its revert-line snapshot (`noteKeydown`).
  */
 export function keyEventHandling(event: KeyboardEvent, textinput: TextField) {
   debug.logKey(event);
+  noteKeydown(textinput);
   dispatchKey(event, textinput, getActiveKeymap());
 }
 

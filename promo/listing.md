@@ -14,7 +14,7 @@ The short description is not here. The store reads it from the manifest's
 ```text
 Razorshell gives web text fields the keys of a bash prompt.
 
-Ctrl+A and Ctrl+E jump to the start and end of the line. Ctrl+K kills to the end of the line and Ctrl+U to its start; Ctrl+Y yanks the text back, and Alt+Y cycles through earlier kills. Alt+F and Alt+B move by word, Alt+D and Alt+Backspace kill a word, Ctrl+D and Ctrl+H delete a character, and Alt+\ deletes the spaces around the cursor. Alt+U, Alt+L and Alt+C change the case of a word, Alt+T swaps two words, and Ctrl+/ undoes.
+Ctrl+A and Ctrl+E jump to the start and end of the line. Ctrl+K kills to the end of the line and Ctrl+U to its start; Ctrl+Y yanks the text back, and Alt+Y cycles through earlier kills. Alt+F and Alt+B move by word, Alt+D and Alt+Backspace kill a word, Ctrl+D and Ctrl+H delete a character, and Alt+\ deletes the spaces around the cursor. Alt+U, Alt+L and Alt+C change the case of a word, Alt+T swaps two words, Alt+R puts back what the field held when you entered it, and Ctrl+/ undoes.
 
 It works in single-line inputs, text areas, fields in frames and open shadow roots, and, if you turn it on, in rich text editors such as Gmail's composer.
 
@@ -28,7 +28,7 @@ The options page lets you:
 
 Click the toolbar icon and then a text field to see which of your bindings the page already handles itself.
 
-Killed text stays in the page's frame. It is never written to storage, never sent anywhere, and never kept from a password field.
+Killed text, and the value Alt+R puts back, stay in the page's frame. Neither is written to storage or sent anywhere, and neither is kept from a password field.
 
 Not supported: macOS (Option composes characters, so the Alt bindings cannot match), email and number fields, and closed shadow roots.
 
@@ -40,7 +40,7 @@ Source, issue forms and discussions: https://github.com/ShortArrow/razorshell
 ```text
 Razorshell は、Web のテキスト欄で bash のプロンプトと同じキー操作を使えるようにする拡張機能です。
 
-Ctrl+A と Ctrl+E で行頭と行末へ移動します。Ctrl+K はカーソルから行末まで、Ctrl+U は行頭まで切り取り、Ctrl+Y で貼り戻します。直後の Alt+Y で、さらに前に切り取った内容に切り替わります。Alt+F と Alt+B は単語単位の移動、Alt+D と Alt+Backspace は単語の切り取り、Ctrl+D と Ctrl+H は 1 文字の削除、Alt+\ はカーソル前後の空白の削除です。Alt+U、Alt+L、Alt+C は単語の大文字小文字を変え、Alt+T は前後の単語を入れ替え、Ctrl+/ は元に戻します。
+Ctrl+A と Ctrl+E で行頭と行末へ移動します。Ctrl+K はカーソルから行末まで、Ctrl+U は行頭まで切り取り、Ctrl+Y で貼り戻します。直後の Alt+Y で、さらに前に切り取った内容に切り替わります。Alt+F と Alt+B は単語単位の移動、Alt+D と Alt+Backspace は単語の切り取り、Ctrl+D と Ctrl+H は 1 文字の削除、Alt+\ はカーソル前後の空白の削除です。Alt+U、Alt+L、Alt+C は単語の大文字小文字を変え、Alt+T は前後の単語を入れ替え、Alt+R は欄に入ったときの内容を復元し、Ctrl+/ は元に戻します。
 
 1 行の入力欄、複数行のテキストエリア、フレームや開いた Shadow DOM の中の欄で動きます。設定を有効にすれば、Gmail の作成画面のようなリッチテキストエディタでも動きます。
 
@@ -54,7 +54,7 @@ Ctrl+A と Ctrl+E で行頭と行末へ移動します。Ctrl+K はカーソル�
 
 ツールバーのアイコンを押してからテキスト欄をクリックすると、ページ自身がすでに使っているキーを調べられます。
 
-切り取った文字列はそのページのフレームの中にだけ保持します。保存も外部への送信もせず、パスワード欄の内容は保持しません。
+切り取った文字列と Alt+R で復元する内容は、そのページのフレームの中にだけ保持します。保存も外部への送信もせず、パスワード欄の内容は保持しません。
 
 対応していないもの: macOS（Option キーが文字を入力するため、Alt の操作が一致しません）、メールアドレス欄と数値欄、閉じた Shadow DOM。
 
@@ -94,8 +94,8 @@ No. All code is packaged in the extension.
 ### Data usage
 
 Check none of the data types. Razorshell collects and transmits no user data:
-keystrokes are handled inside the page, killed text stays in memory in that
-frame, and settings stay in the user's own Chrome sync storage. After an
+keystrokes are handled inside the page, killed text and the value Alt+R
+puts back stay in memory in that frame, and settings stay in the user's own Chrome sync storage. After an
 uninstall Chrome opens an optional anonymous Google form asking why; the
 address carries only the extension version, and nothing is sent unless
 the user submits the form.

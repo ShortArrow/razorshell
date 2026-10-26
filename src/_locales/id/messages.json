@@ -67,6 +67,10 @@
     "message": "Hapus spasi dan tab di sekitar kursor",
     "description": "Hapus spasi dan tab di sekitar kursor"
   },
+  "revert_line": {
+    "message": "Kembalikan isian ke nilainya saat mendapat fokus",
+    "description": "Kembalikan isian ke nilainya saat mendapat fokus"
+  },
   "undo": {
     "message": "Urungkan",
     "description": "Urungkan"

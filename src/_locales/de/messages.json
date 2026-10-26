@@ -67,6 +67,10 @@
     "message": "Leerzeichen und Tabulatoren um den Cursor löschen",
     "description": "Leerzeichen und Tabulatoren um den Cursor löschen"
   },
+  "revert_line": {
+    "message": "Feld auf den Wert zurücksetzen, den es beim Fokussieren hatte",
+    "description": "Feld auf den Wert zurücksetzen, den es beim Fokussieren hatte"
+  },
   "undo": {
     "message": "Rückgängig",
     "description": "Rückgängig"

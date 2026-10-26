@@ -1,6 +1,7 @@
 import { editableOperation } from "./editableoperation";
 import { getMessage } from "./languages";
 import { canAcceptLine, canOpenLine, canYank, canYankPopField, Keymap, operation } from "./operation";
+import { canRevertLine } from "./revertline";
 
 export function keymaching(event: KeyboardEvent, key: Keymap): boolean {
   if (key.unassigned === true) return false;
@@ -174,6 +175,26 @@ export const defaultKeymap: Keymap[] = [
     editableOperation: editableOperation.delete_horizontal_space,
     alt: true,
     key: "\\",
+  },
+  /**
+   * Restores the field's focus-time value (ADR-0016). Role-less like the
+   * deletes, so a kill on either side of it stays its own ring entry, and
+   * `canRevertLine` gives the key back to the page when there is nothing to
+   * restore.
+   *
+   * It ships without an `editableOperation`: a rich text root's content is
+   * markup the host editor owns, and a snapshot written back over it would
+   * bypass that editor's own model. As with the case operations, the chord is
+   * left to the page there.
+   */
+  {
+    id: "revert_line",
+    label: "revert line",
+    description: getMessage("revert_line"),
+    operation: operation.revertLine,
+    canHandle: canRevertLine,
+    alt: true,
+    key: "r",
   },
   /**
    * Undo reaches the same operation from two chords, so it is two entries with

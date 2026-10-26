@@ -19,6 +19,7 @@ import {
 } from "./killregion";
 import { beginYank, newestEntry, recordKill, rotateYank } from "./killring";
 import { transposeCharsEdit, unixWordRuboutRegion } from "./reclaimedregion";
+import { revertLine } from "./revertline";
 import {
   applyYank,
   applyYankPop,
@@ -170,6 +171,16 @@ export const operation = {
     const caret = textinput.selectionEnd;
     if (caret == null) return;
     applyKillRegion(textinput, horizontalSpaceRegion(textinput.value, caret));
+  },
+  /**
+   * Puts back the value the field held when it gained focus — readline's M-r.
+   * The whole value, every line of a textarea; see `revertline.ts` and ADR-0016,
+   * "revert-line restores the value a field held when it gained focus".
+   *
+   * Not a kill: nothing leaves for the ring, so a kill chain around it breaks.
+   */
+  revertLine(textinput: TextField) {
+    revertLine(textinput);
   },
   /**
    * Steps the field's own undo history back one entry.

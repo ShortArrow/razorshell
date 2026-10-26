@@ -67,6 +67,10 @@
     "message": "커서 앞뒤의 공백과 탭 삭제",
     "description": "커서 앞뒤의 공백과 탭 삭제"
   },
+  "revert_line": {
+    "message": "입력란을 포커스를 받았을 때의 내용으로 되돌리기",
+    "description": "입력란을 포커스를 받았을 때의 내용으로 되돌리기"
+  },
   "undo": {
     "message": "실행 취소",
     "description": "실행 취소"

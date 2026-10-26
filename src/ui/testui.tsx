@@ -3,6 +3,7 @@ import { getMessage } from "../languages";
 import { keyEventHandling } from "../keyhandling";
 import { keyChord, selectionSummary } from "../keychord";
 import { TextField } from "../operation";
+import { noteFocus } from "../revertline";
 
 interface LastStatus {
   chord: string[];
@@ -69,6 +70,7 @@ export function TestApp() {
               aria-label={`${getMessage("tooltip_test_area")()} (single line)`}
               className="grow"
               defaultValue={inputText}
+              onFocus={(e) => noteFocus(e.currentTarget)}
               onKeyDown={(e) => handleKeyDown(e, setInputSelection)}
               onKeyUp={(e) => setInputSelection(selectionSummary(e.currentTarget))}
               onSelect={(e) => setInputSelection(selectionSummary(e.currentTarget))}
@@ -82,6 +84,7 @@ export function TestApp() {
             className="textarea w-full"
             rows={3}
             defaultValue={textareaText}
+            onFocus={(e) => noteFocus(e.currentTarget)}
             onKeyDown={(e) => handleKeyDown(e, setTextareaSelection)}
             onKeyUp={(e) => setTextareaSelection(selectionSummary(e.currentTarget))}
             onSelect={(e) => setTextareaSelection(selectionSummary(e.currentTarget))}
