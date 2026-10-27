@@ -32,7 +32,7 @@ budget where it changes behaviour.
 ## Alternatives rejected
 
 - Localizing every string: nine of the eleven locales cannot be
-  reviewed here, so label wording drifts per language and the key
+  reviewed by anyone on the project, so label wording drifts per language and the key
   set grows with each new label.
 
 ## Cost

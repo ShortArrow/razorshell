@@ -2,7 +2,7 @@
  * The reclaimed chords in a rich text root: the walk that measures the rubout
  * and the rule that keeps a transpose inside one text node.
  *
- * Neither `Selection.modify` nor `execCommand` exists in jsdom (ADR-0005), so
+ * Neither `Selection.modify` nor `execCommand` exists in jsdom, so
  * the engine half — the walk over rendered characters, the delete through the
  * host's history, the probe for the end of the line — is the e2e suite's. What
  * runs here are the two decisions that do not need an engine:
