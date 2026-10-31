@@ -1,7 +1,6 @@
 # ADR-0006: The inspector never dispatches key events
 
-Date: 2026-08-15
-Status: accepted
+Status: Accepted
 
 ## Context
 

@@ -1,7 +1,6 @@
 # ADR-0005: contenteditable support is opt-in and Selection-based
 
-Date: 2026-08-15
-Status: accepted
+Status: Accepted
 
 ## Context
 

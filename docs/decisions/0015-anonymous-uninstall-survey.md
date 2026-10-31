@@ -1,7 +1,6 @@
 # ADR-0015: an anonymous form asks why the user uninstalled
 
-Date: 2026-10-22
-Status: accepted
+Status: Accepted
 
 ## Context
 

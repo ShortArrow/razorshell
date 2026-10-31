@@ -1,7 +1,6 @@
 # ADR-0003: The content script is a separate IIFE build
 
-Date: 2026-08-14
-Status: accepted
+Status: Accepted
 
 ## Context
 

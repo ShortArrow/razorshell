@@ -1,7 +1,6 @@
 # ADR-0002: Glob wildcards stay inside one path segment
 
-Date: 2026-08-14
-Status: accepted
+Status: Accepted
 
 ## Context
 

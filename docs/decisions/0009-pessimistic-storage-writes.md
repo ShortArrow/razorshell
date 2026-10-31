@@ -1,7 +1,6 @@
 # ADR-0009: Storage writes are pessimistic
 
-Date: 2026-08-16
-Status: accepted
+Status: Accepted
 
 ## Context
 

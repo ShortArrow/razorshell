@@ -1,7 +1,6 @@
 # ADR-0001: URL rules apply in order, first match wins
 
-Date: 2026-08-14
-Status: accepted
+Status: Accepted
 
 ## Context
 

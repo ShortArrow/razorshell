@@ -1,7 +1,6 @@
 # ADR-0007: The options page localizes tooltips only
 
-Date: 2026-08-15
-Status: accepted
+Status: Accepted
 
 ## Context
 

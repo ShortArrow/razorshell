@@ -1,7 +1,6 @@
 # ADR-0011: reserved chords are reclaimed by opt-in, and pay back what they displace
 
-Date: 2026-09-05
-Status: accepted
+Status: Accepted
 
 ## Context
 

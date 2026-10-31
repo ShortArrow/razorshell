@@ -1,7 +1,6 @@
 # ADR-0012: bindings that shadow an everyday browser key ship unassigned in the keymap
 
-Date: 2026-09-15
-Status: accepted
+Status: Accepted
 
 ## Context
 

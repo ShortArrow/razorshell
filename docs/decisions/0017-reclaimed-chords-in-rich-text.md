@@ -1,7 +1,6 @@
 # ADR-0017: the reclaimed chords act in rich text editors, and Ctrl+T refuses to cross a formatting boundary
 
-Date: 2026-10-26
-Status: accepted
+Status: Accepted
 
 ## Context
 

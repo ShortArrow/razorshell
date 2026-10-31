@@ -1,7 +1,6 @@
 # ADR-0013: word motions follow readline's alphanumeric words
 
-Date: 2026-10-01
-Status: accepted
+Status: Accepted
 
 ## Context
 

@@ -1,7 +1,6 @@
 # ADR-0010: The kill ring is frame-local and never persisted
 
-Date: 2026-08-27
-Status: accepted
+Status: Accepted
 
 ## Context
 

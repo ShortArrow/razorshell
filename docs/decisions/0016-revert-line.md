@@ -1,7 +1,6 @@
 # ADR-0016: revert-line restores the value a field held when it gained focus
 
-Date: 2026-10-26
-Status: accepted
+Status: Accepted
 
 ## Context
 

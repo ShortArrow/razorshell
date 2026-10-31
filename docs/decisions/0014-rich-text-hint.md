@@ -1,7 +1,6 @@
 # ADR-0014: a one-time hint says rich text editors are off
 
-Date: 2026-10-07
-Status: accepted
+Status: Accepted
 
 ## Context
 
