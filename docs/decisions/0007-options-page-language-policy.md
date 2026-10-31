@@ -4,11 +4,10 @@ Status: Accepted
 
 ## Context
 
-Every visible string on the options page went through
-`getMessage` in src/languages.ts, so each label needed an entry in
-all eleven locales under src/_locales. Half of those entries were
-one-word column headers — "action", "default", "current" — whose
-translations nobody on the project can review.
+A string localized through `getMessage` in src/languages.ts needs an
+entry in all eleven locales under src/_locales. On the options page
+many strings are one-word column headers — "action", "default",
+"current" — whose translations nobody on the project can review.
 
 ## Decision
 
@@ -16,8 +15,8 @@ translations nobody on the project can review.
   the per-entry `description` shown on the keymap table.
 - Every other string on the page is an English literal in the TSX:
   headings, labels, column headers, placeholders, the conflict line.
-- Keys that only served a non-tooltip string are gone from all
-  eleven locales.
+- The locales carry no key for an options-page string that is not a
+  tooltip.
 
 ## Criteria
 
