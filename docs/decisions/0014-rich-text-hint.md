@@ -62,6 +62,6 @@ back on every page load, which is the nag this decision exists to avoid.
 ## Cost
 
 One more storage key, one more pair of messages in eleven locales, and
-the content script's keydown path now does work for rich editors while
+the content script's keydown path does work for rich editors while
 the opt-in is off. That work is a keymap match on the first qualifying
 press per frame and nothing after it.
