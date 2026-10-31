@@ -5,12 +5,9 @@ Status: accepted
 
 ## Context
 
-ADR-0011 routed an assigned Ctrl+W or Ctrl+T to the frame that owns
-focus, and that frame answered "field focused" for a contenteditable
-root while the rich text option was on. It then declined to run,
-because both operations read a `value`. The tab stayed open and the
-chord did nothing, which the README listed as a limitation. This
-record replaces that refusal; the rest of ADR-0011 stands.
+An assigned Ctrl+W or Ctrl+T reaches the frame that owns focus
+through the routing ADR-0011 decides, and with the rich text option
+on, that frame may hold a contenteditable root rather than a field.
 
 A rich text root has no value. Its text is spread over Text nodes, and
 the formatting lives on the elements around them: in `ab<b>cd</b>` the
