@@ -8,19 +8,15 @@ Every setting on the options page lives in `chrome.storage.sync`,
 which has quotas — a per-item size, a total size, and a write rate.
 Exceeding any of them rejects the promise; nothing else reports it.
 
-The controls were written the other way round. The keymap store
-(src/keymapstore.ts) assigned its cached overrides before awaiting
-the write. The theme toggle (src/ui/theme.tsx) repainted
-`documentElement.dataset.theme` and called `set` without a handler,
-as did the rich text toggle (src/ui/richtext.tsx) and the language
-select (src/ui/language.tsx); the keymap call sites
-(src/ui/keymap.tsx) awaited nothing. A refused write therefore left
-the page showing a setting that only existed in memory, and the
-rejection surfaced as an unhandled promise in a console nobody has
-open. The user learned about it at the next reload, when the setting
-they had watched take effect was gone. Only the URL rule editor
-(src/ui/url.tsx) had the opposite shape, and it is the one place
-where the failure was legible.
+A control that changes its view before the write resolves keeps
+showing a setting storage refused, one that exists only in memory.
+The rejection surfaces as an unhandled promise in a console nobody
+has open, and the user learns of it at the next reload, when the
+setting they watched take effect is gone. The controls concerned are
+the keymap store (src/keymapstore.ts) and its call sites
+(src/ui/keymap.tsx), the theme toggle (src/ui/theme.tsx), the rich
+text toggle (src/ui/richtext.tsx), the language select
+(src/ui/language.tsx) and the URL rule editor (src/ui/url.tsx).
 
 ## Decision
 
@@ -45,9 +41,8 @@ which is beneath notice at the rate a human toggles a checkbox.
 
 ## Alternatives rejected
 
-- Optimistic display with a rollback only on error: this is what the
-  theme and rich text toggles did, minus the rollback. Adding the
-  rollback still leaves a window in which the page asserts something
+- Optimistic display with a rollback only on error: the rollback
+  still leaves a window in which the page asserts something
   false, and the sync quota is exactly the case where that window
   ends in a reversal the user did not ask for.
 - Reporting failures through a toast or the console: a message that
