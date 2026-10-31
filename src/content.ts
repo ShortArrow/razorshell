@@ -305,13 +305,14 @@ chrome.runtime.onMessage.addListener((message: { type?: string }) => {
 /**
  * The element a reclaimed operation would act on, or null when there is none.
  *
- * Reads `document.activeElement`, since these operations arrive as messages and
- * carry no event target. A text field qualifies always; a contenteditable root
- * qualifies only while the contenteditable setting is on, and is returned as a
- * plain `HTMLElement`, which callers tell from a field with `isTextField`.
+ * Reads the active element through open shadow roots, since these operations
+ * arrive as messages and carry no event target. A text field qualifies always;
+ * a contenteditable root qualifies only while the contenteditable setting is
+ * on, and is returned as a plain `HTMLElement`, which callers tell from a field
+ * with `isTextField`.
  */
 function focusedField(): TextField | HTMLElement | null {
-  const active = document.activeElement;
+  const active = deepActiveElement();
   if (isTextField(active)) return active;
   if (editableEnabled && isEditableTarget(active)) return active;
   return null;
@@ -345,15 +346,21 @@ const reclaimedOperations: Record<
 
 /**
  * Whether this frame is the innermost focused document: its document has focus
- * and its active element is not a child frame. A parent whose child frame holds
- * focus still reports `hasFocus()` true, with that frame element as its
- * `activeElement`, so the second test is what leaves exactly one frame per tab
- * answering a tab-wide message.
+ * and its active element, read through open shadow roots, is not a child
+ * frame. A parent whose child frame holds focus still reports `hasFocus()`
+ * true, with that frame element as its active element — or, for a frame inside
+ * a shadow root, with the shadow host — so the second test is what leaves
+ * exactly one frame per tab answering a tab-wide message.
  */
 function ownsFocus(): boolean {
   if (!document.hasFocus()) return false;
-  const active = document.activeElement;
-  return !(active instanceof HTMLIFrameElement || active instanceof HTMLFrameElement);
+  const active = deepActiveElement();
+  return !(
+    active instanceof HTMLIFrameElement ||
+    active instanceof HTMLFrameElement ||
+    active instanceof HTMLObjectElement ||
+    active instanceof HTMLEmbedElement
+  );
 }
 
 /**

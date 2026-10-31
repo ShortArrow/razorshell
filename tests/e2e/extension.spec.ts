@@ -3131,6 +3131,68 @@ test.describe("the reclaimed chords route to the focused field @C1.18", () => {
     });
   });
 
+  /** The focus query sent to the top frame alone, which a non-owning frame leaves unanswered. */
+  async function askTopFrameFocus(): Promise<unknown> {
+    const sw = await worker();
+    return sw.evaluate(async (pageOrigin: string) => {
+      const tabs = await chrome.tabs.query({ url: `${pageOrigin}/*` });
+      const tab = tabs[0];
+      if (tab?.id === undefined) throw new Error("no test page tab");
+      try {
+        return await chrome.tabs.sendMessage(tab.id, { type: "razorshell-focus-query" }, { frameId: 0 });
+      } catch {
+        return undefined;
+      }
+    }, origin);
+  }
+
+  /**
+   * Appends an open shadow root holding `markup` to the test page and runs
+   * `body` with it present, removing it afterwards.
+   */
+  async function withShadow(markup: string, body: () => Promise<void>): Promise<void> {
+    await page.evaluate((html: string) => {
+      const host = document.createElement("div");
+      host.id = "probe-shadow";
+      host.attachShadow({ mode: "open" }).innerHTML = html;
+      document.body.append(host);
+    }, markup);
+    try {
+      await body();
+    } finally {
+      await page.evaluate(() => document.getElementById("probe-shadow")?.remove());
+    }
+  }
+
+  const shadowInput = () => page.locator("#probe-shadow input");
+
+  test("a field inside an open shadow root is reported focused, and the rubout runs there", async () => {
+    await freshFrame();
+    await withShadow('<input type="text" value="foo bar">', async () => {
+      await shadowInput().evaluate((el: HTMLInputElement) => {
+        el.focus();
+        el.setSelectionRange(el.value.length, el.value.length);
+      });
+      expect(await askFocus()).toEqual({ textFieldFocused: true, enabled: true });
+
+      expect(await runOperation("unix_word_rubout")).toEqual({ ran: true });
+      expect((await fieldState(shadowInput())).value).toBe("foo ");
+    });
+  });
+
+  test("an iframe inside an open shadow root leaves the answer to the iframe", async () => {
+    await freshFrame();
+    await withShadow(`<iframe id="shadow-frame" src="${origin}/frame"></iframe>`, async () => {
+      await page.waitForTimeout(1500);
+      const field = page.frameLocator("#probe-shadow #shadow-frame").locator('input[type="text"]').first();
+      await field.click();
+      expect(await askTopFrameFocus()).toBeUndefined();
+      for (let i = 0; i < 10; i++) {
+        expect(await askFocus()).toEqual({ textFieldFocused: true, enabled: true });
+      }
+    });
+  });
+
   test("the rubout kills a whitespace word onto the ring and Ctrl+Y gives it back", async () => {
     await freshFrame();
     await typeFresh("foo bar-baz");

@@ -30,6 +30,11 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 - The options page is restyled on Tailwind CSS 4 and daisyUI 5:
   flatter controls, a darker footer and new theme palettes.
 
+### Fixed
+
+- An assigned Ctrl+W or Ctrl+T in a field inside an open shadow root
+  closed or opened a tab instead of editing the field.
+
 ## [0.0.8] - 2026-10-22
 
 ### Added
