@@ -12,8 +12,8 @@ how.
 - [ADR-0003](0003-content-script-iife-build.md) — the content script
   is a separate IIFE build
 - [ADR-0004](0004-keymap-override-layers.md) — keymap overrides
-  layer as default < lua < gui; only the GUI rejects conflicts (the
-  Lua layer is dormant since ADR-0008)
+  are one layer over the defaults; only a GUI rebind rejects
+  conflicts
 - [ADR-0005](0005-contenteditable-support.md) — contenteditable
   support is opt-in and Selection-based (the init.lua writer it
   mentions is dormant since ADR-0008)
