@@ -15,8 +15,7 @@ how.
   are one layer over the defaults; only a GUI rebind rejects
   conflicts
 - [ADR-0005](0005-contenteditable-support.md) — contenteditable
-  support is opt-in and Selection-based (the init.lua writer it
-  mentions is dormant since ADR-0008)
+  support is opt-in and Selection-based
 - [ADR-0006](0006-inspector-never-dispatches.md) — the inspector
   never dispatches key events; it reads handler code, admits what it
   cannot analyze, and confirms from real input
