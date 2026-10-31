@@ -14,13 +14,18 @@
  * it. Garbage collection cannot be forced from a test, so that half is checked
  * by reading.
  *
- * A password field is never recorded. The extension promises it keeps no text
- * from one, the same promise the kill ring keeps (ADR-0010).
+ * A password field is never recorded, nor is a field that has ever been seen as
+ * one: a show-password toggle turns it to `type="text"` with the password still
+ * in it. The extension promises it keeps no text from a password field, the
+ * same promise the kill ring keeps (ADR-0010).
  */
 import type { TextField } from "./operation";
 import { replaceRangeNatively } from "./yank";
 
 let focusValues = new WeakMap<TextField, string>();
+
+/** Fields seen as password fields at a focus or a keydown; none is ever recorded. */
+const passwordFields = new WeakSet<TextField>();
 
 /**
  * The element that was active when the window last lost focus, until the next
@@ -108,7 +113,8 @@ export function revertLine(field: TextField): void {
 }
 
 function record(field: TextField): void {
-  if (isPasswordField(field)) return;
+  if (isPasswordField(field)) passwordFields.add(field);
+  if (passwordFields.has(field)) return;
   focusValues.set(field, field.value);
 }
 

@@ -39,8 +39,11 @@ chord is free.
 - The key is left to the page when there is nothing to restore: no
   snapshot, a value equal to it, a readonly or disabled field.
 - A password field is never recorded, and Alt+R there is left to the
-  page. The check is repeated at the key, since a show-password toggle
-  can switch a field to `type="password"` after its focus.
+  page. A field once seen as a password field at a focus or a keydown
+  is never recorded afterwards either, since a show-password toggle
+  turns it to `type="text"` with the password in it. The check is
+  repeated at the key, since a toggle can also switch a field to
+  `type="password"` after its focus.
 - Text fields only. A rich text root has no counterpart, so the chord
   stays the host editor's there.
 - Not a kill: the entry carries no ring role, so a kill chain around

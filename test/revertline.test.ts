@@ -83,6 +83,25 @@ describe("the focus-time snapshot @C1.16", () => {
     expect(focusValue(el)).toBeUndefined();
   });
 
+  /** A show-password toggle turns the field to text with the password in it. */
+  test("a password field shown as text is not recorded by the next keydown", () => {
+    const el = makeInput("", "password");
+    noteFocus(el);
+    el.value = "hunter2";
+    el.type = "text";
+    noteKeydown(el);
+    expect(focusValue(el)).toBeUndefined();
+  });
+
+  test("a password field shown as text is not recorded by a later focus", () => {
+    const el = makeInput("", "password");
+    noteKeydown(el);
+    el.value = "hunter2";
+    el.type = "text";
+    noteFocus(el);
+    expect(focusValue(el)).toBeUndefined();
+  });
+
   test("forgetting drops every snapshot", () => {
     const el = makeInput("kept");
     noteFocus(el);
