@@ -10,7 +10,7 @@ to return to is well defined. A web text field has no prompt and no
 line buffer of its own: it has a current `value`, a `defaultValue`
 from the markup, and an undo history that belongs to the engine and
 cannot be read from script. Alt+R is not a Chrome shortcut, so the
-chord itself was free; the README listed it as not implemented.
+chord is free.
 
 ## Decision
 
