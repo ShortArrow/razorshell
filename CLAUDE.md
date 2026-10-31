@@ -48,8 +48,9 @@
   end by blurring the active element.
 - The inspector never dispatches synthetic events, and the content
   script ignores untrusted ones.
-- Why-decisions go to `docs/decisions/` as one-page ADRs; changes go
-  to `docs/CHANGELOG.md` under Unreleased, in its terse style.
+- Why-decisions go to `docs/decisions/` as one-page ADRs, rewritten
+  in place when the decision changes (ADR-0000); changes go to
+  `docs/CHANGELOG.md` under Unreleased, in its terse style.
 - Commits split structure from behaviour (a structural commit keeps
   every test green without editing one). The subject is an
   imperative sentence, the body one or two sentences of why, naming

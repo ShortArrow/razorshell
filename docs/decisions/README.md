@@ -1,7 +1,9 @@
 # Decision records
 
-What was chosen, by which criteria, and what was rejected. Each
-record names the files it concerns and is frozen when written.
+What is decided, by which criteria, and what was rejected. Each
+record names the files it concerns and is rewritten in place when
+its decision changes; [ADR-0000](0000-decision-records.md) sets out
+how.
 
 - [ADR-0001](0001-url-rules-first-match.md) — URL rules apply in
   order, first match wins, then a default action
