@@ -4,7 +4,7 @@ Status: Accepted
 
 ## Context
 
-Razorshell has few users and almost no feedback. Issue forms now take
+Razorshell has few users and almost no feedback. Issue forms take
 problem reports and binding requests, but the most telling signal for a
 small extension is why someone removed it, and that person has no
 reason to open the repository. Chrome can open one address of the
