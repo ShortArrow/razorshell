@@ -99,10 +99,8 @@ URLs came back hidden and every call succeeded. Taking `tabs` would
 have added the "read your browsing history" warning and disabled the
 extension for existing users until re-approval.
 
-The two operations reach fields only through the message path, so
-they have no contenteditable counterpart: the worker's reply targets
-`isTextField` and declines a rich-text root, the same refusal the
-case operations make.
+In a rich text root the two operations act as ADR-0017 decides,
+under the same routing.
 
 Half of C1.18 is manual and dated. It decays; a Chrome that stopped
 dispatching assigned reserved chords would leave the suites green.
