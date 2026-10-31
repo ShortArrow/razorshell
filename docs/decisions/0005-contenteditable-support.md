@@ -14,8 +14,8 @@ counterparts, addressed by the same entry ids.
 ## Decision
 
 - Off by default. `enableContentEditable` in storage.sync turns it
-  on; a toggle on the options page and, later, init.lua write the
-  same key.
+  on, from the toggle on the options page or an imported settings
+  file.
 - Movement uses `Selection.modify` with character / word /
   lineboundary granularity. Deletion extends the selection to the
   line boundary and runs `document.execCommand("delete")`.
