@@ -5,10 +5,10 @@ Status: Accepted
 ## Context
 
 The inspector lists page shortcuts that collide with razorshell's
-bindings. The first implementation dispatched each chord as a
-synthetic keydown and read `defaultPrevented` — which runs the
-page's handlers, so probing Ctrl+k on a mail composer would open its
-link dialog. Firing page actions from a diagnostic was ruled out.
+bindings. A chord's conflict can be probed by dispatching it as a
+synthetic keydown and reading `defaultPrevented`, but that runs the
+page's handlers: probing Ctrl+k on a mail composer opens its link
+dialog. A diagnostic must not fire page actions.
 
 ## Decision
 
