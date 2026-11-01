@@ -48,3 +48,6 @@ how.
 - [ADR-0017](0017-reclaimed-chords-in-rich-text.md) — the reclaimed
   chords act in rich text editors, and Ctrl+T refuses to cross a
   formatting boundary
+- [ADR-0018](0018-tutorial.md) — a tutorial opens from the toolbar
+  icon's menu and advances on the field state each chord produces
+  (Draft)
