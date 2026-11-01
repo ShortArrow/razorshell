@@ -48,6 +48,10 @@ keymap in force through `getActiveKeymap`.
 - Progress is not stored. Each open starts at the first step.
 - The page's strings are English literals, as on the options page
   (ADR-0007).
+- The menu item's title is localized: each locale under `src/_locales`
+  carries a `menu_tutorial` key, read with `chrome.i18n.getMessage`.
+  Chrome shows the title, as it shows the extension's name and the
+  two commands' descriptions, which the locales already translate.
 
 ## Criteria
 
@@ -83,9 +87,5 @@ time, not only once.
 A permission, a context menu entry, one more page and build entry, and
 the stories, screenshots and e2e cases a page carries. A step's Given
 and Then are fixed text, so a change to how an operation behaves
-changes the step's Then with it.
-
-## Open questions
-
-- Whether the menu item's title is localized. It is shown by Chrome,
-  not by the options page, so ADR-0007 does not decide it.
+changes the step's Then with it. Outside English, the menu item is in
+the user's language and the page it opens is not.
