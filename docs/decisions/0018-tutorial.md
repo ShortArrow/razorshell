@@ -69,6 +69,10 @@ time, not only once.
 - A tutorial section inside the options page. The options page is the
   reference for every setting; a step-by-step lesson is a different
   reader's need, and the two would compete for the same screen.
+- An Alt+Y (yank-pop) step after Ctrl+Y. It acts only with two
+  entries on the kill ring, so its Given would rest on kills made in
+  earlier steps, and it is the next key for a user already at home
+  with Ctrl+Y rather than one to learn first. The README describes it.
 - Advancing on the field state alone. Arrow keys and the mouse reach
   most Then states without the chord.
 - Advancing on the keydown alone. A chord that matched but left the
@@ -83,7 +87,5 @@ changes the step's Then with it.
 
 ## Open questions
 
-- Whether Alt+Y (yank-pop) joins the steps after Ctrl+Y, which needs
-  two kills before it.
 - Whether the menu item's title is localized. It is shown by Chrome,
   not by the options page, so ADR-0007 does not decide it.
