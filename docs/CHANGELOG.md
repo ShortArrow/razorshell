@@ -6,7 +6,7 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ## [Unreleased]
 
-## [0.0.9] - 2026-10-26
+## [0.0.9] - 2026-11-01
 
 ### Added
 
