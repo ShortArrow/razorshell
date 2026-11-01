@@ -1,6 +1,6 @@
 # ADR-0018: A tutorial opens from the toolbar icon's menu and advances on the field state each chord produces
 
-Status: Draft
+Status: Accepted
 
 ## Context
 

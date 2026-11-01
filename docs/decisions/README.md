@@ -50,4 +50,3 @@ how.
   formatting boundary
 - [ADR-0018](0018-tutorial.md) — a tutorial opens from the toolbar
   icon's menu and advances on the field state each chord produces
-  (Draft)
