@@ -47,3 +47,21 @@ export const ResetRestoresGiven: Story = {
     (document.activeElement as HTMLElement | null)?.blur();
   },
 };
+
+export const AllStepsDone: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.click(canvas.getByTestId('tutorial-field'));
+    await userEvent.keyboard('{Control>}a{/Control}');
+    await userEvent.keyboard('{Control>}e{/Control}');
+    await userEvent.keyboard('{Alt>}b{/Alt}');
+    await userEvent.keyboard('{Control>}k{/Control}');
+    await userEvent.keyboard('{Control>}y{/Control}');
+
+    await expect(canvas.getByTestId('tutorial-done')).toHaveTextContent('Done. Every step passed.');
+    await expect(canvas.queryByTestId('tutorial-field')).toBeNull();
+    await expect(canvas.queryByTestId('tutorial-step')).toBeNull();
+    (document.activeElement as HTMLElement | null)?.blur();
+  },
+};

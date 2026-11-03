@@ -50,8 +50,12 @@ export function TutorialApp({ keymap }: { keymap: readonly Keymap[] }) {
     }
   };
 
+  if (step === undefined) {
+    return <p data-testid="tutorial-done" className="m-0">Done. Every step passed.</p>;
+  }
+
   return <div className="flex flex-col w-full gap-3">
-    {step !== undefined && <StepPrompt step={step} keymap={keymap} />}
+    <StepPrompt step={step} keymap={keymap} />
     <input
       ref={field}
       type="text"
