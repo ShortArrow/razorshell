@@ -1,0 +1,62 @@
+import React, { useLayoutEffect, useRef, useState } from "react";
+import { dispatchKey } from "../keyhandling";
+import { keyChord } from "../keychord";
+import { Keymap } from "../operation";
+import { advances, FieldState, stepsFor, TutorialStep } from "../tutorial";
+
+function stateOf(field: HTMLInputElement): FieldState {
+  return { value: field.value, selectionStart: field.selectionStart ?? 0, selectionEnd: field.selectionEnd ?? 0 };
+}
+
+function chordOf(entry: Keymap): string[] {
+  return keyChord({ key: entry.key, ctrlKey: entry.ctrl === true, altKey: entry.alt === true, shiftKey: entry.shift === true });
+}
+
+function StepPrompt({ step, keymap }: { step: TutorialStep; keymap: readonly Keymap[] }) {
+  const entry = keymap.find((candidate) => candidate.id === step.operationId)!;
+  return <p data-testid="tutorial-step" className="flex flex-wrap items-center gap-2 m-0">
+    <span>{entry.label}:</span>
+    <span className="flex items-center gap-1">
+      {chordOf(entry).map((label, index) => <kbd key={index} className="kbd kbd-sm">{label}</kbd>)}
+    </span>
+  </p>;
+}
+
+/**
+ * The tutorial's lessons over the given keymap: one step at a time, its field
+ * put in the step's Given state, and the next step shown once a key the keymap
+ * handled leaves the field in the Then state (ADR-0018).
+ */
+export function TutorialApp({ keymap }: { keymap: readonly Keymap[] }) {
+  const steps = stepsFor(keymap);
+  const [index, setIndex] = useState(0);
+  const field = useRef<HTMLInputElement>(null);
+  const step = steps[index];
+
+  useLayoutEffect(() => {
+    const input = field.current;
+    if (input === null || step === undefined) return;
+    input.value = step.given.value;
+    input.setSelectionRange(step.given.selectionStart, step.given.selectionEnd);
+  }, [step]);
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (step === undefined) return;
+    dispatchKey(event.nativeEvent, event.currentTarget, keymap);
+    if (advances(step.then, stateOf(event.currentTarget), event.nativeEvent.defaultPrevented)) {
+      setIndex(index + 1);
+    }
+  };
+
+  return <div className="flex flex-col w-full gap-3">
+    {step !== undefined && <StepPrompt step={step} keymap={keymap} />}
+    <input
+      ref={field}
+      type="text"
+      data-testid="tutorial-field"
+      aria-label="Tutorial field"
+      className="input w-full font-mono"
+      onKeyDown={handleKeyDown}
+    />
+  </div>;
+}
