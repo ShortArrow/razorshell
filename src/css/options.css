@@ -109,3 +109,32 @@
 .tooltip:not([data-tip]):hover:after {
   display: none;
 }
+
+/*
+ * The tutorial's confetti (src/ui/celebrate.ts): each piece falls from above
+ * the top edge to below the bottom one, drifting and turning by the amounts
+ * its own `--drift` and `--turn` give.
+ */
+.confetti {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -1rem;
+  width: 0.5rem;
+  height: 0.75rem;
+  animation-name: confetti-fall;
+  animation-timing-function: cubic-bezier(0.3, 0.5, 0.6, 1);
+  animation-fill-mode: both;
+}
+
+@keyframes confetti-fall {
+  to {
+    transform: translate(var(--drift), calc(100vh + 2rem)) rotate(var(--turn));
+  }
+}
