@@ -39,6 +39,8 @@ export interface TutorialStep {
   operationId: string;
   given: FieldState;
   then: FieldState;
+  /** The earlier step whose effect this one needs to reach its Then state. */
+  restsOn?: string;
 }
 
 function caret(value: string, at: number): FieldState {
@@ -54,14 +56,25 @@ export const tutorialSteps: readonly TutorialStep[] = [
   { operationId: "move_cursor_to_the_end", given: caret("hello world", 0), then: caret("hello world", 11) },
   { operationId: "move_cursor_to_the_previous_word", given: caret("hello world", 11), then: caret("hello world", 6) },
   { operationId: "delete_to_the_end_of_the_line", given: caret("hello world", 6), then: caret("hello ", 6) },
-  { operationId: "yank", given: caret("hello ", 6), then: caret("hello world", 11) },
+  {
+    operationId: "yank",
+    given: caret("hello ", 6),
+    then: caret("hello world", 11),
+    restsOn: "delete_to_the_end_of_the_line",
+  },
 ];
 
 /**
  * The steps the given keymap can teach, in order: a step whose operation has
- * no entry in the keymap, or whose entry is unassigned (ADR-0012), is left out.
+ * no entry in the keymap, or whose entry is unassigned (ADR-0012), is left out,
+ * and so is a step that rests on one left out.
  */
 export function stepsFor(keymap: readonly Keymap[]): TutorialStep[] {
-  return tutorialSteps.filter((step) =>
-    keymap.some((entry) => entry.id === step.operationId && entry.unassigned !== true));
+  const kept: TutorialStep[] = [];
+  for (const step of tutorialSteps) {
+    const bound = keymap.some((entry) => entry.id === step.operationId && entry.unassigned !== true);
+    const footing = step.restsOn === undefined || kept.some((earlier) => earlier.operationId === step.restsOn);
+    if (bound && footing) kept.push(step);
+  }
+  return kept;
 }

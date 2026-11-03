@@ -96,6 +96,16 @@ describe("stepsFor", () => {
     expect(stepsFor(keymap)).toEqual(tutorialSteps.slice(1));
   });
 
+  test("the yank step goes with the kill step it rests on", () => {
+    const keymap = defaultKeymap.map((entry) =>
+      entry.id === "delete_to_the_end_of_the_line" ? { ...entry, unassigned: true } : entry);
+    expect(stepsFor(keymap).map((step) => step.operationId)).toEqual([
+      "move_cursor_to_the_beginning",
+      "move_cursor_to_the_end",
+      "move_cursor_to_the_previous_word",
+    ]);
+  });
+
   test("a step whose operation is missing from the keymap is left out", () => {
     const keymap = defaultKeymap.filter((entry) => entry.id !== "move_cursor_to_the_previous_word");
     expect(stepsFor(keymap).map((step) => step.operationId)).not.toContain("move_cursor_to_the_previous_word");
