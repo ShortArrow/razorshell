@@ -39,7 +39,9 @@ keymap in force through `getActiveKeymap`.
   typing does not advance it. A Reset button puts the Given state back.
 - The steps, in order: Ctrl+A, Ctrl+E, Alt+B, Ctrl+K, Ctrl+Y. A step
   whose operation the keymap in force leaves unassigned is shown as
-  skipped, with its name, and the next step opens.
+  skipped, with its name, and the next step opens. A step that rests
+  on an earlier one is skipped with it: the Ctrl+Y step needs the text
+  the Ctrl+K step killed.
 - The last step is about Ctrl+W and Ctrl+T. A button opens
   `chrome://extensions/shortcuts`, and the step reads
   `chrome.commands.getAll()` to show whether each of the two commands
