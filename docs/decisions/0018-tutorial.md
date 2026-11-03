@@ -75,6 +75,11 @@ time, not only once.
 - A tutorial section inside the options page. The options page is the
   reference for every setting; a step-by-step lesson is a different
   reader's need, and the two would compete for the same screen.
+- The side panel (`chrome.sidePanel`). Its use is a guide beside a
+  real page, but every step judges only the tutorial's own field, so
+  the page beside it plays no part; the panel is narrow for a field, a
+  chord and its controls; and Playwright has no way to open it, while
+  a tab is opened and asserted like any page.
 - An Alt+Y (yank-pop) step after Ctrl+Y. It acts only with two
   entries on the kill ring, so its Given would rest on kills made in
   earlier steps, and it is the next key for a user already at home
