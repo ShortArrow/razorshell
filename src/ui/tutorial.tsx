@@ -33,12 +33,14 @@ export function TutorialApp({ keymap }: { keymap: readonly Keymap[] }) {
   const field = useRef<HTMLInputElement>(null);
   const step = steps[index];
 
-  useLayoutEffect(() => {
+  const putGiven = () => {
     const input = field.current;
     if (input === null || step === undefined) return;
     input.value = step.given.value;
     input.setSelectionRange(step.given.selectionStart, step.given.selectionEnd);
-  }, [step]);
+  };
+
+  useLayoutEffect(putGiven, [step]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (step === undefined) return;
@@ -58,5 +60,8 @@ export function TutorialApp({ keymap }: { keymap: readonly Keymap[] }) {
       className="input w-full font-mono"
       onKeyDown={handleKeyDown}
     />
+    <button type="button" data-testid="tutorial-reset" className="btn btn-sm self-start" onClick={putGiven}>
+      Reset
+    </button>
   </div>;
 }

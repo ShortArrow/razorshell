@@ -30,3 +30,20 @@ export const CtrlAAdvances: Story = {
     (document.activeElement as HTMLElement | null)?.blur();
   },
 };
+
+export const ResetRestoresGiven: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const field = canvas.getByTestId<HTMLInputElement>('tutorial-field');
+
+    await userEvent.click(field);
+    await userEvent.keyboard('xyz');
+    await expect(field.value).not.toBe('hello world');
+    await userEvent.click(canvas.getByTestId('tutorial-reset'));
+
+    await expect(field.value).toBe('hello world');
+    await expect([field.selectionStart, field.selectionEnd]).toEqual([11, 11]);
+    await expect(canvas.getByTestId('tutorial-step')).toHaveTextContent('move cursor to the beginning');
+    (document.activeElement as HTMLElement | null)?.blur();
+  },
+};
