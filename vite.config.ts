@@ -9,6 +9,7 @@ export default defineConfig({
     viteStaticCopy({
       targets: [
         { src: 'src/options.html', dest: '.', rename: { stripBase: 1 } },
+        { src: 'src/tutorial.html', dest: '.', rename: { stripBase: 1 } },
         { src: 'src/manifest.json', dest: '.', rename: { stripBase: 1 } },
         {
           src: [
@@ -29,6 +30,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         options: "./src/options.tsx",
+        tutorial: "./src/tutorialpage.tsx",
         service: "./src/service.ts",
       },
       output: {
