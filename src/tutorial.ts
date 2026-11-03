@@ -6,6 +6,8 @@
  * advances on the field state each chord produces".
  */
 
+import type { Keymap } from "./operation";
+
 /** What a step reads from its field: the value and where the selection lies. */
 export interface FieldState {
   value: string;
@@ -54,3 +56,12 @@ export const tutorialSteps: readonly TutorialStep[] = [
   { operationId: "delete_to_the_end_of_the_line", given: caret("hello world", 6), then: caret("hello ", 6) },
   { operationId: "yank", given: caret("hello ", 6), then: caret("hello world", 11) },
 ];
+
+/**
+ * The steps the given keymap can teach, in order: a step whose operation has
+ * no entry in the keymap, or whose entry is unassigned (ADR-0012), is left out.
+ */
+export function stepsFor(keymap: readonly Keymap[]): TutorialStep[] {
+  return tutorialSteps.filter((step) =>
+    keymap.some((entry) => entry.id === step.operationId && entry.unassigned !== true));
+}

@@ -8,7 +8,7 @@
 import { describe, expect, test } from "vitest";
 import { keyEventHandling } from "../src/keyhandling";
 import { defaultKeymap } from "../src/keymap";
-import { advances, tutorialSteps, type FieldState } from "../src/tutorial";
+import { advances, stepsFor, tutorialSteps, type FieldState } from "../src/tutorial";
 
 const then: FieldState = { value: "hello world", selectionStart: 0, selectionEnd: 0 };
 
@@ -82,5 +82,23 @@ describe("tutorialSteps", () => {
       expect(advances(step.then, stateOf(field), event.defaultPrevented)).toBe(true);
     }
     field.remove();
+  });
+});
+
+describe("stepsFor", () => {
+  test("the default keymap keeps all five steps", () => {
+    expect(stepsFor(defaultKeymap)).toEqual(tutorialSteps);
+  });
+
+  test("a step whose operation is marked unassigned is left out, and the rest keep their order", () => {
+    const keymap = defaultKeymap.map((entry) =>
+      entry.id === "move_cursor_to_the_beginning" ? { ...entry, unassigned: true } : entry);
+    expect(stepsFor(keymap)).toEqual(tutorialSteps.slice(1));
+  });
+
+  test("a step whose operation is missing from the keymap is left out", () => {
+    const keymap = defaultKeymap.filter((entry) => entry.id !== "move_cursor_to_the_previous_word");
+    expect(stepsFor(keymap).map((step) => step.operationId)).not.toContain("move_cursor_to_the_previous_word");
+    expect(stepsFor(keymap)).toHaveLength(4);
   });
 });
