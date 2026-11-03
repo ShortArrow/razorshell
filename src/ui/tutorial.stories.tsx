@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, fn, userEvent, within } from 'storybook/test';
 import { defaultKeymap } from '../keymap';
 import { TutorialApp } from './tutorial';
 
@@ -48,20 +48,37 @@ export const ResetRestoresGiven: Story = {
   },
 };
 
+async function passEveryStep(canvas: ReturnType<typeof within>): Promise<void> {
+  await userEvent.click(canvas.getByTestId('tutorial-field'));
+  await userEvent.keyboard('{Control>}a{/Control}');
+  await userEvent.keyboard('{Control>}e{/Control}');
+  await userEvent.keyboard('{Alt>}b{/Alt}');
+  await userEvent.keyboard('{Control>}k{/Control}');
+  await userEvent.keyboard('{Control>}y{/Control}');
+}
+
 export const AllStepsDone: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    await userEvent.click(canvas.getByTestId('tutorial-field'));
-    await userEvent.keyboard('{Control>}a{/Control}');
-    await userEvent.keyboard('{Control>}e{/Control}');
-    await userEvent.keyboard('{Alt>}b{/Alt}');
-    await userEvent.keyboard('{Control>}k{/Control}');
-    await userEvent.keyboard('{Control>}y{/Control}');
+    await passEveryStep(canvas);
 
     await expect(canvas.getByTestId('tutorial-done')).toHaveTextContent('Done. Every step passed.');
     await expect(canvas.queryByTestId('tutorial-field')).toBeNull();
     await expect(canvas.queryByTestId('tutorial-step')).toBeNull();
+    (document.activeElement as HTMLElement | null)?.blur();
+  },
+};
+
+export const CelebratesOnceWhenDone: Story = {
+  args: { celebrate: fn() },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+
+    await expect(args.celebrate).not.toHaveBeenCalled();
+    await passEveryStep(canvas);
+
+    await expect(args.celebrate).toHaveBeenCalledTimes(1);
     (document.activeElement as HTMLElement | null)?.blur();
   },
 };

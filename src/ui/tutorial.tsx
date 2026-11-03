@@ -25,9 +25,10 @@ function StepPrompt({ step, keymap }: { step: TutorialStep; keymap: readonly Key
 /**
  * The tutorial's lessons over the given keymap: one step at a time, its field
  * put in the step's Given state, and the next step shown once a key the keymap
- * handled leaves the field in the Then state (ADR-0018).
+ * handled leaves the field in the Then state (ADR-0018). `celebrate` is called
+ * once, as the last step passes.
  */
-export function TutorialApp({ keymap }: { keymap: readonly Keymap[] }) {
+export function TutorialApp({ keymap, celebrate }: { keymap: readonly Keymap[]; celebrate?: () => void }) {
   const steps = stepsFor(keymap);
   const [index, setIndex] = useState(0);
   const field = useRef<HTMLInputElement>(null);
@@ -47,6 +48,7 @@ export function TutorialApp({ keymap }: { keymap: readonly Keymap[] }) {
     dispatchKey(event.nativeEvent, event.currentTarget, keymap);
     if (advances(step.then, stateOf(event.currentTarget), event.nativeEvent.defaultPrevented)) {
       setIndex(index + 1);
+      if (index + 1 === steps.length) celebrate?.();
     }
   };
 
