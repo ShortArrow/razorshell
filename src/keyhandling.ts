@@ -59,7 +59,7 @@ function noteIfForeign(entry: Keymap): void {
  * the default action stands, because a binding that will do nothing must not
  * swallow the native key it shadows.
  */
-export function dispatchKey(event: KeyboardEvent, textinput: TextField, keymap: Keymap[]): void {
+export function dispatchKey(event: KeyboardEvent, textinput: TextField, keymap: readonly Keymap[]): void {
   if (event.isComposing) return;
   const matched = keymap.find((entry) => keymaching(event, entry));
   if (!matched) return;
