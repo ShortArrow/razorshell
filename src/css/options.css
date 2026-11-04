@@ -115,7 +115,8 @@
  * the bottom centre. Its carrier is flung sideways and slows quickly, as air
  * stops paper, reaching `--drift` by the peak and then drifting a little
  * further on the way down. The paper inside decelerates up to `--peak`, then
- * accelerates back down past the bottom edge, turning by `--turn`. Every
+ * accelerates back down past the bottom edge, turning by `--turn`, and is
+ * scaled by `--depth` so that pieces seem to fly at different distances. Every
  * piece peaks at the same moment, so the burst holds the shape its drifts
  * and peaks draw. The peak sits a little before half the flight because the
  * fall runs slightly further than the rise.
@@ -139,8 +140,8 @@
 
 .confetti-paper {
   display: block;
-  width: 0.5rem;
-  height: 0.75rem;
+  width: calc(0.5rem * var(--depth));
+  height: calc(0.75rem * var(--depth));
   animation-name: confetti-rise-and-fall, confetti-turn;
   animation-timing-function: linear;
   animation-fill-mode: both;
