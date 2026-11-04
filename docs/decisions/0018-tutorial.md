@@ -94,9 +94,8 @@ time, not only once.
   most Then states without the chord.
 - Advancing on the keydown alone. A chord that matched but left the
   field unchanged, such as Ctrl+Y with an empty kill ring, would pass.
-- canvas-confetti for the burst. Its default cannon draws in a Worker
-  built from a blob: URL, which the extension-page CSP refuses, and a
-  single burst would bring in a 25 KB library and its type package.
+- canvas-confetti for the burst. A single burst would bring in a 25 KB
+  library and its type package.
 
 ## Cost
 
