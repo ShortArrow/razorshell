@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
-import { resetStorage, seedCommands } from '../../.storybook/chromemock';
+import { openedTabs, resetStorage, seedCommands } from '../../.storybook/chromemock';
 import { defaultKeymap } from '../keymap';
 import { TutorialApp } from './tutorial';
 
@@ -129,6 +129,21 @@ export const DoneShowsBrowserShortcuts: Story = {
     const transpose = canvas.getByTestId('tutorial-command-transpose_chars');
     await expect(transpose).toHaveTextContent('transpose chars');
     await expect(transpose).toHaveTextContent('—');
+    (document.activeElement as HTMLElement | null)?.blur();
+  },
+};
+
+export const DoneOpensShortcutsPage: Story = {
+  loaders: [() => {
+    resetStorage();
+  }],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await passEveryStep(canvas);
+    await userEvent.click(canvas.getByTestId('tutorial-open-shortcuts'));
+
+    await waitFor(() => expect(openedTabs()).toEqual([{ url: 'chrome://extensions/shortcuts' }]));
     (document.activeElement as HTMLElement | null)?.blur();
   },
 };

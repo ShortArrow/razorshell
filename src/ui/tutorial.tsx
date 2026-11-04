@@ -5,7 +5,7 @@ import { keyChord } from "../keychord";
 import { Keymap } from "../operation";
 import { defaultKeymap } from "../keymap";
 import { advances, FieldState, SkippedStep, skippedFor, stepsFor, TutorialStep } from "../tutorial";
-import { onPageRevisit, readAssignedShortcuts } from "./shortcuts";
+import { onPageRevisit, openShortcutsPage, readAssignedShortcuts } from "./shortcuts";
 
 function stateOf(field: HTMLInputElement): FieldState {
   return { value: field.value, selectionStart: field.selectionStart ?? 0, selectionEnd: field.selectionEnd ?? 0 };
@@ -39,8 +39,8 @@ function SkippedNote({ skipped }: { skipped: SkippedStep }) {
 
 /**
  * What Chrome holds for Ctrl+W and Ctrl+T, which act only once the user assigns
- * them on Chrome's shortcuts page (ADR-0011), read again whenever the user
- * comes back to this tab.
+ * them on Chrome's shortcuts page (ADR-0011), with a button that opens that
+ * page, read again whenever the user comes back to this tab.
  */
 function BrowserShortcuts() {
   const [assigned, setAssigned] = useState<Record<string, string>>({});
@@ -60,6 +60,10 @@ function BrowserShortcuts() {
         ? "—"
         : <kbd className="kbd kbd-sm">{assigned[chord.command]}</kbd>}
     </p>)}
+    <button type="button" data-testid="tutorial-open-shortcuts" className="btn btn-sm self-start"
+      onClick={openShortcutsPage}>
+      Open Chrome's shortcuts page
+    </button>
   </div>;
 }
 
