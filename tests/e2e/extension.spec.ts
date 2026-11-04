@@ -592,6 +592,32 @@ test.describe("options page", () => {
   });
 });
 
+/**
+ * The tutorial reads the keymap and stores nothing, so it runs here, before the
+ * rebinding describe changes the keymap, without moving any state the later
+ * describes assert.
+ */
+test.describe("the tutorial", () => {
+  test("the tutorial throws its confetti without a page or console error", async () => {
+    const tutorial = await context.newPage();
+    const errors: string[] = [];
+    tutorial.on("pageerror", (err) => errors.push(err.message));
+    tutorial.on("console", (msg) => {
+      if (msg.type() === "error") errors.push(msg.text());
+    });
+    await tutorial.goto(`chrome-extension://${extensionId}/tutorial.html`);
+
+    await tutorial.locator('[data-testid="tutorial-field"]').click();
+    for (const chord of ["Control+a", "Control+e", "Alt+b", "Control+k", "Control+y"]) {
+      await tutorial.keyboard.press(chord);
+    }
+
+    await expect(tutorial.locator('[data-testid="confetti"]')).toBeAttached();
+    expect(errors).toEqual([]);
+    await tutorial.close();
+  });
+});
+
 test.describe("keymap rebinding @C1.5", () => {
   const currentChord = (id: string) =>
     optionsPage
