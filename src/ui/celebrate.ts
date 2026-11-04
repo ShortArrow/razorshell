@@ -22,7 +22,7 @@ function piece(): HTMLElement {
     element.style.animationDuration = `${FLIGHT_MS}ms`;
     element.style.animationDelay = delay;
   }
-  carrier.style.setProperty("--drift", `${between(-45, 45)}vw`);
+  carrier.style.setProperty("--drift", `${between(-62.5, 62.5)}vw`);
   paper.style.setProperty("--peak", `${between(65, 85)}vh`);
   paper.style.setProperty("--turn", `${between(-2, 2) * 720}deg`);
   carrier.append(paper);
