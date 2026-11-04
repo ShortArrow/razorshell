@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, fn, userEvent, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
+import { resetStorage, seedCommands } from '../../.storybook/chromemock';
 import { defaultKeymap } from '../keymap';
 import { TutorialApp } from './tutorial';
 
@@ -109,6 +110,25 @@ export const CelebratesOnceWhenDone: Story = {
     await passEveryStep(canvas);
 
     await expect(args.celebrate).toHaveBeenCalledTimes(1);
+    (document.activeElement as HTMLElement | null)?.blur();
+  },
+};
+export const DoneShowsBrowserShortcuts: Story = {
+  loaders: [() => {
+    resetStorage();
+    seedCommands({ unix_word_rubout: 'Ctrl+W' });
+  }],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await passEveryStep(canvas);
+
+    const rubout = canvas.getByTestId('tutorial-command-unix_word_rubout');
+    await waitFor(() => expect(rubout).toHaveTextContent('Ctrl+W'));
+    await expect(rubout).toHaveTextContent('unix word rubout');
+    const transpose = canvas.getByTestId('tutorial-command-transpose_chars');
+    await expect(transpose).toHaveTextContent('transpose chars');
+    await expect(transpose).toHaveTextContent('—');
     (document.activeElement as HTMLElement | null)?.blur();
   },
 };

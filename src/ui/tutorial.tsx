@@ -1,9 +1,11 @@
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { browserChords } from "../browserchords";
 import { dispatchKey } from "../keyhandling";
 import { keyChord } from "../keychord";
 import { Keymap } from "../operation";
 import { defaultKeymap } from "../keymap";
 import { advances, FieldState, SkippedStep, skippedFor, stepsFor, TutorialStep } from "../tutorial";
+import { onPageRevisit, readAssignedShortcuts } from "./shortcuts";
 
 function stateOf(field: HTMLInputElement): FieldState {
   return { value: field.value, selectionStart: field.selectionStart ?? 0, selectionEnd: field.selectionEnd ?? 0 };
@@ -33,6 +35,32 @@ function SkippedNote({ skipped }: { skipped: SkippedStep }) {
   return <p data-testid="tutorial-skipped" className="m-0 text-sm opacity-70">
     Skipped: {labelOf(skipped.step.operationId)} ({why})
   </p>;
+}
+
+/**
+ * What Chrome holds for Ctrl+W and Ctrl+T, which act only once the user assigns
+ * them on Chrome's shortcuts page (ADR-0011), read again whenever the user
+ * comes back to this tab.
+ */
+function BrowserShortcuts() {
+  const [assigned, setAssigned] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const refresh = () => {
+      void readAssignedShortcuts().then(setAssigned).catch(() => {});
+    };
+    refresh();
+    return onPageRevisit(refresh);
+  }, []);
+
+  return <div className="flex flex-col gap-1 text-sm">
+    <p className="m-0">Ctrl+W and Ctrl+T act only once assigned on Chrome's shortcuts page:</p>
+    {browserChords.map((chord) => <p key={chord.command} data-testid={`tutorial-command-${chord.command}`} className="m-0">
+      {chord.label}: {assigned[chord.command] === undefined
+        ? "—"
+        : <kbd className="kbd kbd-sm">{assigned[chord.command]}</kbd>}
+    </p>)}
+  </div>;
 }
 
 function DoneCheck() {
@@ -91,6 +119,7 @@ export function TutorialApp({ keymap, celebrate }: { keymap: readonly Keymap[]; 
       ? <div data-testid="tutorial-done" className="flex flex-col items-center gap-3">
         <DoneCheck />
         <p className="m-0">Done. Every step passed.</p>
+        <BrowserShortcuts />
       </div>
       : <button type="button" data-testid="tutorial-reset" className="btn btn-sm self-start" onClick={putGiven}>
         Reset
