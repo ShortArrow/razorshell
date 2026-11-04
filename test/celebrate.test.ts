@@ -3,7 +3,7 @@
  * taken away once it has fallen, and none for a user who asks for less motion.
  */
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { CONFETTI_PIECES, CONFETTI_MS, fireConfetti } from "../src/ui/celebrate";
+import { CONFETTI_PIECES, CONFETTI_MS, fireConfetti, peakEllipse } from "../src/ui/celebrate";
 
 function prefersReducedMotion(reduce: boolean): void {
   vi.stubGlobal("matchMedia", (query: string) => ({
@@ -52,5 +52,20 @@ describe("fireConfetti", () => {
     fireConfetti();
 
     expect(bursts()).toHaveLength(0);
+  });
+});
+
+describe("peakEllipse", () => {
+  const golden = (1 + Math.sqrt(5)) / 2;
+
+  test("is a golden ellipse covering about a golden share of a 16:9 screen", () => {
+    const { across, up } = peakEllipse(1920, 1080);
+    expect(across / up).toBeCloseTo(golden, 2);
+    expect((Math.PI * across * up) / (1920 * 1080)).toBeCloseTo(1 / golden, 2);
+  });
+
+  test("keeps its height inside an ultrawide screen", () => {
+    const { up } = peakEllipse(3440, 1080);
+    expect(2 * up).toBeLessThanOrEqual(1080);
   });
 });
