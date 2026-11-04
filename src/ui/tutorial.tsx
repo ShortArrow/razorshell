@@ -34,7 +34,8 @@ function DoneCheck() {
  * The tutorial's lessons over the given keymap: one step at a time, its field
  * put in the step's Given state, and the next step shown once a key the keymap
  * handled leaves the field in the Then state (ADR-0018). `celebrate` is called
- * once, as the last step passes.
+ * once, as the last step passes; the field then stays, read-only, showing what
+ * that step left in it.
  */
 export function TutorialApp({ keymap, celebrate }: { keymap: readonly Keymap[]; celebrate?: () => void }) {
   const steps = stepsFor(keymap);
@@ -60,25 +61,24 @@ export function TutorialApp({ keymap, celebrate }: { keymap: readonly Keymap[]; 
     }
   };
 
-  if (step === undefined) {
-    return <div data-testid="tutorial-done" className="flex flex-col items-center gap-3">
-      <DoneCheck />
-      <p className="m-0">Done. Every step passed.</p>
-    </div>;
-  }
-
   return <div className="flex flex-col w-full gap-3">
-    <StepPrompt step={step} keymap={keymap} />
+    {step !== undefined && <StepPrompt step={step} keymap={keymap} />}
     <input
       ref={field}
       type="text"
       data-testid="tutorial-field"
       aria-label="Tutorial field"
       className="input w-full font-mono"
+      readOnly={step === undefined}
       onKeyDown={handleKeyDown}
     />
-    <button type="button" data-testid="tutorial-reset" className="btn btn-sm self-start" onClick={putGiven}>
-      Reset
-    </button>
+    {step === undefined
+      ? <div data-testid="tutorial-done" className="flex flex-col items-center gap-3">
+        <DoneCheck />
+        <p className="m-0">Done. Every step passed.</p>
+      </div>
+      : <button type="button" data-testid="tutorial-reset" className="btn btn-sm self-start" onClick={putGiven}>
+        Reset
+      </button>}
   </div>;
 }

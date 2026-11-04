@@ -65,8 +65,11 @@ export const AllStepsDone: Story = {
 
     await expect(canvas.getByTestId('tutorial-done')).toHaveTextContent('Done. Every step passed.');
     await expect(canvas.getByTestId('tutorial-done-check')).toBeVisible();
-    await expect(canvas.queryByTestId('tutorial-field')).toBeNull();
+    const field = canvas.getByTestId<HTMLInputElement>('tutorial-field');
+    await expect(field.value).toBe('hello world');
+    await expect(field.readOnly).toBe(true);
     await expect(canvas.queryByTestId('tutorial-step')).toBeNull();
+    await expect(canvas.queryByTestId('tutorial-reset')).toBeNull();
     (document.activeElement as HTMLElement | null)?.blur();
   },
 };
