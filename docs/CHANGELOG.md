@@ -6,6 +6,19 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ## [Unreleased]
 
+### Added
+
+- A tutorial, opened from the toolbar icon's right-click menu, walks
+  through Ctrl+A, Ctrl+E, Alt+B, Ctrl+K and Ctrl+Y one step at a time
+  in a field of its own. A step passes when the chord leaves the field
+  as shown; a step whose key is unassigned is named as skipped. The
+  last screen shows whether Ctrl+W and Ctrl+T are assigned and opens
+  Chrome's shortcuts page. The extension now asks for the
+  `contextMenus` permission, which installs without a warning. See
+  [ADR-0018](decisions/0018-tutorial.md), "a tutorial opens from the
+  toolbar icon's menu and advances on the field state each chord
+  produces".
+
 ## [0.0.9] - 2026-11-01
 
 ### Added
