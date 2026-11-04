@@ -47,6 +47,9 @@ keymap in force through `getActiveKeymap`.
   `chrome.commands.getAll()` to show whether each of the two commands
   has a shortcut. It does not wait for one; the tutorial ends here
   either way.
+- As the last step the field judges passes, the page throws one burst
+  of confetti, drawn with CSS by src/ui/celebrate.ts. A user who asks
+  for reduced motion gets none.
 - Progress is not stored. Each open starts at the first step.
 - The page's strings are English literals, as on the options page
   (ADR-0007).
@@ -88,11 +91,15 @@ time, not only once.
   most Then states without the chord.
 - Advancing on the keydown alone. A chord that matched but left the
   field unchanged, such as Ctrl+Y with an empty kill ring, would pass.
+- canvas-confetti for the burst. Its default cannon draws in a Worker
+  built from a blob: URL, which the extension-page CSP refuses, and a
+  single burst would bring in a 25 KB library and its type package.
 
 ## Cost
 
 A permission, a context menu entry, one more page and build entry, and
 the stories, screenshots and e2e cases a page carries. A step's Given
 and Then are fixed text, so a change to how an operation behaves
-changes the step's Then with it. Outside English, the menu item is in
-the user's language and the page it opens is not.
+changes the step's Then with it. The confetti's motion is code of our
+own, so tuning how it looks is ours too. Outside English, the menu item
+is in the user's language and the page it opens is not.
