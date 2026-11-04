@@ -112,11 +112,13 @@
 
 /*
  * The tutorial's confetti (src/ui/celebrate.ts). A piece is thrown up from
- * the bottom centre: its carrier drifts sideways at a steady pace by
- * `--drift`, while the paper inside decelerates up to `--peak`, then
- * accelerates back down past the bottom edge, turning by `--turn`. The two
- * motions together trace a parabola. The peak sits a little before half the
- * flight because the fall runs slightly further than the rise.
+ * the bottom centre. Its carrier is flung sideways and slows quickly, as air
+ * stops paper, reaching `--drift` by the peak and then drifting a little
+ * further on the way down. The paper inside decelerates up to `--peak`, then
+ * accelerates back down past the bottom edge, turning by `--turn`. The
+ * sideways motion settling first is what curves the path out and over. The
+ * peak sits a little before half the flight because the fall runs slightly
+ * further than the rise.
  */
 .confetti {
   position: fixed;
@@ -145,8 +147,15 @@
 }
 
 @keyframes confetti-drift {
-  to {
+  0% {
+    translate: 0 0;
+    animation-timing-function: cubic-bezier(0.1, 0.8, 0.3, 1);
+  }
+  48% {
     translate: var(--drift) 0;
+  }
+  100% {
+    translate: calc(var(--drift) * 1.15) 0;
   }
 }
 
