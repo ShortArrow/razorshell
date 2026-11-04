@@ -48,6 +48,32 @@ export const ResetRestoresGiven: Story = {
   },
 };
 
+export const SkippedStepsNamed: Story = {
+  args: {
+    keymap: defaultKeymap.map((entry) =>
+      entry.id === 'delete_to_the_end_of_the_line' ? { ...entry, unassigned: true } : entry),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const skipped = canvas.getAllByTestId('tutorial-skipped');
+    await expect(skipped).toHaveLength(2);
+    await expect(skipped[0]).toHaveTextContent('Skipped: delete to the end of the line (no key assigned)');
+    await expect(skipped[1]).toHaveTextContent('Skipped: yank (needs delete to the end of the line)');
+    await expect(canvas.getByTestId('tutorial-step')).toHaveTextContent('move cursor to the beginning');
+    (document.activeElement as HTMLElement | null)?.blur();
+  },
+};
+
+export const NothingSkippedByDefault: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(canvas.queryByTestId('tutorial-skipped')).toBeNull();
+    (document.activeElement as HTMLElement | null)?.blur();
+  },
+};
+
 async function passEveryStep(canvas: ReturnType<typeof within>): Promise<void> {
   await userEvent.click(canvas.getByTestId('tutorial-field'));
   await userEvent.keyboard('{Control>}a{/Control}');

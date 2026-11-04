@@ -2,7 +2,8 @@ import React, { useLayoutEffect, useRef, useState } from "react";
 import { dispatchKey } from "../keyhandling";
 import { keyChord } from "../keychord";
 import { Keymap } from "../operation";
-import { advances, FieldState, stepsFor, TutorialStep } from "../tutorial";
+import { defaultKeymap } from "../keymap";
+import { advances, FieldState, SkippedStep, skippedFor, stepsFor, TutorialStep } from "../tutorial";
 
 function stateOf(field: HTMLInputElement): FieldState {
   return { value: field.value, selectionStart: field.selectionStart ?? 0, selectionEnd: field.selectionEnd ?? 0 };
@@ -22,6 +23,18 @@ function StepPrompt({ step, keymap }: { step: TutorialStep; keymap: readonly Key
   </p>;
 }
 
+/** An operation's name, from the defaults, since a skipped one may be missing from the keymap in force. */
+function labelOf(operationId: string): string {
+  return defaultKeymap.find((entry) => entry.id === operationId)?.label ?? operationId;
+}
+
+function SkippedNote({ skipped }: { skipped: SkippedStep }) {
+  const why = skipped.reason === "unassigned" ? "no key assigned" : `needs ${labelOf(skipped.step.restsOn!)}`;
+  return <p data-testid="tutorial-skipped" className="m-0 text-sm opacity-70">
+    Skipped: {labelOf(skipped.step.operationId)} ({why})
+  </p>;
+}
+
 function DoneCheck() {
   return <svg data-testid="tutorial-done-check" aria-hidden="true" viewBox="0 0 48 48" className="w-16 h-16">
     <circle cx="24" cy="24" r="22" className="fill-success" />
@@ -31,9 +44,10 @@ function DoneCheck() {
 }
 
 /**
- * The tutorial's lessons over the given keymap: one step at a time, its field
- * put in the step's Given state, and the next step shown once a key the keymap
- * handled leaves the field in the Then state (ADR-0018). `celebrate` is called
+ * The tutorial's lessons over the given keymap, under a note for each step it
+ * leaves out and why: one step at a time, its field put in the step's Given
+ * state, and the next step shown once a key the keymap handled leaves the
+ * field in the Then state (ADR-0018). `celebrate` is called
  * once, as the last step passes; the field then stays, read-only, showing what
  * that step left in it.
  */
@@ -62,6 +76,7 @@ export function TutorialApp({ keymap, celebrate }: { keymap: readonly Keymap[]; 
   };
 
   return <div className="flex flex-col w-full gap-3">
+    {skippedFor(keymap).map((skipped) => <SkippedNote key={skipped.step.operationId} skipped={skipped} />)}
     {step !== undefined && <StepPrompt step={step} keymap={keymap} />}
     <input
       ref={field}
