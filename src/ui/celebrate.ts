@@ -28,7 +28,8 @@ function piece(ellipse: { across: number; up: number }): HTMLElement {
   carrier.className = "confetti-piece";
   const paper = document.createElement("span");
   paper.className = "confetti-paper";
-  paper.style.background = `hsl(${Math.floor(between(0, 360))} 85% 60%)`;
+  const depth = between(0.5, 1.5);
+  paper.style.background = `hsl(${Math.floor(between(0, 360))} ${35 + (depth - 0.5) * 50}% 60%)`;
   const delay = `${between(0, MAX_DELAY_MS)}ms`;
   for (const element of [carrier, paper]) {
     element.style.animationDuration = `${FLIGHT_MS}ms`;
@@ -39,7 +40,6 @@ function piece(ellipse: { across: number; up: number }): HTMLElement {
   carrier.style.setProperty("--drift", `${ellipse.across * reach * Math.cos(angle)}px`);
   paper.style.setProperty("--peak", `${window.innerHeight / 2 + ellipse.up * reach * Math.sin(angle)}px`);
   paper.style.setProperty("--turn", `${between(-2, 2) * 720}deg`);
-  const depth = between(0.5, 1.5);
   paper.style.setProperty("--depth", `${depth}`);
   carrier.style.zIndex = `${Math.round(depth * 100)}`;
   carrier.append(paper);

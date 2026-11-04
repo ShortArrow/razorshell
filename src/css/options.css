@@ -117,7 +117,8 @@
  * further on the way down. The paper inside decelerates up to `--peak`, then
  * accelerates back down past the bottom edge, turning by `--turn`, and is
  * scaled by `--depth` so that pieces seem to fly at different distances; the
- * nearer, larger pieces are drawn over the farther ones. Every
+ * nearer, larger pieces are drawn over the farther ones, and the farther
+ * ones are paler. Every
  * piece peaks at the same moment, so the burst holds the shape its drifts
  * and peaks draw. The peak sits a little before half the flight because the
  * fall runs slightly further than the rise.
