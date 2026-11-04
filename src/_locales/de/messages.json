@@ -210,5 +210,9 @@
   "richtext_hint_body": {
     "message": "Aktiviere „Enable in rich text editors“ auf der Optionsseite, um die Tasten hier zu nutzen. Dieser Hinweis erscheint nur einmal.",
     "description": "Turn on \"Enable in rich text editors\" on the options page to use the keys here. This tip shows once."
+  },
+  "menu_tutorial": {
+    "message": "Tutorial",
+    "description": "Title of the toolbar icon's menu item that opens the tutorial"
   }
 }

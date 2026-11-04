@@ -210,5 +210,9 @@
   "richtext_hint_body": {
     "message": "在选项页面开启“Enable in rich text editors”即可在此使用快捷键。此提示只显示一次。",
     "description": "Turn on \"Enable in rich text editors\" on the options page to use the keys here. This tip shows once."
+  },
+  "menu_tutorial": {
+    "message": "教程",
+    "description": "Title of the toolbar icon's menu item that opens the tutorial"
   }
 }

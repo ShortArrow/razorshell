@@ -210,5 +210,9 @@
   "richtext_hint_body": {
     "message": "فعّل \"Enable in rich text editors\" في صفحة الخيارات لاستخدام الاختصارات هنا. يظهر هذا التنبيه مرة واحدة فقط.",
     "description": "Turn on \"Enable in rich text editors\" on the options page to use the keys here. This tip shows once."
+  },
+  "menu_tutorial": {
+    "message": "دليل تعليمي",
+    "description": "Title of the toolbar icon's menu item that opens the tutorial"
   }
 }

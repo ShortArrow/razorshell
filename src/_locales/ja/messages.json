@@ -210,5 +210,9 @@
   "richtext_hint_body": {
     "message": "オプションページで「Enable in rich text editors」を有効にすると、ここでもキーが使えます。この案内は一度だけ表示されます。",
     "description": "Turn on \"Enable in rich text editors\" on the options page to use the keys here. This tip shows once."
+  },
+  "menu_tutorial": {
+    "message": "チュートリアル",
+    "description": "Title of the toolbar icon's menu item that opens the tutorial"
   }
 }

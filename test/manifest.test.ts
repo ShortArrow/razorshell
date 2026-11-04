@@ -5,7 +5,8 @@
  * granted for the life of the extension, so a permission nothing calls is a
  * capability handed over for nothing in return. Editing runs entirely inside the
  * page through the statically declared content scripts, which need no
- * `activeTab` grant and no `scripting` API. Asserting the whole array rather
+ * `activeTab` grant and no `scripting` API. `contextMenus` puts the tutorial
+ * on the toolbar icon's menu and installs without a warning. Asserting the whole array rather
  * than the absence of two names is what makes a silently re-added permission go
  * red.
  */
@@ -22,8 +23,8 @@ const packageJson = JSON.parse(
 ) as { version: string };
 
 describe("the shipped manifest", () => {
-  test("the manifest asks for storage and hosts and nothing else", () => {
-    expect(manifest.permissions).toEqual(["storage"]);
+  test("the manifest asks for storage, the icon's menu and hosts and nothing else", () => {
+    expect(manifest.permissions).toEqual(["storage", "contextMenus"]);
     expect(manifest.host_permissions).toEqual(["*://*/*"]);
   });
 
