@@ -37,6 +37,9 @@ keymap in force through `getActiveKeymap`.
 - The step advances when a keydown that the keymap handled leaves the
   field in the Then state. A state reached by mouse, arrow keys or
   typing does not advance it. A Reset button puts the Given state back.
+  Once the last step passes, the field stays, read-only, showing what
+  that step left in it, since otherwise the effect of its chord is
+  never seen.
 - The steps, in order: Ctrl+A, Ctrl+E, Alt+B, Ctrl+K, Ctrl+Y. A step
   whose operation the keymap in force leaves unassigned is shown as
   skipped, with its name, and the next step opens. A step that rests
