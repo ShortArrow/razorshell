@@ -64,17 +64,38 @@ export const tutorialSteps: readonly TutorialStep[] = [
   },
 ];
 
+/** Why a step is left out: its operation has no binding, or it rests on a step left out. */
+export type SkipReason = "unassigned" | "rests-on-skipped";
+
+/** A step left out of the tutorial, and why. */
+export interface SkippedStep {
+  step: TutorialStep;
+  reason: SkipReason;
+}
+
 /**
- * The steps the given keymap can teach, in order: a step whose operation has
- * no entry in the keymap, or whose entry is unassigned (ADR-0012), is left out,
- * and so is a step that rests on one left out.
+ * Each step paired with why the given keymap leaves it out, or `undefined`
+ * for a step it can teach: an operation with no entry in the keymap, or whose
+ * entry is unassigned (ADR-0012), cannot be taught, nor can a step that rests
+ * on one left out.
  */
-export function stepsFor(keymap: readonly Keymap[]): TutorialStep[] {
-  const kept: TutorialStep[] = [];
-  for (const step of tutorialSteps) {
+function sortSteps(keymap: readonly Keymap[]): { step: TutorialStep; reason: SkipReason | undefined }[] {
+  const kept = new Set<string>();
+  return tutorialSteps.map((step) => {
     const bound = keymap.some((entry) => entry.id === step.operationId && entry.unassigned !== true);
-    const footing = step.restsOn === undefined || kept.some((earlier) => earlier.operationId === step.restsOn);
-    if (bound && footing) kept.push(step);
-  }
-  return kept;
+    const footing = step.restsOn === undefined || kept.has(step.restsOn);
+    const reason = !bound ? "unassigned" : !footing ? "rests-on-skipped" : undefined;
+    if (reason === undefined) kept.add(step.operationId);
+    return { step, reason };
+  });
+}
+
+/** The steps the given keymap can teach, in order. */
+export function stepsFor(keymap: readonly Keymap[]): TutorialStep[] {
+  return sortSteps(keymap).filter(({ reason }) => reason === undefined).map(({ step }) => step);
+}
+
+/** The steps the given keymap leaves out, in order, each with why. */
+export function skippedFor(keymap: readonly Keymap[]): SkippedStep[] {
+  return sortSteps(keymap).flatMap(({ step, reason }) => (reason === undefined ? [] : [{ step, reason }]));
 }

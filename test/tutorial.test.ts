@@ -8,7 +8,7 @@
 import { describe, expect, test } from "vitest";
 import { keyEventHandling } from "../src/keyhandling";
 import { defaultKeymap } from "../src/keymap";
-import { advances, stepsFor, tutorialSteps, type FieldState } from "../src/tutorial";
+import { advances, skippedFor, stepsFor, tutorialSteps, type FieldState } from "../src/tutorial";
 
 const then: FieldState = { value: "hello world", selectionStart: 0, selectionEnd: 0 };
 
@@ -110,5 +110,31 @@ describe("stepsFor", () => {
     const keymap = defaultKeymap.filter((entry) => entry.id !== "move_cursor_to_the_previous_word");
     expect(stepsFor(keymap).map((step) => step.operationId)).not.toContain("move_cursor_to_the_previous_word");
     expect(stepsFor(keymap)).toHaveLength(4);
+  });
+});
+
+describe("skippedFor", () => {
+  test("the default keymap skips nothing", () => {
+    expect(skippedFor(defaultKeymap)).toEqual([]);
+  });
+
+  test("an unassigned operation's step is skipped as unassigned", () => {
+    const keymap = defaultKeymap.map((entry) =>
+      entry.id === "move_cursor_to_the_beginning" ? { ...entry, unassigned: true } : entry);
+    expect(skippedFor(keymap)).toEqual([{ step: tutorialSteps[0], reason: "unassigned" }]);
+  });
+
+  test("a missing operation's step is skipped as unassigned", () => {
+    const keymap = defaultKeymap.filter((entry) => entry.id !== "move_cursor_to_the_previous_word");
+    expect(skippedFor(keymap)).toEqual([{ step: tutorialSteps[2], reason: "unassigned" }]);
+  });
+
+  test("the yank step is skipped for the kill step it rests on, after it", () => {
+    const keymap = defaultKeymap.map((entry) =>
+      entry.id === "delete_to_the_end_of_the_line" ? { ...entry, unassigned: true } : entry);
+    expect(skippedFor(keymap)).toEqual([
+      { step: tutorialSteps[3], reason: "unassigned" },
+      { step: tutorialSteps[4], reason: "rests-on-skipped" },
+    ]);
   });
 });
