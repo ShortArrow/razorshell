@@ -39,7 +39,9 @@ function piece(ellipse: { across: number; up: number }): HTMLElement {
   carrier.style.setProperty("--drift", `${ellipse.across * reach * Math.cos(angle)}px`);
   paper.style.setProperty("--peak", `${window.innerHeight / 2 + ellipse.up * reach * Math.sin(angle)}px`);
   paper.style.setProperty("--turn", `${between(-2, 2) * 720}deg`);
-  paper.style.setProperty("--depth", `${between(0.5, 1.5)}`);
+  const depth = between(0.5, 1.5);
+  paper.style.setProperty("--depth", `${depth}`);
+  carrier.style.zIndex = `${Math.round(depth * 100)}`;
   carrier.append(paper);
   return carrier;
 }
