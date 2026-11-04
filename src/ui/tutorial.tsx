@@ -22,6 +22,14 @@ function StepPrompt({ step, keymap }: { step: TutorialStep; keymap: readonly Key
   </p>;
 }
 
+function DoneCheck() {
+  return <svg data-testid="tutorial-done-check" aria-hidden="true" viewBox="0 0 48 48" className="w-16 h-16">
+    <circle cx="24" cy="24" r="22" className="fill-success" />
+    <path d="M14 25l7 7 13-15" fill="none" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"
+      className="stroke-success-content" />
+  </svg>;
+}
+
 /**
  * The tutorial's lessons over the given keymap: one step at a time, its field
  * put in the step's Given state, and the next step shown once a key the keymap
@@ -53,7 +61,10 @@ export function TutorialApp({ keymap, celebrate }: { keymap: readonly Keymap[]; 
   };
 
   if (step === undefined) {
-    return <p data-testid="tutorial-done" className="m-0">Done. Every step passed.</p>;
+    return <div data-testid="tutorial-done" className="flex flex-col items-center gap-3">
+      <DoneCheck />
+      <p className="m-0">Done. Every step passed.</p>
+    </div>;
   }
 
   return <div className="flex flex-col w-full gap-3">
