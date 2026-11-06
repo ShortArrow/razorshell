@@ -20,7 +20,7 @@ function StepPrompt({ step, keymap }: { step: TutorialStep; keymap: readonly Key
   return <p data-testid="tutorial-step" className="flex flex-wrap items-center gap-2 m-0">
     <span>{entry.label}:</span>
     <span className="flex items-center gap-1">
-      {chordOf(entry).map((label, index) => <kbd key={index} className="kbd kbd-sm">{label}</kbd>)}
+      {chordOf(entry).map((label, index) => <kbd key={index} className="kbd">{label}</kbd>)}
     </span>
   </p>;
 }
