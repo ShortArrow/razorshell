@@ -98,6 +98,10 @@ const storyIds = [
   "inspect-toast--conflicts",
   "inspect-toast--no-conflicts",
   "inspect-toast--inspect-mode",
+  "tutorial-tutorialapp--first-step",
+  "tutorial-tutorialapp--skipped-steps-named",
+  "tutorial-tutorialapp--all-steps-done",
+  "tutorial-tutorialapp--done-shows-browser-shortcuts",
 ];
 
 /** Stories deliberately not captured, each ending as a rendering above. */
@@ -135,6 +139,13 @@ const excludedStoryIds = [
   "options-testapp--ctrl-a-handled",
   "options-richtextapp--toggle-persists",
   "options-themeapp--system-default",
+  // end as FirstStep's layout: a step prompt, the field and Reset
+  "tutorial-tutorialapp--ctrl-a-advances",
+  "tutorial-tutorialapp--reset-restores-given",
+  "tutorial-tutorialapp--nothing-skipped-by-default",
+  // end as the AllStepsDone screen
+  "tutorial-tutorialapp--celebrates-once-when-done",
+  "tutorial-tutorialapp--done-opens-shortcuts-page",
 ];
 
 const themes = ["light", "dark"] as const;
