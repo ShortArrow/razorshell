@@ -17,6 +17,7 @@ type Story = StoryObj<typeof TutorialApp>;
 export const FirstStep: Story = {};
 
 export const CtrlAAdvances: Story = {
+  tags: ['@C1.21'],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
@@ -50,6 +51,7 @@ export const ResetRestoresGiven: Story = {
 };
 
 export const SkippedStepsNamed: Story = {
+  tags: ['@C1.21'],
   args: {
     keymap: defaultKeymap.map((entry) =>
       entry.id === 'delete_to_the_end_of_the_line' ? { ...entry, unassigned: true } : entry),
@@ -85,6 +87,7 @@ async function passEveryStep(canvas: ReturnType<typeof within>): Promise<void> {
 }
 
 export const AllStepsDone: Story = {
+  tags: ['@C1.21'],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
@@ -102,6 +105,7 @@ export const AllStepsDone: Story = {
 };
 
 export const CelebratesOnceWhenDone: Story = {
+  tags: ['@C1.21'],
   args: { celebrate: fn() },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);

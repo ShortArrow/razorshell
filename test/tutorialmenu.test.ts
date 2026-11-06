@@ -24,7 +24,7 @@ function fakeChrome() {
   return { api, install: () => installed(), click: (menuItemId: string | number) => clicked({ menuItemId }) };
 }
 
-describe("the tutorial menu item", () => {
+describe("the tutorial menu item @C1.21", () => {
   test("is created on the toolbar icon's menu, with its localized title, as the extension is installed", () => {
     const chrome = fakeChrome();
     registerTutorialMenu(chrome.api);

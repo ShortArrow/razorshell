@@ -598,7 +598,7 @@ test.describe("options page", () => {
  * describes assert.
  */
 test.describe("the tutorial", () => {
-  test("the tutorial throws its confetti without a page or console error", async () => {
+  test("the tutorial throws its confetti without a page or console error @C1.21", async () => {
     const tutorial = await context.newPage();
     const errors: string[] = [];
     tutorial.on("pageerror", (err) => errors.push(err.message));

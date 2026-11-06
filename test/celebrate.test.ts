@@ -15,7 +15,7 @@ function bursts(): NodeListOf<HTMLElement> {
   return document.querySelectorAll<HTMLElement>("[data-testid=confetti]");
 }
 
-describe("fireConfetti", () => {
+describe("fireConfetti @C1.21", () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });

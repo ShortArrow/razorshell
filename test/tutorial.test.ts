@@ -49,7 +49,7 @@ function stateOf(field: HTMLInputElement): FieldState {
   return { value: field.value, selectionStart: field.selectionStart!, selectionEnd: field.selectionEnd! };
 }
 
-describe("tutorialSteps", () => {
+describe("tutorialSteps @C1.21", () => {
   test("the steps teach start, end, word back, kill and yank, in that order", () => {
     expect(tutorialSteps.map((step) => step.operationId)).toEqual([
       "move_cursor_to_the_beginning",
@@ -85,7 +85,7 @@ describe("tutorialSteps", () => {
   });
 });
 
-describe("stepsFor", () => {
+describe("stepsFor @C1.21", () => {
   test("the default keymap keeps all five steps", () => {
     expect(stepsFor(defaultKeymap)).toEqual(tutorialSteps);
   });
@@ -113,7 +113,7 @@ describe("stepsFor", () => {
   });
 });
 
-describe("skippedFor", () => {
+describe("skippedFor @C1.21", () => {
   test("the default keymap skips nothing", () => {
     expect(skippedFor(defaultKeymap)).toEqual([]);
   });
