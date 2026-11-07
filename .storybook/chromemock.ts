@@ -45,6 +45,7 @@ let acceptLanguages = defaultAcceptLanguages;
 const armedSetFailures: string[] = [];
 const changeListeners: ChangeListener[] = [];
 const createdTabs: { url?: string }[] = [];
+let optionsPageOpenings = 0;
 
 type MockCommand = { name: string; description?: string; shortcut: string };
 
@@ -156,6 +157,7 @@ export function resetStorage(seed: Record<string, unknown> = {}): void {
   localStore = {};
   armedSetFailures.length = 0;
   createdTabs.length = 0;
+  optionsPageOpenings = 0;
   commands = unassignedCommands.map((command) => ({ ...command }));
 }
 
@@ -190,6 +192,18 @@ export function seedCommands(assignments: Record<string, string>): void {
  */
 export function openedTabs(): { url?: string }[] {
   return createdTabs.map((tab) => ({ ...tab }));
+}
+
+/**
+ * @fn openedOptionsPages
+ * @brief How many times `chrome.runtime.openOptionsPage` was called since the
+ *        last reset.
+ * @details As with `openedTabs`, a story cannot follow the page it opens, so
+ *          what it asserts is the request.
+ * @return The call count
+ */
+export function openedOptionsPages(): number {
+  return optionsPageOpenings;
 }
 
 /**
@@ -263,6 +277,7 @@ export function installChromeMock(): void {
     runtime: {
       getURL: (path: string) => path,
       getManifest: () => ({ version: mockManifestVersion }),
+      openOptionsPage: async () => { optionsPageOpenings += 1; },
     },
     tabs: {
       create: async (properties: { url?: string }) => {
