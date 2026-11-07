@@ -50,3 +50,5 @@ how.
   formatting boundary
 - [ADR-0018](0018-tutorial.md) — a tutorial opens from the toolbar
   icon's menu and advances on the field state each chord produces
+- [ADR-0019](0019-release-approval.md) — a release tag is checked and
+  tested, and the release is published only once its owner approves
