@@ -50,6 +50,12 @@ keymap in force through `getActiveKeymap`.
   `chrome.commands.getAll()` to show whether each of the two commands
   has a shortcut. It does not wait for one; the tutorial ends here
   either way.
+- Below it, the done screen names three sections of the options page
+  by their headings, Keymap, Rich text editors and URL policy, each
+  with what it does and how it starts, and a button opens the options
+  page with `chrome.runtime.openOptionsPage`. They are pointers, not
+  steps: the tutorial's field is a plain input under no URL rule, so
+  neither a rich text editor nor a rule can be tried in it.
 - As the last step the field judges passes, the page throws one burst
   of confetti, drawn with CSS by src/ui/celebrate.ts. A user who asks
   for reduced motion gets none.

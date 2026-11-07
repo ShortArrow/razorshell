@@ -13,7 +13,9 @@ Design rationale lives in [docs/decisions](decisions/README.md).
   in a field of its own. A step passes when the chord leaves the field
   as shown; a step whose key is unassigned is named as skipped. The
   last screen shows whether Ctrl+W and Ctrl+T are assigned and opens
-  Chrome's shortcuts page. The extension now asks for the
+  Chrome's shortcuts page, then points to the options page's keymap,
+  rich text and URL policy sections and opens it. The extension now
+  asks for the
   `contextMenus` permission, which installs without a warning. See
   [ADR-0018](decisions/0018-tutorial.md), "a tutorial opens from the
   toolbar icon's menu and advances on the field state each chord

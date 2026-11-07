@@ -53,7 +53,7 @@ function BrowserShortcuts() {
     return onPageRevisit(refresh);
   }, []);
 
-  return <div className="flex flex-col gap-1 text-sm">
+  return <div className="flex flex-col self-stretch gap-1 text-sm">
     <p className="m-0">Ctrl+W and Ctrl+T act only once assigned on Chrome's shortcuts page:</p>
     {browserChords.map((chord) => <p key={chord.command} data-testid={`tutorial-command-${chord.command}`} className="m-0">
       {chord.label}: {assigned[chord.command] === undefined
@@ -63,6 +63,23 @@ function BrowserShortcuts() {
     <button type="button" data-testid="tutorial-open-shortcuts" className="btn btn-sm self-start"
       onClick={openShortcutsPage}>
       Open Chrome's shortcuts page
+    </button>
+  </div>;
+}
+
+/**
+ * What the options page offers beyond the steps, under the headings it shows
+ * them by, with a button that opens it.
+ */
+function NextOnOptionsPage() {
+  return <div data-testid="tutorial-next" className="flex flex-col self-stretch gap-1 text-sm">
+    <p className="m-0">More on the options page:</p>
+    <p className="m-0"><strong>Keymap</strong>: rebind any of these keys.</p>
+    <p className="m-0"><strong>Rich text editors</strong>: turn the keys on in editors such as a mail body; off until you do.</p>
+    <p className="m-0"><strong>URL policy</strong>: choose the sites where the keys act; every site until you add a rule.</p>
+    <button type="button" data-testid="tutorial-open-options" className="btn btn-sm self-start"
+      onClick={() => void chrome.runtime.openOptionsPage()}>
+      Open the options page
     </button>
   </div>;
 }
@@ -124,6 +141,7 @@ export function TutorialApp({ keymap, celebrate }: { keymap: readonly Keymap[]; 
         <DoneCheck />
         <p className="m-0">Done. Every step passed.</p>
         <BrowserShortcuts />
+        <NextOnOptionsPage />
       </div>
       : <button type="button" data-testid="tutorial-reset" className="btn btn-sm self-start" onClick={putGiven}>
         Reset

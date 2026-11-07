@@ -146,6 +146,7 @@ const excludedStoryIds = [
   // end as the AllStepsDone screen
   "tutorial-tutorialapp--celebrates-once-when-done",
   "tutorial-tutorialapp--done-opens-shortcuts-page",
+  "tutorial-tutorialapp--done-opens-options-page",
 ];
 
 const themes = ["light", "dark"] as const;
