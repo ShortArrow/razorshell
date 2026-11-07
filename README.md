@@ -26,8 +26,8 @@ Then focus any text field and press `Ctrl` + `a`. The caret jumps to
 the start of the line. The options page has a test area that shows each
 chord's effect and the full keymap table.
 
-To run a build the store does not carry yet, load it unpacked. Every
-`v*` tag publishes a zip of the built extension on the
+To run a build the store does not carry yet, load it unpacked. Each
+release publishes a zip of the built extension on the
 [Releases page](https://github.com/ShortArrow/razorshell/releases):
 
 1. Download `razorshell-<version>.zip` from the release and unzip it.

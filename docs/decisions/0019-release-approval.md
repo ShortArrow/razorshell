@@ -1,18 +1,18 @@
 # ADR-0019: A release tag is checked and tested, and the release is published only once its owner approves
 
-Status: Draft
+Status: Accepted
 
 ## Context
 
-`.github/workflows/release.yml` runs on every pushed `v*` tag and goes
-straight through: tests, build, a check that the tag names the
-manifest's version, the zip, and `softprops/action-gh-release`, which
-publishes the GitHub Release. Pushing the tag is the step that cannot
-be taken back, so every tag waits on a person who has loaded `dist/`
-and tried the build, and on that same person to type the tag.
+`.github/workflows/release.yml` runs on every pushed `v*` tag, and its
+last step, `softprops/action-gh-release`, publishes a GitHub Release
+with the zip of `dist/`. Anyone who loads the extension unpacked takes
+it from there, so a published release cannot be taken back once it
+has been downloaded. Whether a build is fit to publish is known only
+after a person has loaded it and tried it.
 
-The tag check compares the tag with `src/manifest.json` only. A tag on
-a commit off main, or a version with no CHANGELOG section, passes.
+A tag can name a commit off main, or a version the manifest or the
+CHANGELOG does not carry, and only a check in the workflow stops it.
 
 ## Decision
 
@@ -26,9 +26,9 @@ a commit off main, or a version with no CHANGELOG section, passes.
     which waits for the repository owner's approval and admits only
     `v*` tags. It downloads the zip and creates the GitHub Release.
     Rejecting the approval publishes nothing.
-- The person who approves first loads the build and tries it. The
-  check that used to come before the tag comes before the approval.
-- A tag is then an ordinary step of cutting a release. A rejected one
+- The person who approves first loads the build and tries it.
+- A tag is an ordinary step of cutting a release, taken without
+  waiting on that check. A tag whose approval is rejected
   is removed with `git push --delete origin <tag>` and
   `git tag -d <tag>`.
 - Submitting the zip to the Chrome Web Store stays a manual step after
