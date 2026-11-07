@@ -1,18 +1,36 @@
 name: Release
 
+# How a release is guarded is ADR-0019: verify runs on every v* tag, and
+# publish waits in the release environment for the owner's approval.
+
 on:
   push:
     tags:
       - 'v*'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  release:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Check the tagged commit is on main
+        run: git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+
+      - name: Check the tag matches the manifest
+        run: |
+          manifest="v$(node -p "require('./src/manifest.json').version")"
+          echo "tag: ${GITHUB_REF_NAME}"
+          echo "manifest: ${manifest}"
+          test "${GITHUB_REF_NAME}" = "${manifest}"
+
+      - name: Check the changelog has the version's section
+        run: grep -qF "## [${GITHUB_REF_NAME#v}]" docs/CHANGELOG.md
 
       - uses: pnpm/action-setup@v6
 
@@ -35,17 +53,27 @@ jobs:
 
       - run: pnpm test:e2e
 
-      - name: Check the tag matches the manifest
-        run: |
-          manifest="v$(node -p "require('./src/manifest.json').version")"
-          echo "tag: ${GITHUB_REF_NAME}"
-          echo "manifest: ${manifest}"
-          test "${GITHUB_REF_NAME}" = "${manifest}"
-
       - name: Package dist
         run: |
           cd dist
           zip -r "../razorshell-${GITHUB_REF_NAME}.zip" .
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: razorshell
+          path: razorshell-*.zip
+          if-no-files-found: error
+
+  publish:
+    needs: verify
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: razorshell
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
