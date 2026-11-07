@@ -6,6 +6,8 @@ Design rationale lives in [docs/decisions](decisions/README.md).
 
 ## [Unreleased]
 
+## [0.0.10] - 2026-11-07
+
 ### Added
 
 - A tutorial, opened from the toolbar icon's right-click menu, walks
